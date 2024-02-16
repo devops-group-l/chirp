@@ -2,10 +2,9 @@ using Chirp.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using System.Text;
 
 namespace Chirp.WebService;
 
@@ -36,8 +35,23 @@ public class Program
 
     private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
-        services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(configuration.GetSection("AzureADB2C"));    
+        services.AddAuthentication("MyAuthenticationScheme")
+        .AddCookie("MyAuthenticationScheme", options =>
+        {
+            options.Cookie.Name = "MyAuthCookie";
+            options.LoginPath = "/Account/Login"; // Specify the login page
+            options.AccessDeniedPath = "/Account/AccessDenied"; // Specify the access denied page
+        });
+
+        services.AddAuthorization();
+
+        services.AddDistributedMemoryCache();
+        services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+        });   
         
         services.AddAuthorization(options =>
         {
@@ -94,7 +108,35 @@ public class Startup
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
+        // Use the session middleware
+        app.UseSession();
+
+        // Use the custom middleware
+        app.Use(async (context, next) =>
+        {
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+                // Optionally, perform database-related operations
+            }
+
+            if (context.Session.TryGetValue("user_id", out var userIdBytes))
+            {
+                var userId = Encoding.UTF8.GetString(userIdBytes);
+
+                // Store the userId in a way that it can be accessed during the request
+                context.Items["user_id"] = userId;
+
+                // Optionally, query the database using userId
+                var user = GetUserFromDatabase(userId); //Mangler en metode i AuthorRepositary 
+                // Store the user information for later use
+                context.Items["user"] = user;
+            }
+
+            await next.Invoke();
+        });
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapRazorPages();
