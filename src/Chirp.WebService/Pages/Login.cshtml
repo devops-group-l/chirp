@@ -1,0 +1,31 @@
+@page "/Login"
+@attribute [AllowAnonymous]
+@using Microsoft.AspNetCore.Authorization
+@model Chirp.WebService.Pages.LoginModel
+
+@{
+    ViewData["Title"] = "Chirp! - Sign Up";
+    Layout = "Shared/_Layout";
+}
+
+<div class="min-h-screen flex items-center justify-center">
+    <div class="container mx-auto">
+        <h2 class="text-3xl font-bold mb-4 text-center">Login!</h2>
+
+        <form asp-controller="Base" asp-action="RegisterUser" class="max-w-md mx-auto">
+            <div class="mb-4">
+                <input class="w-full p-2 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
+                    type="text" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="mb-4">
+                <input class="w-full p-2 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500"
+                    type="password" name="password" placeholder="Password" required>
+            </div>
+
+            <div class="text-center">
+                <input class="bg-gray-800 text-white font-bold py-2 px-4 rounded" type="submit" value="Login">
+            </div>
+        </form>
+    </div>
+</div>
