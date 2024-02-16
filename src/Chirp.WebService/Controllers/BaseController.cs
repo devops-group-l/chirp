@@ -56,6 +56,35 @@ public abstract class BaseController : Controller, IController
         }
     }
 
+    // POST: Cheep/Create
+    [HttpPost]
+    [Route("User/Register")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegisterUser(IFormCollection collection)
+    {
+        return await WithAuthAsync(async user =>
+        {
+            string? cheepText = collection["cheepText"];
+
+            if (String.IsNullOrEmpty(cheepText))
+            {
+                return RedirectWithError("Invalid input");
+            }
+
+            if (cheepText.Length > 160)
+            {
+                return RedirectWithError("Invalid input - cheep is too long (max 160 characters)");
+            }
+
+            await CheepRepository.AddCheep(new AddCheepDto
+            {
+                AuthorId = user.Id,
+                Text = cheepText
+            });
+            return Redirect(GetPathUrl());
+        });
+    }                   
+
     public ActionResult RedirectWithError(string errorMessage)
     {
         var pathUrl = GetPathUrl();
