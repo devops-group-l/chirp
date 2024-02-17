@@ -38,10 +38,7 @@ public class Program
     {
         services.AddHttpClient();
         services
-            .AddRazorPages(options =>
-            {
-                options.Conventions.AllowAnonymousToPage("/Index");
-            })
+            .AddRazorPages(_ => { })
             .AddMvcOptions(_ => { })
             .AddMicrosoftIdentityUI();
         

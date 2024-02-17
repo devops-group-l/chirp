@@ -53,9 +53,49 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("The two passwords do not match");
             }
 
-            var user = new AuthorDto{Id = new Guid(), Username = username, Name = username  };
+            var user = new AuthorDto{Id = new Guid(), Username = username, Name = username, Password = password };
 
             await AuthorRepository.AddAuthor(user);
+
+            return Redirect(GetPathUrl());
+        }
+
+        // POST: User/Login
+        [HttpPost]
+        [Route("User/Login")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(IFormCollection collection)
+        {
+            string? username = collection["username"];
+            string? password = collection["password"];
+
+            if (String.IsNullOrEmpty(username))
+            {
+                return RedirectWithError("You have to enter a username");
+            }
+            else if (String.IsNullOrEmpty(password))
+            {
+                return RedirectWithError("You have to enter a password");
+            }
+    
+
+            var authorWithUsernameExists = await _chirpDbContext.Authors.AnyAsync(a => a.Username == username);
+
+            if (!authorWithUsernameExists) 
+            {
+                return RedirectWithError("Invalid username");
+            }
+
+            var user = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.Username == username);
+
+            if (user.Password != password)
+            {
+                return RedirectWithError("Invalid password");
+            }
+            else 
+            { 
+                //add userID to session
+            }
 
             return Redirect(GetPathUrl());
         }

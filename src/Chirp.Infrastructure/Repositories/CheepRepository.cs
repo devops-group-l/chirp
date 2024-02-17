@@ -171,7 +171,7 @@ public class CheepRepository : ICheepRepository
             AuthorId = cheep.Author.AuthorId,
             AuthorName = cheep.Author.Name,
             AuthorUsername = cheep.Author.Username,
-            AuthorAvatarUrl = cheep.Author.AvatarUrl,
+            // AuthorAvatarUrl = cheep.Author.AvatarUrl,
             Text = cheep.Text,
             Timestamp = cheep.Timestamp,
             LikeCount = cheep.Likes.Count,
@@ -183,7 +183,7 @@ public class CheepRepository : ICheepRepository
                     CheepAuthorId = com.Cheep.Author.AuthorId,
                     AuthorName = com.CommentAuthor.Name,
                     AuthorUsername = com.CommentAuthor.Username,
-                    AuthorAvatarUrl = com.CommentAuthor.AvatarUrl,
+                    // AuthorAvatarUrl = com.CommentAuthor.AvatarUrl,
                     CommentId = com.CommentId,
                     Text = com.Text,
                     Timestamp = com.Timestamp

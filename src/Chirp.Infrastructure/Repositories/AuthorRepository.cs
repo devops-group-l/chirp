@@ -27,7 +27,7 @@ public class AuthorRepository : IAuthorRepository
                 Name = authorDto.Name,
                 Username = authorDto.Username,
                 Password = authorDto.Password,
-                AvatarUrl = authorDto.AvatarUrl
+                // AvatarUrl = authorDto.AvatarUrl
             });
             await _chirpDbContext.SaveChangesAsync();
         }
