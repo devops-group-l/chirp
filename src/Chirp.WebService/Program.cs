@@ -47,6 +47,13 @@ public class Program
         services.AddScoped<ILikeRepository, LikeRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddSingleton(configuration);
+
+        services.AddSession(options =>
+        {
+            options.Cookie.Name = ".Chirp.Session";
+            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            options.Cookie.IsEssential = true;
+        });
         
         var sqlConnectionString = new SqlConnectionStringBuilder(configuration.GetConnectionString("ChirpSqlDb"));
         string? password = configuration["DB:Password"];
@@ -80,6 +87,7 @@ public class Startup
         app.UseStaticFiles();
 
         app.UseRouting();
+        app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
         

@@ -94,7 +94,8 @@ namespace Chirp.WebService.Controllers
             }
             else 
             { 
-                //add userID to session
+            // Store user ID in the session
+            HttpContext.Session.SetString("UserId", user.AuthorId.ToString()); // Assuming Id is of type int, adjust accordingly
             }
 
             return Redirect(GetPathUrl());
