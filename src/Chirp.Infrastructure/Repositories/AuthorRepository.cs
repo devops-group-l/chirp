@@ -3,6 +3,7 @@ using Chirp.Core.Repositories;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace Chirp.Infrastructure.Repositories;
 
@@ -31,6 +32,11 @@ public class AuthorRepository : IAuthorRepository
             await _chirpDbContext.SaveChangesAsync();
         }
     }
+
+    // public async string GetAuthorById(string userId){
+
+    //     return "";
+    // }
     
     public async Task<List<string>> GetFollowsForAuthor(Guid authorId)
     {

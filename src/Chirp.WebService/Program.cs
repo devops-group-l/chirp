@@ -35,13 +35,13 @@ public class Program
 
     private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
-        services.AddAuthentication("MyAuthenticationScheme")
-        .AddCookie("MyAuthenticationScheme", options =>
-        {
-            options.Cookie.Name = "MyAuthCookie";
-            options.LoginPath = "/Account/Login"; // Specify the login page
-            options.AccessDeniedPath = "/Account/AccessDenied"; // Specify the access denied page
-        });
+        // services.AddAuthentication("MyAuthenticationScheme")
+        // .AddCookie("MyAuthenticationScheme", options =>
+        // {
+        //     options.Cookie.Name = "MyAuthCookie";
+        //     options.LoginPath = "/Account/Login"; // Specify the login page
+        //     options.AccessDeniedPath = "/Account/AccessDenied"; // Specify the access denied page
+        // });
 
         services.AddAuthorization();
 
@@ -115,23 +115,30 @@ public class Startup
         // Use the custom middleware
         app.Use(async (context, next) =>
         {
-            using (var scope = app.ApplicationServices.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
-                // Optionally, perform database-related operations
-            }
+            var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
 
             if (context.Session.TryGetValue("user_id", out var userIdBytes))
             {
-                var userId = Encoding.UTF8.GetString(userIdBytes);
+                var userId = new Guid(userIdBytes);
 
                 // Store the userId in a way that it can be accessed during the request
                 context.Items["user_id"] = userId;
 
                 // Optionally, query the database using userId
-                var user = GetUserFromDatabase(userId); //Mangler en metode i AuthorRepositary 
+                // var user = authorRepository.GetAuthorById(userId);
+
+                // if (user == null)
+                // {
+                //     // User not found in the database
+                //     // Log an error message
+                //     Console.WriteLine($"User with ID {userId} not found in the database.");
+
+                //     // Redirect to the homepage with an error message
+                //     context.Response.Redirect("/?error=UserNotFound");
+                //     return;
+                // }
                 // Store the user information for later use
-                context.Items["user"] = user;
+                // context.Items["user"] = user;
             }
 
             await next.Invoke();

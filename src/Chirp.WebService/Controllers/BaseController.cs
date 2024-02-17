@@ -10,6 +10,7 @@ public abstract class BaseController : Controller, IController
 {
     public virtual Func<ClaimsUser?> GetUser { get; }
     public virtual Func<string> GetPathUrl { get; }
+    public const string SessionKeyName = "_UserId";
     
     protected readonly IAuthorRepository AuthorRepository;
     protected readonly ICheepRepository CheepRepository;
@@ -24,7 +25,6 @@ public abstract class BaseController : Controller, IController
         
         GetUser = () => User.GetUser();
         LikeRepository = likeRepository;
-        GetUser = () => User.GetUser();
         GetPathUrl = () => Request.GetPathUrl();
     }
     
@@ -64,22 +64,47 @@ public abstract class BaseController : Controller, IController
     {
         return await WithAuthAsync(async user =>
         {
-            string? cheepText = collection["cheepText"];
+            string? username = collection["username"];
 
-            if (String.IsNullOrEmpty(cheepText))
+            if (String.IsNullOrEmpty(username))
             {
                 return RedirectWithError("Invalid input");
             }
 
-            if (cheepText.Length > 160)
+            string? email = collection["email"];
+
+            if (String.IsNullOrEmpty(email))
             {
-                return RedirectWithError("Invalid input - cheep is too long (max 160 characters)");
+                return RedirectWithError("Invalid input");
+            }
+            // else if (metode der ser om email findes i db){
+            //              
+            // }
+
+            string? password = collection["password"];
+
+            if (String.IsNullOrEmpty(password)){
+                return RedirectWithError("Invalid input");
             }
 
-            await CheepRepository.AddCheep(new AddCheepDto
+            string? password2 = collection["password2"];
+
+            if (String.IsNullOrEmpty(password2)){
+                return RedirectWithError("Invalid input");
+            } else if (password != password2){
+                return RedirectWithError("Password does not match");
+            }
+
+            var userId = new Guid();
+            context.Session.Set("user_id", userId.ToByteArray()); // sets the user_id var
+            
+
+            await AuthorRepository.AddAuthor(new AuthorDto
             {
-                AuthorId = user.Id,
-                Text = cheepText
+                Id = userId,
+                Name = user.Name,
+                Username = username,
+                AvatarUrl = "https://gravatar.com/avatar/d2f178641c50d4ea8127b8c8fd99c99c?s=400&d=identicon&r=x"
             });
             return Redirect(GetPathUrl());
         });
