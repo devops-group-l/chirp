@@ -125,20 +125,20 @@ public class Startup
                 context.Items["user_id"] = userId;
 
                 // Optionally, query the database using userId
-                // var user = authorRepository.GetAuthorById(userId);
+                var user = authorRepository.VarifyAuthorById(userId);
 
-                // if (user == null)
-                // {
-                //     // User not found in the database
-                //     // Log an error message
-                //     Console.WriteLine($"User with ID {userId} not found in the database.");
+                if (user == null)
+                {
+                    // User not found in the database
+                    // Log an error message
+                    Console.WriteLine($"User with ID {userId} not found in the database.");
 
-                //     // Redirect to the homepage with an error message
-                //     context.Response.Redirect("/?error=UserNotFound");
-                //     return;
-                // }
+                    // Redirect to the homepage with an error message
+                    context.Response.Redirect("/?error=UserNotFound");
+                    return;
+                }
                 // Store the user information for later use
-                // context.Items["user"] = user;
+                context.Items["user"] = user;
             }
 
             await next.Invoke();

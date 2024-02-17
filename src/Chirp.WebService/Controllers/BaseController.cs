@@ -23,7 +23,7 @@ public abstract class BaseController : Controller, IController
         CheepRepository = cheepRepository;
         CommentRepository = commentRepository;
         
-        GetUser = () => User.GetUser();
+        
         LikeRepository = likeRepository;
         GetPathUrl = () => Request.GetPathUrl();
     }
@@ -96,8 +96,7 @@ public abstract class BaseController : Controller, IController
             }
 
             var userId = new Guid();
-            context.Session.Set("user_id", userId.ToByteArray()); // sets the user_id var
-            
+            HttpContext.Session.Set("user_id", userId.ToByteArray()); // sets the user_id var
 
             await AuthorRepository.AddAuthor(new AuthorDto
             {

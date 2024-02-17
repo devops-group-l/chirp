@@ -33,10 +33,16 @@ public class AuthorRepository : IAuthorRepository
         }
     }
 
-    // public async string GetAuthorById(string userId){
+    public async Task<bool> VarifyAuthorById( Guid userId){
 
-    //     return "";
-    // }
+        Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == userId);
+        if (author == null)
+        {
+            return false;
+        }
+
+        return true;
+    }
     
     public async Task<List<string>> GetFollowsForAuthor(Guid authorId)
     {

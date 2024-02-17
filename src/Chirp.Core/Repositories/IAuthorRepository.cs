@@ -9,4 +9,6 @@ public interface IAuthorRepository
     public Task AddFollow(Guid authorId, Guid followId);
     public Task RemoveFollow(Guid authorId, Guid unfollowAuthorId);
     public Task<bool> DeleteAuthor(Guid authorId);
+
+    public Task<bool> VarifyAuthorById(Guid userId);
 }
