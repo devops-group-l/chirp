@@ -36,15 +36,6 @@ public class Program
 
     private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
-        services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(configuration.GetSection("AzureADB2C"));    
-        
-        services.AddAuthorization(options =>
-        {
-            // By default, all incoming requests will be authorized according to 
-            // the default policy
-            options.FallbackPolicy = options.DefaultPolicy;
-        });
         services.AddHttpClient();
         services
             .AddRazorPages(options =>

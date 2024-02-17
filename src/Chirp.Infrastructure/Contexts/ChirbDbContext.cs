@@ -17,7 +17,7 @@ public class ChirpDbContext : DbContext
         : base(options)
     {
         Database.Migrate(); // Required for tests
-        DbInitializer.SeedDatabase(this);
+        // DbInitializer.SeedDatabase(this);
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
