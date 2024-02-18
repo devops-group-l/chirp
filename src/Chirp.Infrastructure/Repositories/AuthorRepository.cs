@@ -24,7 +24,7 @@ public class AuthorRepository : IAuthorRepository
             _chirpDbContext.Authors.Add(new Author
             {
                 AuthorId = authorDto.Id,
-                Name = authorDto.Name,
+                Email = authorDto.Email,
                 Username = authorDto.Username,
                 Password = authorDto.Password,
                 // AvatarUrl = authorDto.AvatarUrl
@@ -42,6 +42,24 @@ public class AuthorRepository : IAuthorRepository
         if (author == null) return new List<string>();
 
         return GetFollows(author);
+    }
+
+    public async Task<AuthorDto?> GetAuthorById(Guid userId)
+    {
+
+        Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == userId);
+        if (author == null)
+        {
+            return null;
+        }
+
+        return new AuthorDto
+        {
+            Id = author.AuthorId,
+            Email = author.Email,
+            Username = author.Username,
+            Password = ""
+        };
     }
 
     private List<string> GetFollows(Author author)

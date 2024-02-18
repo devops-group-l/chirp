@@ -12,7 +12,7 @@
         <input name="__RequestVerificationToken" type="hidden"/>
         @Html.AntiForgeryToken()
         <button type="submit" style="background:none;border:none;color: purple;padding:0;margin-left: 10px;cursor:pointer">
-            Unfollow @(Model.AuthorName)
+            Unfollow @(Model.AuthorEmail)
         </button>
     </form>
 }

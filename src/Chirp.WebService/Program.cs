@@ -2,10 +2,7 @@ using Chirp.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
 
 namespace Chirp.WebService;
 
@@ -39,8 +36,7 @@ public class Program
         services.AddHttpClient();
         services
             .AddRazorPages(_ => { })
-            .AddMvcOptions(_ => { })
-            .AddMicrosoftIdentityUI();
+            .AddMvcOptions(_ => { });
         
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<ICheepRepository, CheepRepository>();
@@ -90,7 +86,40 @@ public class Startup
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
+        // Use the custom middleware
+        app.Use(async (context, next) =>
+        {
+            var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
+
+            if (context.Session.TryGetValue("UserId", out var userIdByte))
+            {
+                var userId = new Guid(userIdByte);
+
+                // Store the userId in a way that it can be accessed during the request
+                // context.Items["user_id"] = userId;
+
+                // Optionally, query the database using userId
+                var user = await authorRepository.GetAuthorById(userId);
+
+                if (user == null)
+                {
+                    // User not found in the database
+                    // Log an error message
+                    Console.WriteLine($"User with ID {userId} not found in the database.");
+
+                    // Redirect to the homepage with an error message
+                    context.Response.Redirect("/?error=UserNotFound");
+                    return;
+                }
+                Console.WriteLine($"---", user.Email);
+                // Store the user information for later use
+                context.Items["user"] = user;
+            }
+
+            await next(context);
+        });
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapRazorPages();

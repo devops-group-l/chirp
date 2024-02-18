@@ -8,11 +8,9 @@ public class Author
     [Key]
     public Guid AuthorId { get; set; }
 
-    [
-        MaxLength(50, ErrorMessage = "Username must contain less than 50 characters"),
-        MinLength(5, ErrorMessage = "Username must contain more than 5 characters")
-    ]
-    public required string Name { get; set; }
+    //https://stackoverflow.com/questions/53815532/dataannotations-for-valid-email-address
+    [EmailAddress(ErrorMessage = "The Email field is not a valid e-mail address.")]
+    public string Email { get; set; }
     
     [
         MaxLength(40, ErrorMessage = "Username must contain less than 40 characters"),

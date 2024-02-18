@@ -44,16 +44,17 @@ namespace Chirp.WebService.Controllers
 
             var authorWithUsernameExists = await _chirpDbContext.Authors.AnyAsync(a => a.Username == username);
 
-            if (authorWithUsernameExists) 
+            if (authorWithUsernameExists)
             {
                 return RedirectWithError("The username is already taken");
             }
 
-            if (password != password2) { 
+            if (password != password2)
+            {
                 return RedirectWithError("The two passwords do not match");
             }
 
-            var user = new AuthorDto{Id = new Guid(), Username = username, Name = username, Password = password };
+            var user = new AuthorDto { Id = new Guid(), Username = username, Email = email, Password = password };
 
             await AuthorRepository.AddAuthor(user);
 
@@ -77,11 +78,11 @@ namespace Chirp.WebService.Controllers
             {
                 return RedirectWithError("You have to enter a password");
             }
-    
+
 
             var authorWithUsernameExists = await _chirpDbContext.Authors.AnyAsync(a => a.Username == username);
 
-            if (!authorWithUsernameExists) 
+            if (!authorWithUsernameExists)
             {
                 return RedirectWithError("Invalid username");
             }
@@ -92,11 +93,21 @@ namespace Chirp.WebService.Controllers
             {
                 return RedirectWithError("Invalid password");
             }
-            else 
-            { 
-            // Store user ID in the session
-            HttpContext.Session.SetString("UserId", user.AuthorId.ToString()); // Assuming Id is of type int, adjust accordingly
+            else
+            {
+                // Store user ID in the session
+                HttpContext.Session.Set("UserId", user.AuthorId.ToByteArray()); // Assuming Id is of type int, adjust accordingly
             }
+
+            return Redirect(GetPathUrl());
+        }
+
+        [HttpGet]
+        [Route("User/Logout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout(IFormCollection collection)
+        {
+            HttpContext.Session.Remove("UserId");
 
             return Redirect(GetPathUrl());
         }
