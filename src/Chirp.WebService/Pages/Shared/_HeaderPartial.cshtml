@@ -11,9 +11,6 @@
 @inject ChirpDbContext _chirpDbContext
 @{
     AuthorDto? rawUser = (AuthorDto?)Context.Items["user"];
-
-    var url = HttpUtility.UrlEncode(Context.Request.Scheme + "://" + Context.Request.Host.Value + "/Users/DeleteAccount");
-    var deleteAccountUrl = $"https://BDSAGROUP11CHIRP.b2clogin.com/BDSAGROUP11CHIRP.onmicrosoft.com/oauth2/v2.0/authorize?p=B2C_1A_DELETE_MY_ACCOUNT&client_id=beb64166-c054-4fd6-b6a0-41828e2bae4b&nonce=defaultNonce&redirect_uri={url}&scope=openid&response_type=id_token&prompt=login";
 }
 
 <header class="relative flex items-center justify-between p-4 bg-gray-200">
@@ -98,7 +95,10 @@
                     <!-- Modal footer -->
                     <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b">
                         <button data-modal-hide="delete-account-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">Cancel</button>
-                        <a href="@deleteAccountUrl" data-modal-hide="delete-account-modal" type="button" class="ms-3 text-white bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Delete</a>
+                        <form asp-controller="User" asp-action="DeleteUser" method="post">
+                            @Html.AntiForgeryToken()
+                        <button type="submit" data-modal-hide="delete-account-modal" class="ms-3 text-white bg-red-500 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Delete</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -114,9 +114,11 @@
             <span class="text-white">@(user.Username)</span>
         </button>
         <div id="user-dropdown" class="z-10 overflow-hidden hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-[max-content] flex-col">
-            <button asp-controller="User" 
-                asp-action="Logout" 
-                class="block px-4 py-2 hover:bg-blue-500 text-black hover:text-white">Log out</button>
+            <form asp-controller="User" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+
+                <button type="submit" class="block px-4 py-2 hover:bg-blue-500 text-black hover:text-white">Log out</button>
+            </form>
             <button href="#" data-modal-target="delete-account-modal" data-modal-toggle="delete-account-modal" type="button" class="block px-4 py-2 hover:bg-red-500 text-red hover:text-white">
                 Delete Account
             </button>

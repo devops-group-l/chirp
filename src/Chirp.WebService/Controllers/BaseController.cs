@@ -41,7 +41,7 @@ public abstract class BaseController : Controller, IController
                 Id = user.Id,
                 Email = user.Email,
                 Username = user.Username,
-                // AvatarUrl = user.AvatarUrl,
+                AvatarUrl = user.AvatarUrl,
             });
 
             return await protectedFunction(user);

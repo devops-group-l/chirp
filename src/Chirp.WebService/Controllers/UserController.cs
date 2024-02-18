@@ -8,10 +8,10 @@ namespace Chirp.WebService.Controllers
 {
     public class UserController : BaseController
     {
-        private readonly ChirpDbContext _chirpDbContext;
+        private readonly IAuthorRepository _authorRepository;
         public UserController(ChirpDbContext chirpDbContext, IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository)
         {
-            _chirpDbContext = chirpDbContext;
+            _authorRepository = authorRepository;
         }
 
         // POST: User/Register
@@ -42,9 +42,9 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("Invalid input");
             }
 
-            var authorWithUsernameExists = await _chirpDbContext.Authors.AnyAsync(a => a.Username == username);
+            var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(username);
 
-            if (authorWithUsernameExists)
+            if ((bool)authorWithUsernameExists)
             {
                 return RedirectWithError("The username is already taken");
             }
@@ -80,14 +80,14 @@ namespace Chirp.WebService.Controllers
             }
 
 
-            var authorWithUsernameExists = await _chirpDbContext.Authors.AnyAsync(a => a.Username == username);
+            var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(username);
 
-            if (!authorWithUsernameExists)
+            if ((bool)!authorWithUsernameExists)
             {
                 return RedirectWithError("Invalid username");
             }
 
-            var user = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.Username == username);
+            var user = await _authorRepository.GetAuthorByName(username);
 
             if (user.Password != password)
             {
@@ -96,20 +96,40 @@ namespace Chirp.WebService.Controllers
             else
             {
                 // Store user ID in the session
-                HttpContext.Session.Set("UserId", user.AuthorId.ToByteArray()); // Assuming Id is of type int, adjust accordingly
+                HttpContext.Session.Set("UserId", user.Id.ToByteArray()); // Assuming Id is of type int, adjust accordingly
             }
 
-            return Redirect(GetPathUrl());
+            return Redirect("/");
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("User/Logout")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout(IFormCollection collection)
         {
             HttpContext.Session.Remove("UserId");
 
-            return Redirect(GetPathUrl());
+            return Redirect("/");
+        }
+
+        [HttpPost]
+        [Route("User/DeleteUser")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(IFormCollection collection)
+        {
+            AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
+            if (user is not null)
+            {
+                
+            }
+
+            //This part is weird, doesnt do anything
+
+            await _authorRepository.DeleteAuthor(user.Id);
+            Console.WriteLine("----egjierge----");
+
+            HttpContext.Session.Remove("UserId");
+            return Redirect("/");
         }
     }
 }

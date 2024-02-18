@@ -1,11 +1,12 @@
 @using Chirp.Core.Extensions
+@using Chirp.Core.Dto
 @model Chirp.Core.Dto.CheepDto
 
 @{
-    var user = User.GetUser();
+    AuthorDto? user = (AuthorDto?)Context.Items["user"];
 }
 
-@if (user is not null && !user.GetUserNonNull().Username.Equals(Model.AuthorUsername))
+@if (user is not null && !user.Username.Equals(Model.AuthorUsername))
 {
     <form asp-controller="Cheep" asp-action="Follow" style="display:inline;">
         <input type="hidden" name="CheepAuthorId" value="@Model.AuthorId"/>

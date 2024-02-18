@@ -23,7 +23,7 @@ public class Author
         MinLength(5, ErrorMessage = "URL must contain more than 5 characters")
     ]
     public required string Password { get; set; }
-    // public string AvatarUrl { get; set; }
+    public string AvatarUrl { get; set; }
     
     public ICollection<Cheep> Cheeps { get; } = new List<Cheep>();
     public ICollection<Comment> Comments { get; } = new List<Comment>();

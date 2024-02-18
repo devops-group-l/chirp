@@ -18,6 +18,7 @@ public class AuthorRepository : IAuthorRepository
     public async Task AddAuthor(AuthorDto authorDto)
     {
         var authorWithIdExists = await _chirpDbContext.Authors.AnyAsync(a => a.AuthorId == authorDto.Id);
+        string avatarurl = "https://ui-avatars.com/api/?name=" + authorDto.Username;
         
         if (!authorWithIdExists)
         {
@@ -27,7 +28,7 @@ public class AuthorRepository : IAuthorRepository
                 Email = authorDto.Email,
                 Username = authorDto.Username,
                 Password = authorDto.Password,
-                // AvatarUrl = authorDto.AvatarUrl
+                AvatarUrl = avatarurl
             });
             await _chirpDbContext.SaveChangesAsync();
         }
@@ -44,6 +45,12 @@ public class AuthorRepository : IAuthorRepository
         return GetFollows(author);
     }
 
+    public async Task<bool?> AuthorWithUsernameExists(string username) {
+        var result = await _chirpDbContext.Authors.AnyAsync(a => a.Username == username);
+        return result;
+    }
+     
+
     public async Task<AuthorDto?> GetAuthorById(Guid userId)
     {
 
@@ -59,6 +66,24 @@ public class AuthorRepository : IAuthorRepository
             Email = author.Email,
             Username = author.Username,
             Password = ""
+        };
+    }
+
+    public async Task<AuthorDto?> GetAuthorByName(string userName)
+    {
+
+        Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.Username == userName);
+        if (author == null)
+        {
+            return null;
+        }
+
+        return new AuthorDto
+        {
+            Id = author.AuthorId,
+            Email = author.Email,
+            Username = author.Username,
+            Password = author.Password
         };
     }
 
@@ -111,13 +136,13 @@ public class AuthorRepository : IAuthorRepository
     {
         return WithErrorHandlingDefaultValueAsync(false, async () =>
         {
-            Author? author = await _chirpDbContext.Authors.Include(a => a.Likes).Include(a => a.Comments).FirstOrDefaultAsync(a => a.AuthorId == authorId);
+            Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
             if (author is null) throw new NullReferenceException("Author not found");
 
-            // Delete user likes
-            _chirpDbContext.Likes.RemoveRange(author.Likes);
-            // Delete user comments
-            _chirpDbContext.Comments.RemoveRange(author.Comments);
+            // // Delete user likes
+            // _chirpDbContext.Likes.RemoveRange(author.Likes);
+            // // Delete user comments
+            // _chirpDbContext.Comments.RemoveRange(author.Comments);
             // Delete user
             _chirpDbContext.Authors.Remove(author);
 

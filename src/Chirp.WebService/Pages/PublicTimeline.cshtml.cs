@@ -43,11 +43,11 @@ public class PublicTimelineModel: PageModel
         List<LikeDto>? likes = null;
         
         //If the user is not null -> update the list of follows and likes
-        var user = User.GetUser();
+        AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
         if (user is not null)
         {
-            follows = await _authorRepository.GetFollowsForAuthor(user.GetUserNonNull().Id);
-            likes = await _likeRepository.GetLikesByAuthorId(user.GetUserNonNull().Id);
+            follows = await _authorRepository.GetFollowsForAuthor(user.Id);
+            likes = await _likeRepository.GetLikesByAuthorId(user.Id);
         }
         
         //Generate a cheep model for each CheepDto on page

@@ -112,7 +112,6 @@ public class Startup
                     context.Response.Redirect("/?error=UserNotFound");
                     return;
                 }
-                Console.WriteLine($"---", user.Email);
                 // Store the user information for later use
                 context.Items["user"] = user;
             }

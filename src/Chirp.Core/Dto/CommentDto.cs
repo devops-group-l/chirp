@@ -16,7 +16,7 @@ public class CommentDto
     public required Guid CheepId { get; init; }
     public required string AuthorEmail { get; init; }
     public required string AuthorUsername { get; init; }
-    // public required string AuthorAvatarUrl { get; init; }
+    public required string AuthorAvatarUrl { get; init; }
     public required string Text { get; init; }
     public required DateTime Timestamp { get; init; }
 }
