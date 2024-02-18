@@ -2,10 +2,7 @@ using Chirp.Core.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Repositories;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
 
 namespace Chirp.WebService;
 
@@ -36,29 +33,23 @@ public class Program
 
     private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
-        services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(configuration.GetSection("AzureADB2C"));    
-        
-        services.AddAuthorization(options =>
-        {
-            // By default, all incoming requests will be authorized according to 
-            // the default policy
-            options.FallbackPolicy = options.DefaultPolicy;
-        });
         services.AddHttpClient();
         services
-            .AddRazorPages(options =>
-            {
-                options.Conventions.AllowAnonymousToPage("/Index");
-            })
-            .AddMvcOptions(_ => { })
-            .AddMicrosoftIdentityUI();
+            .AddRazorPages(_ => { })
+            .AddMvcOptions(_ => { });
         
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<ICheepRepository, CheepRepository>();
         services.AddScoped<ILikeRepository, LikeRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddSingleton(configuration);
+
+        services.AddSession(options =>
+        {
+            options.Cookie.Name = ".Chirp.Session";
+            options.IdleTimeout = TimeSpan.FromSeconds(10);
+            options.Cookie.IsEssential = true;
+        });
         
         var sqlConnectionString = new SqlConnectionStringBuilder(configuration.GetConnectionString("ChirpSqlDb"));
         string? password = configuration["DB:Password"];
@@ -92,9 +83,42 @@ public class Startup
         app.UseStaticFiles();
 
         app.UseRouting();
+        app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
+        // Use the custom middleware
+        app.Use(async (context, next) =>
+        {
+            var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
+
+            if (context.Session.TryGetValue("UserId", out var userIdByte))
+            {
+                var userId = new Guid(userIdByte);
+
+                // Store the userId in a way that it can be accessed during the request
+                // context.Items["user_id"] = userId;
+
+                // Optionally, query the database using userId
+                var user = await authorRepository.GetAuthorById(userId);
+
+                if (user == null)
+                {
+                    // User not found in the database
+                    // Log an error message
+                    Console.WriteLine($"User with ID {userId} not found in the database.");
+
+                    // Redirect to the homepage with an error message
+                    context.Response.Redirect("/?error=UserNotFound");
+                    return;
+                }
+                // Store the user information for later use
+                context.Items["user"] = user;
+            }
+
+            await next(context);
+        });
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapRazorPages();

@@ -1,13 +1,14 @@
 @using Chirp.Core.Extensions
+@using Chirp.Core.Dto
 
 @{
-    var rawUser = User.GetUser();
+    AuthorDto? rawUser = (AuthorDto?)Context.Items["user"];
 }
 @if (rawUser is not null)
 {
-    var user = rawUser.GetUserNonNull();
+    var user = rawUser;
     <div class="cheepbox">
-        <h3>What's on your mind @(user.Name)?</h3>
+        <h3>What's on your mind @(user.Username)?</h3>
         <form asp-controller="Cheep" asp-action="Create">
             <input style="float: left" type="text" name="cheepText" placeholder="This is a cheep...">
             <input type="submit" value="Share">

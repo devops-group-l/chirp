@@ -1,6 +1,10 @@
 @model Chirp.Core.Dto.CheepDto
+@using Chirp.Core.Dto
 
-@if (User.Identity is { IsAuthenticated: true })
+@{
+    AuthorDto? rawUser = (AuthorDto?)Context.Items["user"];
+}
+@if (rawUser != null)
 {
     <form asp-controller="Cheep" asp-action="Like" style="display:inline;">
         <input type="hidden" name="cheepId" value="@Model.CheepId"/>

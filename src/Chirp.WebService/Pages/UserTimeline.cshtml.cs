@@ -25,12 +25,12 @@ public class UserTimelineModel : PageModel
     
     public async Task<IActionResult> OnGet(string author)
     {
-        var user = User.GetUser();
+        AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
         // Get amount of pages
         int amountOfPages;
         if (user is not null)
         {
-            amountOfPages = (int)Math.Ceiling((double)await _cheepRepository.GetAuthorCheepCount(author, user.GetUserNonNull().Id) / 32);
+            amountOfPages = (int)Math.Ceiling((double)await _cheepRepository.GetAuthorCheepCount(author, user.Id) / 32);
         }
         else
         {
@@ -54,9 +54,9 @@ public class UserTimelineModel : PageModel
         }
         else
         {
-            if (user.GetUserNonNull().Username.Equals(author))
+            if (user.Username.Equals(author))
             {
-                cheepDtos = await _cheepRepository.GetAuthorCheepsForPageAsOwner(user.GetUserNonNull().Id, pageNumber);
+                cheepDtos = await _cheepRepository.GetAuthorCheepsForPageAsOwner(user.Id, pageNumber);
             }
             else
             {
@@ -73,8 +73,8 @@ public class UserTimelineModel : PageModel
                 //If the user is not null -> update the list of follows and likes
                 if (user is not null)
                 {
-                    follows = await _authorRepository.GetFollowsForAuthor(user.GetUserNonNull().Id);
-                    likes = await _likeRepository.GetLikesByAuthorId(user.GetUserNonNull().Id);
+                    follows = await _authorRepository.GetFollowsForAuthor(user.Id);
+                    likes = await _likeRepository.GetLikesByAuthorId(user.Id);
                 }
                 
                 //Generate a cheep model for each CheepDto on page

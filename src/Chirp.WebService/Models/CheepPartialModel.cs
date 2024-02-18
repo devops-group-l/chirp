@@ -6,7 +6,7 @@ public struct CheepPartialModel
     public Guid CheepId;
     public Guid AuthorId;
     public string AuthorAvatarUrl;
-    public string AuthorName;
+    public string AuthorEmail;
     public string AuthorUsername;
     public DateTime Timestamp;
     public string Text;
@@ -26,7 +26,7 @@ public struct CheepPartialModel
             CheepId = cheepDto.CheepId,
             AuthorId = cheepDto.AuthorId,
             AuthorAvatarUrl = cheepDto.AuthorAvatarUrl,
-            AuthorName = cheepDto.AuthorName ?? cheepDto.AuthorUsername,
+            AuthorEmail = cheepDto.AuthorEmail ?? cheepDto.AuthorUsername,
             AuthorUsername = cheepDto.AuthorUsername,
             Timestamp = cheepDto.Timestamp,
             Text = cheepDto.Text,
@@ -43,7 +43,7 @@ public struct CheepPartialModel
                     CheepAuthorId = c.CheepAuthorId,
                     CommentId = c.CommentId,
                     AuthorUsername = c.AuthorUsername,
-                    AuthorName = c.AuthorName,
+                    AuthorName = c.AuthorEmail,
                     Timestamp = c.Timestamp,
                     Text = c.Text,
                     CheepId = c.CheepId

@@ -17,27 +17,28 @@ public class ChirpDbContext : DbContext
         : base(options)
     {
         Database.Migrate(); // Required for tests
-        DbInitializer.SeedDatabase(this);
+        // DbInitializer.SeedDatabase(this);
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-    { 
+    {
         modelBuilder.Entity<Cheep>()
             .HasOne<Author>(c => c.Author)
             .WithMany(a => a.Cheeps)
             .HasForeignKey("AuthorId")
             .IsRequired();
-        
+
         modelBuilder.Entity<Author>()
             .HasMany<Author>(a => a.Follows)
             .WithMany(c => c.FollowedBy);
-        
+
         modelBuilder.Entity<Comment>()
             .HasOne<Author>(c => c.CommentAuthor)
             .WithMany(a => a.Comments)
             .HasForeignKey("AuthorId")
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
+
 
         modelBuilder.Entity<Comment>()
             .HasOne<Cheep>(c => c.Cheep)

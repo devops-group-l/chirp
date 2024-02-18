@@ -28,20 +28,20 @@ public abstract class BaseController : Controller, IController
         GetPathUrl = () => Request.GetPathUrl();
     }
     
-    protected async Task<IActionResult> WithAuthAsync(Func<ClaimsUser, Task<IActionResult>> protectedFunction)
+    protected async Task<IActionResult> WithAuthAsync(Func<AuthorDto, Task<IActionResult>> protectedFunction)
     {
         try
         {
-            var rawuser = GetUser();
-            if (rawuser is null) throw new ArgumentException("User is null in Auth async");
-            var user = rawuser.GetUserNonNull();
+            AuthorDto? rawUser = (AuthorDto?)HttpContext.Items["user"];
+            if (rawUser is null) throw new ArgumentException("User is null in Auth async");
+            var user = rawUser;
             
             await AuthorRepository.AddAuthor(new AuthorDto
             {
                 Id = user.Id,
-                Name = user.Name,
+                Email = user.Email,
                 Username = user.Username,
-                AvatarUrl = user.AvatarUrl
+                AvatarUrl = user.AvatarUrl,
             });
 
             return await protectedFunction(user);
@@ -54,7 +54,7 @@ public abstract class BaseController : Controller, IController
         {
             return BadRequest("Unknown Error Occurred");
         }
-    }
+    }                
 
     public ActionResult RedirectWithError(string errorMessage)
     {

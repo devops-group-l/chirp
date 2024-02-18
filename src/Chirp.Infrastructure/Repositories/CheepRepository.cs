@@ -169,7 +169,7 @@ public class CheepRepository : ICheepRepository
         new () {
             CheepId = cheep.CheepId,
             AuthorId = cheep.Author.AuthorId,
-            AuthorName = cheep.Author.Name,
+            AuthorEmail = cheep.Author.Email,
             AuthorUsername = cheep.Author.Username,
             AuthorAvatarUrl = cheep.Author.AvatarUrl,
             Text = cheep.Text,
@@ -181,7 +181,7 @@ public class CheepRepository : ICheepRepository
                     AuthorId = com.CommentAuthor.AuthorId,
                     CheepId = com.Cheep.CheepId,
                     CheepAuthorId = com.Cheep.Author.AuthorId,
-                    AuthorName = com.CommentAuthor.Name,
+                    AuthorEmail = com.CommentAuthor.Email,
                     AuthorUsername = com.CommentAuthor.Username,
                     AuthorAvatarUrl = com.CommentAuthor.AvatarUrl,
                     CommentId = com.CommentId,

@@ -28,12 +28,12 @@ public class UserStatisticsModel : PageModel
     
     public async Task<IActionResult> OnGet()
     {
-        var user = User.GetUser();
+        AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
 
         if (user is not null)
         {
-            Following = await _authorRepository.GetFollowsForAuthor(user.GetUserNonNull().Id);
-            Likes = await _likeRepository.GetLikesByAuthorId(user.GetUserNonNull().Id);
+            Following = await _authorRepository.GetFollowsForAuthor(user.Id);
+            Likes = await _likeRepository.GetLikesByAuthorId(user.Id);
         }
 
         HashSet<Guid> likeIds = new HashSet<Guid>();
@@ -43,8 +43,8 @@ public class UserStatisticsModel : PageModel
         }
         
         
-        var follows = await _authorRepository.GetFollowsForAuthor(user.GetUserNonNull().Id);
-        var likes = await _likeRepository.GetLikesByAuthorId(user.GetUserNonNull().Id);
+        var follows = await _authorRepository.GetFollowsForAuthor(user.Id);
+        var likes = await _likeRepository.GetLikesByAuthorId(user.Id);
 
         LikedCheeps = (await _cheepRepository.GetCheepsFromIds(likeIds))
             .Select(cheepDto =>
