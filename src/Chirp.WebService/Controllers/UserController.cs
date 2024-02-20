@@ -113,20 +113,18 @@ namespace Chirp.WebService.Controllers
         }
 
         [HttpPost]
-        [Route("User/DeleteUser")]
+        [Route("User/Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(IFormCollection collection)
         {
+            Console.WriteLine("----start----");
             AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
-            if (user is not null)
-            {
-                
-            }
+           
 
             //This part is weird, doesnt do anything
-
             await _authorRepository.DeleteAuthor(user.Id);
-            Console.WriteLine("----egjierge----");
+            Console.WriteLine("----efter ----");
+           
 
             HttpContext.Session.Remove("UserId");
             return Redirect("/");

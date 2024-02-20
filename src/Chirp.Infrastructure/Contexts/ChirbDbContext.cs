@@ -26,7 +26,8 @@ public class ChirpDbContext : DbContext
             .HasOne<Author>(c => c.Author)
             .WithMany(a => a.Cheeps)
             .HasForeignKey("AuthorId")
-            .IsRequired();
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<Author>()
             .HasMany<Author>(a => a.Follows)
