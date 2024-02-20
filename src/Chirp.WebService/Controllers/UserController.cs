@@ -54,11 +54,11 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("The two passwords do not match");
             }
 
-            var user = new AuthorDto { Id = new Guid(), Username = username, Email = email, Password = password };
+            var user = new AuthorDto { Id = new Guid() , Username = username, Email = email, Password = password };
 
             await AuthorRepository.AddAuthor(user);
 
-            return Redirect(GetPathUrl());
+            return Redirect("/Login");
         }
 
         // POST: User/Login
@@ -96,7 +96,7 @@ namespace Chirp.WebService.Controllers
             else
             {
                 // Store user ID in the session
-                HttpContext.Session.Set("UserId", user.Id.ToByteArray()); // Assuming Id is of type int, adjust accordingly
+                HttpContext.Session.Set("UserId", user.Id.ToByteArray()); 
             }
 
             return Redirect("/");
