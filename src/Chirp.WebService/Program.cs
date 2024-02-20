@@ -116,7 +116,7 @@ public class Startup
                 context.Items["user"] = user;
             }
 
-            await next(context);
+            await next.Invoke();
         });
 
         app.UseEndpoints(endpoints =>

@@ -132,24 +132,17 @@ public class AuthorRepository : IAuthorRepository
         await _chirpDbContext.SaveChangesAsync();
     }
 
-    public Task<bool> DeleteAuthor(Guid authorId)
+    public async Task DeleteAuthor(Guid authorId)
     {
-        return WithErrorHandlingDefaultValueAsync(false, async () =>
-        {
-            Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
-            if (author is null) throw new NullReferenceException("Author not found");
+        Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
+        if (author is null) throw new NullReferenceException("Author not found");
 
-            // // Delete user likes
-            // _chirpDbContext.Likes.RemoveRange(author.Likes);
-            // // Delete user comments
-            // _chirpDbContext.Comments.RemoveRange(author.Comments);
-            // Delete user
-            _chirpDbContext.Authors.Remove(author);
+        _chirpDbContext.Authors.Remove(author);
 
-            await _chirpDbContext.SaveChangesAsync();
-            return true;
-        });
+        await _chirpDbContext.SaveChangesAsync();
     }
+
+
 
     private async Task<T> WithErrorHandlingDefaultValueAsync<T>(T defaultValue, Func<Task<T>> function) where T : struct
     {

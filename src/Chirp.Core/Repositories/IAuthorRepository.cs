@@ -11,5 +11,5 @@ public interface IAuthorRepository
     public Task<List<string>> GetFollowsForAuthor(Guid authorId);
     public Task AddFollow(Guid authorId, Guid followId);
     public Task RemoveFollow(Guid authorId, Guid unfollowAuthorId);
-    public Task<bool> DeleteAuthor(Guid authorId);
+    public Task DeleteAuthor(Guid authorId);
 }
