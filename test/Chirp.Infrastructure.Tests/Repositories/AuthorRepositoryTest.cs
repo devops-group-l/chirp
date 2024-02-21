@@ -17,11 +17,12 @@ public class AuthorRepositoryTest
         Guid authorDtoId = Guid.NewGuid();
         string name = new Faker().Name.FullName();
         string username = new Faker().Internet.UserName(name);
+        string authorDtoMail = new Faker().Internet.Email();
         //Act
         await _mockChirpRepositories.AuthorRepository.AddAuthor(new AuthorDto
         {
             Id = authorDtoId,
-            Name = name,
+            Email = authorDtoMail,
             Username = username,
             AvatarUrl = new Faker().Internet.Avatar()
         });
@@ -78,11 +79,11 @@ public class AuthorRepositoryTest
         //Arrange
         Author author = _mockChirpRepositories.TestAuthors.First();
         //Act
-        bool? isRemoved = await _mockChirpRepositories.AuthorRepository.DeleteAuthor(author.AuthorId);
+        await _mockChirpRepositories.AuthorRepository.DeleteAuthor(author.AuthorId);
         //Assert
         _mockChirpRepositories.MockAuthorsDbSet.Verify(m => m.Remove(It.IsAny<Author>()), Times.Once);
         _mockChirpRepositories.MockChirpDbContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        Assert.True(isRemoved);
+        
     }
     
    
