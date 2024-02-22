@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using System.Net;
+using Chirp.Core.Dto;
+using Chirp.Infrastructure.Repositories;
 
 namespace Chirp.WebService.Controllers;
 [Route("api/[controller]")]//TODO: CHANGE
@@ -12,7 +14,7 @@ public class SimulationController : BaseController
 {
     private readonly string _latestFileLocation = "./SimulationModels/latest_processed_sim_action_id.txt";
     
-    public SimulationController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository)
+    public SimulationController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
     {
     }
 
@@ -46,9 +48,6 @@ public class SimulationController : BaseController
             error = "You have to enter a valid email address";
         else if (requestModel.pwd == null) error = "You have to enter a password";
         else if (await user_id_exists(requestModel.username)) error = "The username is already taken";
-        
-        //Passed validation checks -> register user
-        //TODO: Implement actual handling of user creation
 
         if (error != null)
         {
@@ -65,13 +64,13 @@ public class SimulationController : BaseController
     }
 
     [HttpGet("msgs")]
-    public HttpResponseMessage HandleMsgs()
+    public async Task<ActionResult> HandleMsgs()
     {
         update_latest(HttpContext);
 
-        bool valid = not_req_from_simulator(HttpContext);
+        bool illegalRequest = not_req_from_simulator(HttpContext);
 
-        if (!valid)
+        if (illegalRequest)
         {
             string error = "You are not authorized to use this resource!";
             JObject returnObject = new JObject
@@ -79,19 +78,98 @@ public class SimulationController : BaseController
                 { "status", 403 },
                 { "error_msg", error }
             };
-            
-            //Could not find built in .NET 403 status with message, so constructed my own
-            var rsp = new HttpResponseMessage(HttpStatusCode.Forbidden);
-            rsp.Content = new StringContent(returnObject.ToString());
-            return rsp;
-        }
-        
-        //TODO: Continue
 
-        return new HttpResponseMessage(HttpStatusCode.Forbidden);//Temp
+            return Forbid(returnObject.ToString());
+        }
+
+        int noMsgs = 0;
+        string noMsgsString = HttpContext.Request.Query["no"];
+        if (int.TryParse(noMsgsString, out int value)) noMsgs = value;
+
+        List<SimulationMessageDto> dtos = await SimulationRepository.GetMessages(noMsgs);
+
+        JArray messages = new JArray();
+        foreach(SimulationMessageDto dto in dtos)
+        {
+            JObject newMsg = new JObject();
+            newMsg.Add("Content", dto.text);
+            newMsg.Add("pub_date", dto.pub_date);
+            newMsg.Add("user", dto.username);
+            messages.Add(newMsg);
+        }
+
+        return Ok(messages);
     }
     
-    //TODO: Implement remaining GET/POST for msgs/username
+    [HttpGet("msgs/{username}")]
+    public async Task<ActionResult> HandleMsgsUsernameGet(string username)
+    {
+        update_latest(HttpContext);
+        
+        bool illegalRequest = not_req_from_simulator(HttpContext);
+
+        if (illegalRequest)
+        {
+            string error = "You are not authorized to use this resource!";
+            JObject returnObject = new JObject
+            {
+                { "status", 403 },
+                { "error_msg", error }
+            };
+
+            return Forbid(returnObject.ToString());
+        }
+
+        int noMsgs = 0;
+        string noMsgsString = HttpContext.Request.Query["no"];
+        if (int.TryParse(noMsgsString, out int value)) noMsgs = value;
+
+        if (!await user_id_exists(username)) return NotFound();
+
+        List<SimulationMessageDto> dtos = await SimulationRepository.GetSpecificMessages(username, noMsgs);
+        
+        JArray messages = new JArray();
+        foreach(SimulationMessageDto dto in dtos)
+        {
+            JObject newMsg = new JObject();
+            newMsg.Add("Content", dto.text);
+            newMsg.Add("pub_date", dto.pub_date);
+            newMsg.Add("user", dto.username);
+            messages.Add(newMsg);
+        }
+
+        return Ok(messages);
+    }
+
+    [HttpPost("msgs/{username}")]
+    public async Task<ActionResult> HandleMsgsUsernamePost(HTTPPostMessageModel requestModel)
+    {
+        update_latest(HttpContext);
+        
+        bool illegalRequest = not_req_from_simulator(HttpContext);
+
+        if (illegalRequest)
+        {
+            string error = "You are not authorized to use this resource!";
+            JObject returnObject = new JObject
+            {
+                { "status", 403 },
+                { "error_msg", error }
+            };
+
+            return Forbid(returnObject.ToString());
+        }
+
+        SimulationRepository.AddMessage(new SimulationMessageDto()
+        { 
+            username = requestModel.username,
+            text = requestModel.content,
+            pub_date = DateTime.UtcNow.ToString()
+        });
+
+        return NoContent();
+    }
+    
     //TODO: Implement remaining GET/POST for fllws/username
     
     //Helpers functions
