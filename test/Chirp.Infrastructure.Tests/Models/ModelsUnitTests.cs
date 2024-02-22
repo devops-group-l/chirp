@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Bogus;
 using Chirp.Infrastructure.Models;
 using Chirp.Tests.Core;
+using Microsoft.Graph;
 
 namespace Chirp.Infrastructure.Tests.Models;
 
@@ -13,15 +14,15 @@ public class ModelsUnitTests
         string name = new Faker().Name.FullName();
         string username = new Faker().Internet.UserName(name);
         string avatarUrl = new Faker().Internet.Avatar();
+        string password = new Faker().Internet.Password();
 
         Author author = new Author
         {
-            Name = name,
             Username = username,
+            Password = password,
             AvatarUrl = avatarUrl
         };
 
-        Assert.Equal(name, author.Name);
         Assert.Equal(username, author.Username);
         Assert.Equal(avatarUrl, author.AvatarUrl);
         Assert.Equal(Guid.Empty, author.AuthorId);
@@ -107,36 +108,38 @@ public class ModelsUnitTests
         Assert.True(cheepTime > timeNowMinusOneSecond);
     }
 
-    [Fact]
-    public void ExceptionTestNameLengthMin()
-    {
-        var author = new Author
-        {
-            Name = "1234",
-            Username = new Faker().Internet.UserName(),
-            AvatarUrl = new Faker().Internet.Avatar()
-        };
+//Is this test still relevant?
+    // [Fact]
+    // public void ExceptionTestNameLengthMin()
+    // {
+    //     var author = new Author
+    //     {
+    //         Name = "1234",
+    //         Username = new Faker().Internet.UserName(),
+    //         AvatarUrl = new Faker().Internet.Avatar()
+    //     };
 
-        var exception = Assert.Throws<System.ComponentModel.DataAnnotations.ValidationException>
-            (() => Validator.ValidateObject(author, new ValidationContext(author), true));
-        Assert.Contains("Username must contain more than 5 characters", exception.Message);
-    }
+    //     var exception = Assert.Throws<System.ComponentModel.DataAnnotations.ValidationException>
+    //         (() => Validator.ValidateObject(author, new ValidationContext(author), true));
+    //     Assert.Contains("Username must contain more than 5 characters", exception.Message);
+    // }
 
-    [Fact]
-    public void ExceptionTestNameLengthMax()
-    {
-        var author = new Author
-        {
-            Name = new string('a', 51),
-            Username = new Faker().Internet.UserName(),
-            AvatarUrl = new Faker().Internet.Avatar()
+//Is this test still relevant? Name is gone.
+    // [Fact]
+    // public void ExceptionTestNameLengthMax()
+    // {
+    //     var author = new Author
+    //     {
+    //         Username = new string('a', 51),
+    //         Username = new Faker().Internet.UserName(),
+    //         AvatarUrl = new Faker().Internet.Avatar()
 
-        };
+    //     };
 
-        var exception = Assert.Throws<System.ComponentModel.DataAnnotations.ValidationException>
-            (() => Validator.ValidateObject(author, new ValidationContext(author), true));
-        Assert.Contains("Username must contain less than 50 characters", exception.Message);
-    }
+    //     var exception = Assert.Throws<System.ComponentModel.DataAnnotations.ValidationException>
+    //         (() => Validator.ValidateObject(author, new ValidationContext(author), true));
+    //     Assert.Contains("Username must contain less than 50 characters", exception.Message);
+    // }
 
     [Fact]
     public void ExceptionTestCheepLengthMax()

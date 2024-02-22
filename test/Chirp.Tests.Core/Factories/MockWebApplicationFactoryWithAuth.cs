@@ -31,11 +31,11 @@ public class MockWebApplicationFactoryWithAuth : DbFixture, IAsyncLifetime, IDis
             webBuilder.UseStartup<Startup>();
             webBuilder.UseUrls(BaseUrl);
         })
-        .ConfigureServices(services => {
-            services
-                .AddAuthentication(defaultScheme: "E2EScheme")
-                .AddScheme<AuthenticationSchemeOptions, MockAuth>("E2EScheme",_ => {});
-        })
+        // .ConfigureServices(services => {
+        //     services
+        //         .AddAuthentication(defaultScheme: "E2EScheme")
+        //         .AddScheme<AuthenticationSchemeOptions, MockAuth>("E2EScheme",_ => {});
+        // })
         .Build();
     }
 

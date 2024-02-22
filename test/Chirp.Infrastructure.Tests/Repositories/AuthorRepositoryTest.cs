@@ -17,12 +17,13 @@ public class AuthorRepositoryTest
         Guid authorDtoId = Guid.NewGuid();
         string name = new Faker().Name.FullName();
         string username = new Faker().Internet.UserName(name);
+        string email = new Faker().Internet.Email();
         //Act
         await _mockChirpRepositories.AuthorRepository.AddAuthor(new AuthorDto
         {
             Id = authorDtoId,
-            Name = name,
             Username = username,
+            Email = email,
             AvatarUrl = new Faker().Internet.Avatar()
         });
         //Assert

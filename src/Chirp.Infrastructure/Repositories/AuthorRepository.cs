@@ -132,14 +132,17 @@ public class AuthorRepository : IAuthorRepository
         await _chirpDbContext.SaveChangesAsync();
     }
 
-    public async Task DeleteAuthor(Guid authorId)
+    public async Task<bool?> DeleteAuthor(Guid authorId)
     {
         Author? author = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
-        if (author is null) throw new NullReferenceException("Author not found");
+        if (author is null) { 
+            throw new NullReferenceException("Author not found");}
+       
 
         _chirpDbContext.Authors.Remove(author);
 
         await _chirpDbContext.SaveChangesAsync();
+        return true;
     }
 
 
