@@ -55,7 +55,7 @@ public class SimulationRepository : ISimulationRepository
         return dtoList.Take(amount).ToList();
     }
 
-    public void AddMessage(SimulationMessageDto message)
+    public async Task AddMessage(SimulationMessageDto message)
     {
         _chirpDbContext.SimulationMessages.Add(new SimulationMessage
         {
@@ -64,7 +64,7 @@ public class SimulationRepository : ISimulationRepository
             username = message.username
         });
 
-        _chirpDbContext.SaveChanges();
+        await _chirpDbContext.SaveChangesAsync();
     }
 
     public List<string> GetFollowsForUser(string username, int amount)

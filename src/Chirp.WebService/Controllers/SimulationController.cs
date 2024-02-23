@@ -1,18 +1,16 @@
-﻿using Chirp.Core.Repositories;
+﻿using System.Globalization;
+using Chirp.Core.Repositories;
 using Chirp.WebService.Controllers.SimulationModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
-using System.IO;
-using System.Net;
 using Chirp.Core.Dto;
-using Chirp.Infrastructure.Repositories;
 
 namespace Chirp.WebService.Controllers;
-[Route("api/[controller]")]//TODO: CHANGE
+[Route("api/[controller]")]
 [ApiController]
 public class SimulationController : BaseController
 {
-    private readonly string _latestFileLocation = "./SimulationModels/latest_processed_sim_action_id.txt";
+    private readonly string _latestFileLocation = "latest_processed_sim_action_id.txt";
     
     public SimulationController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
     {
@@ -21,14 +19,14 @@ public class SimulationController : BaseController
     [HttpGet("latest")]
     public ActionResult HandleLatest()
     {
-        int latestProcessedCommandId = -1;
+        int latestProcessedCommandId;
 
         try
         {
             string content = System.IO.File.ReadAllText(_latestFileLocation);
             latestProcessedCommandId = int.Parse(content);
         }
-        catch (Exception e)
+        catch
         {
             latestProcessedCommandId = -1;//Fallback
         }
@@ -80,7 +78,7 @@ public class SimulationController : BaseController
         if (illegalRequest) return ForbidAccess();
 
         int noMsgs = 0;
-        string noMsgsString = HttpContext.Request.Query["no"];
+        string? noMsgsString = HttpContext.Request.Query["no"];
         if (int.TryParse(noMsgsString, out int value)) noMsgs = value;
 
         List<SimulationMessageDto> dtos = await SimulationRepository.GetMessages(noMsgs);
@@ -88,10 +86,12 @@ public class SimulationController : BaseController
         JArray messages = new JArray();
         foreach(SimulationMessageDto dto in dtos)
         {
-            JObject newMsg = new JObject();
-            newMsg.Add("Content", dto.text);
-            newMsg.Add("pub_date", dto.pub_date);
-            newMsg.Add("user", dto.username);
+            JObject newMsg = new JObject
+            {
+                { "content", dto.text },
+                { "pub_date", dto.pub_date },
+                { "user", dto.username }
+            };
             messages.Add(newMsg);
         }
 
@@ -107,7 +107,7 @@ public class SimulationController : BaseController
         if (illegalRequest) return ForbidAccess();
         
         int noMsgs = 0;
-        string noMsgsString = HttpContext.Request.Query["no"];
+        string? noMsgsString = HttpContext.Request.Query["no"];
         if (int.TryParse(noMsgsString, out int value)) noMsgs = value;
 
         if (!user_id_exists(username)) return NotFound();
@@ -117,14 +117,16 @@ public class SimulationController : BaseController
         JArray messages = new JArray();
         foreach(SimulationMessageDto dto in dtos)
         {
-            JObject newMsg = new JObject();
-            newMsg.Add("Content", dto.text);
-            newMsg.Add("pub_date", dto.pub_date);
-            newMsg.Add("user", dto.username);
+            JObject newMsg = new JObject
+            {
+                { "content", dto.text },
+                { "pub_date", dto.pub_date },
+                { "user", dto.username }
+            };
             messages.Add(newMsg);
         }
 
-        return Ok(messages);
+        return Ok(messages.ToString());
     }
 
     [HttpPost("msgs/{username}")]
@@ -135,19 +137,18 @@ public class SimulationController : BaseController
         bool illegalRequest = not_req_from_simulator(HttpContext);
         if (illegalRequest) return ForbidAccess();
 
-        SimulationRepository.AddMessage(new SimulationMessageDto()
+        await SimulationRepository.AddMessage(new SimulationMessageDto()
         { 
             username = requestModel.username,
             text = requestModel.content,
-            pub_date = DateTime.UtcNow.ToString()
+            pub_date = DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)
         });
 
         return NoContent();
     }
     
-    //TODO: Implement remaining GET/POST for fllws/username
     [HttpGet("fllws/{username}")]
-    public async Task<ActionResult> HandleFllwsUsernameGet(string username)
+    public ActionResult HandleFllwsUsernameGet(string username)
     {
         update_latest(HttpContext);
         
@@ -158,7 +159,7 @@ public class SimulationController : BaseController
         if (!userExists) return NotFound();
 
         int noFollowers = 0;
-        string noFollowersString = HttpContext.Request.Query["no"];
+        string? noFollowersString = HttpContext.Request.Query["no"];
         if (int.TryParse(noFollowersString, out int value)) noFollowers = value;
 
         List<string> follows = SimulationRepository.GetFollowsForUser(username, noFollowers);
@@ -172,21 +173,19 @@ public class SimulationController : BaseController
     }
 
     [HttpPost("fllws/{username}")]
-    public async Task<ActionResult> HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel)
+    public ActionResult HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel)
     {
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
         if (illegalRequest) return ForbidAccess();
-        
-        bool userExists = user_id_exists(requestModel.username);
-        if (!userExists) return NotFound();
+
+        if (!user_id_exists(requestModel.username)) return NotFound();
         
         //Determine if follow or unfollow request
         if (requestModel.follow != null)
         {
-            bool followExist = user_id_exists(requestModel.follow);
-            if (!followExist) return NotFound();
+            if (!user_id_exists(requestModel.follow)) return NotFound();
 
             SimulationRepository.AddFollower(requestModel.username, requestModel.follow);
             return NoContent();
@@ -194,8 +193,7 @@ public class SimulationController : BaseController
 
         if (requestModel.unfollow != null)
         {
-            bool followExist = user_id_exists(requestModel.unfollow);
-            if (!followExist) return NotFound();
+            if (!user_id_exists(requestModel.unfollow)) return NotFound();
 
             SimulationRepository.RemoveFollower(requestModel.username, requestModel.unfollow);
             return NoContent();
@@ -215,7 +213,7 @@ public class SimulationController : BaseController
 
             if (!value.Equals("Basic c2ltdWxhdG9yOnN1cGVyX3NhZmUh")) return true;
         }
-        catch (Exception e)
+        catch
         {
             return true;//Invalid request header
         }
@@ -239,18 +237,14 @@ public class SimulationController : BaseController
     {
         string? parsedCommandIdString = request.Request.Query["latest"];
         int parsedCommandId = -1;
-
-        //Convert the query value to an integer
+        
         if (!string.IsNullOrEmpty(parsedCommandIdString))
         {
             if (int.TryParse(parsedCommandIdString, out int intValue)) parsedCommandId = intValue;
         }
         
         //If command is valid -> store in .txt file
-        if (parsedCommandId != -1)
-        {
-            System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
-        }
+        if (parsedCommandId != -1) System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
     }
     
     private Boolean user_id_exists(string username)

@@ -10,7 +10,7 @@ public interface ISimulationRepository
 
     public Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount);
 
-    public void AddMessage(SimulationMessageDto message);
+    public Task AddMessage(SimulationMessageDto message);
 
     public List<string> GetFollowsForUser(string username, int amount);
 
