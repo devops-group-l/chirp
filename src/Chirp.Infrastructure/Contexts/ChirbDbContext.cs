@@ -14,6 +14,8 @@ public class ChirpDbContext : DbContext
 
     public virtual DbSet<SimulationUser> SimulationUsers { get; set; } = null!;
     public virtual DbSet<SimulationMessage> SimulationMessages { get; set; } = null!;
+
+    public virtual DbSet<SimulationFollows> SimulationFollows { get; set; } = null!;
     public ChirpDbContext() {}
 
     public ChirpDbContext(DbContextOptions<ChirpDbContext> options)

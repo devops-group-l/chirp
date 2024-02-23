@@ -42,12 +42,12 @@ public class SimulationController : BaseController
         update_latest(HttpContext);
 
         string? error = null;
-
-        if (requestModel.username == null) error = "You have to enter a username";
-        else if (requestModel.email == null || requestModel.email.Contains("@"))
+        
+        if (string.IsNullOrEmpty(requestModel.username)) error = "You have to enter a username";
+        else if (string.IsNullOrEmpty(requestModel.email) || !requestModel.email.Contains("@"))
             error = "You have to enter a valid email address";
-        else if (requestModel.pwd == null) error = "You have to enter a password";
-        else if (await user_id_exists(requestModel.username)) error = "The username is already taken";
+        else if (string.IsNullOrEmpty(requestModel.pwd)) error = "You have to enter a password";
+        else if (user_id_exists(requestModel.username)) error = "The username is already taken";
 
         if (error != null)
         {
@@ -57,8 +57,16 @@ public class SimulationController : BaseController
                 { "error_msg", error }
             };
 
-            return BadRequest(returnModel);
+            return BadRequest(returnModel.ToString());
         }
+        
+        //Create user
+        await SimulationRepository.AddUser(new SimulationUserDto()
+        {
+            Email = requestModel.email,
+            Username = requestModel.username,
+            PwdHashed = requestModel.pwd,
+        });//TODO: HASH PWD?
 
         return NoContent();//HTTP 204
     }
@@ -69,18 +77,7 @@ public class SimulationController : BaseController
         update_latest(HttpContext);
 
         bool illegalRequest = not_req_from_simulator(HttpContext);
-
-        if (illegalRequest)
-        {
-            string error = "You are not authorized to use this resource!";
-            JObject returnObject = new JObject
-            {
-                { "status", 403 },
-                { "error_msg", error }
-            };
-
-            return Forbid(returnObject.ToString());
-        }
+        if (illegalRequest) return ForbidAccess();
 
         int noMsgs = 0;
         string noMsgsString = HttpContext.Request.Query["no"];
@@ -98,7 +95,7 @@ public class SimulationController : BaseController
             messages.Add(newMsg);
         }
 
-        return Ok(messages);
+        return Ok(messages.ToString());
     }
     
     [HttpGet("msgs/{username}")]
@@ -107,24 +104,13 @@ public class SimulationController : BaseController
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
-
-        if (illegalRequest)
-        {
-            string error = "You are not authorized to use this resource!";
-            JObject returnObject = new JObject
-            {
-                { "status", 403 },
-                { "error_msg", error }
-            };
-
-            return Forbid(returnObject.ToString());
-        }
-
+        if (illegalRequest) return ForbidAccess();
+        
         int noMsgs = 0;
         string noMsgsString = HttpContext.Request.Query["no"];
         if (int.TryParse(noMsgsString, out int value)) noMsgs = value;
 
-        if (!await user_id_exists(username)) return NotFound();
+        if (!user_id_exists(username)) return NotFound();
 
         List<SimulationMessageDto> dtos = await SimulationRepository.GetSpecificMessages(username, noMsgs);
         
@@ -147,18 +133,7 @@ public class SimulationController : BaseController
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
-
-        if (illegalRequest)
-        {
-            string error = "You are not authorized to use this resource!";
-            JObject returnObject = new JObject
-            {
-                { "status", 403 },
-                { "error_msg", error }
-            };
-
-            return Forbid(returnObject.ToString());
-        }
+        if (illegalRequest) return ForbidAccess();
 
         SimulationRepository.AddMessage(new SimulationMessageDto()
         { 
@@ -171,8 +146,65 @@ public class SimulationController : BaseController
     }
     
     //TODO: Implement remaining GET/POST for fllws/username
+    [HttpGet("fllws/{username}")]
+    public async Task<ActionResult> HandleFllwsUsernameGet(string username)
+    {
+        update_latest(HttpContext);
+        
+        bool illegalRequest = not_req_from_simulator(HttpContext);
+        if (illegalRequest) return ForbidAccess();
+
+        bool userExists = user_id_exists(username);
+        if (!userExists) return NotFound();
+
+        int noFollowers = 0;
+        string noFollowersString = HttpContext.Request.Query["no"];
+        if (int.TryParse(noFollowersString, out int value)) noFollowers = value;
+
+        List<string> follows = SimulationRepository.GetFollowsForUser(username, noFollowers);
+
+        JObject returnable = new JObject
+        {
+            { "follows", JArray.FromObject(follows) }
+        };
+
+        return Ok(returnable);
+    }
+
+    [HttpPost("fllws/{username}")]
+    public async Task<ActionResult> HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel)
+    {
+        update_latest(HttpContext);
+        
+        bool illegalRequest = not_req_from_simulator(HttpContext);
+        if (illegalRequest) return ForbidAccess();
+        
+        bool userExists = user_id_exists(requestModel.username);
+        if (!userExists) return NotFound();
+        
+        //Determine if follow or unfollow request
+        if (requestModel.follow != null)
+        {
+            bool followExist = user_id_exists(requestModel.follow);
+            if (!followExist) return NotFound();
+
+            SimulationRepository.AddFollower(requestModel.username, requestModel.follow);
+            return NoContent();
+        }
+
+        if (requestModel.unfollow != null)
+        {
+            bool followExist = user_id_exists(requestModel.unfollow);
+            if (!followExist) return NotFound();
+
+            SimulationRepository.RemoveFollower(requestModel.username, requestModel.unfollow);
+            return NoContent();
+        }
+
+        return BadRequest();
+    }
     
-    //Helpers functions
+    //Helper functions
     private Boolean not_req_from_simulator(HttpContext request)
     {
         if (!request.Request.Headers.ContainsKey("Authorization")) return true;
@@ -189,6 +221,18 @@ public class SimulationController : BaseController
         }
         
         return false;
+    }
+
+    private ActionResult ForbidAccess()
+    {
+        string error = "You are not authorized to use this resource!";
+        JObject returnObject = new JObject
+        {
+            { "status", 403 },
+            { "error_msg", error }
+        };
+
+        return StatusCode(403, returnObject.ToString());
     }
     
     private void update_latest(HttpContext request)
@@ -208,13 +252,9 @@ public class SimulationController : BaseController
             System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
         }
     }
-
-    //Same functionality as "get_user_id" from API Specification
-    private async Task<Boolean> user_id_exists(string username)
+    
+    private Boolean user_id_exists(string username)
     {
-        bool? result = await AuthorRepository.AuthorWithUsernameExists(username);
-
-        if (result == true) return true;
-        return false;
+        return SimulationRepository.CheckIfUserExists(username);
     }
 }

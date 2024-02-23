@@ -11,4 +11,12 @@ public interface ISimulationRepository
     public Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount);
 
     public void AddMessage(SimulationMessageDto message);
+
+    public List<string> GetFollowsForUser(string username, int amount);
+
+    public void AddFollower(string follower, string following);
+
+    public void RemoveFollower(string follower, string following);
+
+    public Boolean CheckIfUserExists(string username);
 }

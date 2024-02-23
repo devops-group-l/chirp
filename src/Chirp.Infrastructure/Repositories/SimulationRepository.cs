@@ -66,4 +66,40 @@ public class SimulationRepository : ISimulationRepository
 
         _chirpDbContext.SaveChanges();
     }
+
+    public List<string> GetFollowsForUser(string username, int amount)
+    {
+        var query = _chirpDbContext.SimulationFollows.Where(p => p.Follower == username).Select(p => p.Follows)
+            .Take(amount).ToList();
+
+        return query;
+    }
+
+    public void AddFollower(string follower, string following)
+    {
+        _chirpDbContext.SimulationFollows.Add(new SimulationFollows()
+        {
+            Follower = follower,
+            Follows = following
+        });
+
+        _chirpDbContext.SaveChanges();
+    }
+
+    public void RemoveFollower(string follower, string following)
+    {
+        SimulationFollows? follow =
+            _chirpDbContext.SimulationFollows.FirstOrDefault(p => p.Follower == follower && p.Follows == following);
+
+        if (follow != null) _chirpDbContext.SimulationFollows.Remove(follow);
+
+        _chirpDbContext.SaveChanges();
+    }
+
+    public Boolean CheckIfUserExists(string username)
+    {
+        SimulationUser? user = _chirpDbContext.SimulationUsers.FirstOrDefault(p => p.Username == username);
+
+        return user != null;
+    }
 }
