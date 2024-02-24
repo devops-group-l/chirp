@@ -1,15 +1,15 @@
 using Chirp.Core.Repositories;
 using Chirp.Core.Dto;
 using Microsoft.AspNetCore.Mvc;
-using Chirp.Infrastructure.Contexts;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Chirp.WebService.Controllers
 {
     public class UserController : BaseController
     {
         private readonly IAuthorRepository _authorRepository;
-        public UserController(ChirpDbContext chirpDbContext, IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository)
+        public UserController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository)
         {
             _authorRepository = authorRepository;
         }
@@ -54,7 +54,9 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("The two passwords do not match");
             }
 
-            var user = new AuthorDto { Id = new Guid() , Username = username, Email = email, Password = password };
+            string hashedPassword = SimpleHashPassword(password);
+
+            var user = new AuthorDto { Id = new Guid() , Username = username, Email = email, Password = hashedPassword };
 
             await AuthorRepository.AddAuthor(user);
 
@@ -68,7 +70,9 @@ namespace Chirp.WebService.Controllers
         public async Task<IActionResult> Login(IFormCollection collection)
         {
             string? username = collection["username"];
-            string? password = collection["password"];
+            string? enteredPassword = collection["password"];
+
+            string password = SimpleHashPassword(enteredPassword);
 
             if (String.IsNullOrEmpty(username))
             {
@@ -105,7 +109,7 @@ namespace Chirp.WebService.Controllers
         [HttpPost]
         [Route("User/Logout")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout(IFormCollection collection)
+        public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Remove("UserId");
 
@@ -115,19 +119,26 @@ namespace Chirp.WebService.Controllers
         [HttpPost]
         [Route("User/Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(IFormCollection collection)
+        public async Task<IActionResult> Delete()
         {
-            Console.WriteLine("----start----");
             AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
-           
-
-            //This part is weird, doesnt do anything
+            if (user is null) {
+                return RedirectWithError("No users found to be deleted!");
+            }
             await _authorRepository.DeleteAuthor(user.Id);
-            Console.WriteLine("----efter ----");
-           
 
             HttpContext.Session.Remove("UserId");
+            
             return Redirect("/");
+        }
+
+        static string SimpleHashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return Convert.ToBase64String(hashBytes);
+            }
         }
     }
 }
