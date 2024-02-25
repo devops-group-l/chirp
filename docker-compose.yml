@@ -1,0 +1,9 @@
+
+version: '3.4'
+
+services:
+  chirpwebservice:
+    image: chirpwebservice
+    build:
+      context: .
+      dockerfile: src/Chirp.WebService/Dockerfile

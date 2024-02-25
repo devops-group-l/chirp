@@ -105,6 +105,22 @@ However, a certificate can also be added with:
 ```shell
 dotnet dev-certs https
 ```
+---
+
+# How to containerize and run locally with docker
+You need to run two command, one for containerize and build the minitwit image and one for running the image
+
+To containerize the project go to the root: /chirp and run this command
+```shell
+docker build -f src/Chirp.WebService/Dockerfile -t minitwit --build-arg dbPassword=<YOUR_DB_PASSWORD> .
+```
+
+Now after the project has been containerized run:
+```shell
+docker run -p 8080:80 -e DB_PASSWORD=<YOUR_DB_PASSWORD>  minitwit
+```
+
+Now Minitwit should be running on http://localhost:8080/
 
 ---
 
