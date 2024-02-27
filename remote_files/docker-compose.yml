@@ -12,10 +12,10 @@ services:
       - chirp-network
 
   chirpwebservice:
-    image: chirpwebservice
+    image: ${DOCKER_USERNAME}/minitwitimage
     build:
       context: .
-      dockerfile: ../src/Chirp.WebService/Dockerfile
+      dockerfile: src/Chirp.WebService/Dockerfile
     container_name: minitwit
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
