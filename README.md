@@ -108,7 +108,16 @@ dotnet dev-certs https
 ---
 
 # How to containerize and run locally with docker
-You need to run two command, one for containerize and build the minitwit image and one for running the image
+First you need to gain your docker sql server Ip address, so that docker can make an internal connection to it. Run this command:
+```shell
+docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' azure-sql-server
+```
+And paste the Ip address into the appsettings.json file, where the connection string is specified:
+```json
+"ChirpSqlDb": "Data Source=<your_ip_address>,1433;Initial Catalog=Chirp;User=sa;TrustServerCertificate=True"
+```
+
+You now need to run two commands, one for containerize and building the minitwit image and one for running the image.
 
 To containerize the project go to the root: /chirp and run this command
 ```shell
