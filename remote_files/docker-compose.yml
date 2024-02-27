@@ -12,7 +12,7 @@ services:
       - chirp-network
 
   chirpwebservice:
-    image: ${DOCKER_USERNAME}/minitwitimage
+    image: ${DOCKER_USERNAME}/minitwitimage:latest
     build:
       context: .
       dockerfile: src/Chirp.WebService/Dockerfile
