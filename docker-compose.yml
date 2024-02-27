@@ -1,17 +1,15 @@
 version: '3.4'
 services:
   azure-sql-server:
-    image: mcr.microsoft.com/azure-sql-edge
+    image: mcr.microsoft.com/mssql/server:2017-latest
     environment:
-      - "ACCEPT_EULA=Y"
-      - "MSSQL_SA_PASSWORD= ${DB_PASSWORD}"
-    container_name: azure-sql-server
+      - SA_PASSWORD=${DB_PASSWORD}
+      - ACCEPT_EULA=Y
     ports:
       - "1433:1433"
+    container_name: azure-sql-server
     networks:
       - chirp-network
-    
-
 
   chirpwebservice:
     image: chirpwebservice
@@ -19,6 +17,8 @@ services:
       context: .
       dockerfile: src/Chirp.WebService/Dockerfile
     container_name: minitwit
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
     ports:
       - "8080:80"
     depends_on:
