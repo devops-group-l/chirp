@@ -52,12 +52,14 @@ public class Program
         });
         
         var sqlConnectionString = new SqlConnectionStringBuilder(configuration.GetConnectionString("ChirpSqlDb"));
-        string? password = configuration["DB:Password"];
-        
+        Console.WriteLine($"Connection String: {sqlConnectionString}");
+        string? password = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
         if (string.IsNullOrEmpty(sqlConnectionString.Password) && password != null)
         {
             // Add local password
             sqlConnectionString.Password = password;
+            Console.WriteLine($"Password from environment variable: {password}");
         } 
         
         services.AddDbContext<ChirpDbContext>(options =>
