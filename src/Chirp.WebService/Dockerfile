@@ -4,7 +4,7 @@ EXPOSE 80
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG configuration=Release
-ARG dbPassword
+
 WORKDIR /src
 COPY ["src/Chirp.WebService/Chirp.WebService.csproj", "src/Chirp.WebService/"]
 # Install Node.js and npm
@@ -24,4 +24,3 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Chirp.WebService.dll"]
-ENV DB_PASSWORD=$dbPassword

@@ -59,6 +59,7 @@ public class Program
         {
             // Add local password
             sqlConnectionString.Password = password;
+            Console.WriteLine($"Password from environment variable: {password}");
         } 
         
         services.AddDbContext<ChirpDbContext>(options =>
