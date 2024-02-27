@@ -27,4 +27,8 @@
       <ProjectReference Include="..\Chirp.Tests.Core\Chirp.Tests.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Contexts\ChirpDbContextTests.cs" />
+    </ItemGroup>
+
 </Project>

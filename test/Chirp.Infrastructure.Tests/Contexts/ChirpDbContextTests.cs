@@ -121,8 +121,8 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
         EntityEntry<Like> addedLike = context.Likes.Add(like);
         EntityEntry<Comment> addedComment = context.Comments.Add(comment);
         
-        Assert.Equal(author.Name, addedAuthor.Entity.Name);
-        Assert.Equal(author.Name, addedCheep.Entity.Author.Name);
+        Assert.Equal(author.Username, addedAuthor.Entity.Username);
+        Assert.Equal(author.Username, addedCheep.Entity.Author.Username);
         Assert.Equal(cheep.Author, author);
         Assert.Equal(cheep.Text, addedCheep.Entity.Text);
         Assert.Equal(like.LikedByAuthor.AuthorId, addedLike.Entity.LikedByAuthor.AuthorId);
