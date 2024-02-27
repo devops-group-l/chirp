@@ -12,15 +12,15 @@ services:
       - chirp-network
 
   chirpwebservice:
-    image: ${DOCKER_USERNAME}/minitwitimage:latest
+    image: minitwit
     build:
       context: .
-      dockerfile: src/Chirp.WebService/Dockerfile
+      dockerfile: ../src/Chirp.WebService/Dockerfile
     container_name: minitwit
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
     ports:
-      - "5000:5000"
+      - "8080:80"
     depends_on:
       - azure-sql-server
     networks:
