@@ -24,7 +24,7 @@ public class SimulationRepository : ISimulationRepository
             PwdHashed = sud.PwdHashed
         };
 
-        _chirpDbContext.SimulationUsers.Add(user);
+        await _chirpDbContext.SimulationUsers.AddAsync(user);
         await _chirpDbContext.SaveChangesAsync();
     }
 
@@ -57,7 +57,7 @@ public class SimulationRepository : ISimulationRepository
 
     public async Task AddMessage(SimulationMessageDto message)
     {
-        _chirpDbContext.SimulationMessages.Add(new SimulationMessage
+        await _chirpDbContext.SimulationMessages.AddAsync(new SimulationMessage
         {
             pub_date = message.pub_date,
             text = message.text,
@@ -75,15 +75,15 @@ public class SimulationRepository : ISimulationRepository
         return query;
     }
 
-    public void AddFollower(string follower, string following)
+    public async Task AddFollower(string follower, string following)
     {
-        _chirpDbContext.SimulationFollows.Add(new SimulationFollows()
+        await _chirpDbContext.SimulationFollows.AddAsync(new SimulationFollows()
         {
             Follower = follower,
             Follows = following
         });
 
-        _chirpDbContext.SaveChanges();
+        await _chirpDbContext.SaveChangesAsync();
     }
 
     public void RemoveFollower(string follower, string following)

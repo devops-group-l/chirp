@@ -173,7 +173,7 @@ public class SimulationController : BaseController
     }
 
     [HttpPost("fllws/{username}")]
-    public ActionResult HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel, string username)
+    public async Task<ActionResult> HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel, string username)
     {
         update_latest(HttpContext);
         
@@ -187,7 +187,7 @@ public class SimulationController : BaseController
         {
             if (!user_id_exists(requestModel.follow)) return NotFound();
 
-            SimulationRepository.AddFollower(username, requestModel.follow);
+            await SimulationRepository.AddFollower(username, requestModel.follow);
             return NoContent();
         }
 

@@ -14,7 +14,7 @@ public interface ISimulationRepository
 
     public List<string> GetFollowsForUser(string username, int amount);
 
-    public void AddFollower(string follower, string following);
+    public Task AddFollower(string follower, string following);
 
     public void RemoveFollower(string follower, string following);
 
