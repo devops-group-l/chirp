@@ -1,4 +1,5 @@
 using Chirp.Core.Repositories;
+using Chirp.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Repositories;
@@ -48,6 +49,7 @@ public class Program
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<ISimulationRepository, SimulationRepository>();
         services.AddSingleton(configuration);
+        services.AddSingleton(new UpdateLatestTracker());
 
         services.AddSession(options =>
         {

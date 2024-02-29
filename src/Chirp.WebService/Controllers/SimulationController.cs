@@ -4,6 +4,7 @@ using Chirp.WebService.Controllers.SimulationModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Chirp.Core.Dto;
+using Chirp.Infrastructure;
 
 namespace Chirp.WebService.Controllers;
 [Route("api/[controller]")]
@@ -11,27 +12,31 @@ namespace Chirp.WebService.Controllers;
 public class SimulationController : BaseController
 {
     private readonly string _latestFileLocation = "latest_processed_sim_action_id.txt";
+    private readonly UpdateLatestTracker _updateLatestTracker;
     
-    public SimulationController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
+    public SimulationController(UpdateLatestTracker updateLatestTracker, IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
     {
+        _updateLatestTracker = updateLatestTracker;
     }
 
     [HttpGet("latest")]
     public ActionResult HandleLatest()
     {
-        int latestProcessedCommandId;
+        // int latestProcessedCommandId;
+        //
+        // try
+        // {
+        //     string content = System.IO.File.ReadAllText(_latestFileLocation);
+        //     latestProcessedCommandId = int.Parse(content);
+        // }
+        // catch
+        // {
+        //     latestProcessedCommandId = -1;//Fallback
+        // }
 
-        try
-        {
-            string content = System.IO.File.ReadAllText(_latestFileLocation);
-            latestProcessedCommandId = int.Parse(content);
-        }
-        catch
-        {
-            latestProcessedCommandId = -1;//Fallback
-        }
+        // return Ok(new {latest = latestProcessedCommandId });
 
-        return Ok(new {latest = latestProcessedCommandId });
+        return Ok(new {latest=_updateLatestTracker.num});
     }
 
     [HttpPost("register")]
@@ -243,8 +248,11 @@ public class SimulationController : BaseController
             if (int.TryParse(parsedCommandIdString, out int intValue)) parsedCommandId = intValue;
         }
         
+        //Got the value
+        _updateLatestTracker.num = parsedCommandId;
+        
         //If command is valid -> store in .txt file
-        if (parsedCommandId != -1) System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
+        //if (parsedCommandId != -1) System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
     }
     
     private Boolean user_id_exists(string username)
