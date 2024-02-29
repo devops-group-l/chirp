@@ -12,7 +12,11 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        CreateHostBuilder(args).Build().Run();
+        var host = CreateHostBuilder(args).Build();
+
+        host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
+        
+        host.Run();
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
