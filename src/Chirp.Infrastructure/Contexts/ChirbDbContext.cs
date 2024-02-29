@@ -21,7 +21,8 @@ public class ChirpDbContext : DbContext
     public ChirpDbContext(DbContextOptions<ChirpDbContext> options)
         : base(options)
     {
-        Database.Migrate(); // Required for tests
+        //Database.EnsureCreated();
+        //Database.Migrate(); // Required for tests
         // DbInitializer.SeedDatabase(this);
     }
     
