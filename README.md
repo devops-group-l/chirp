@@ -31,43 +31,20 @@ Thereafter, depending on what you want to do, here are the setup guides for the 
 - [How to set up **_Chirp_**](#how-to-set-up-chirp)
 - [How to set up tests](#how-to-set-up-tests)
 
-## How to set up **_Chirp_**
-The main requirement needed to run **_Chirp_**, other than .NET, is an `azure-sql-edge` Docker container, for which the setup guide is below.
+---
 
-### Set up Sql Server with Docker
-Here are the steps to set up the sql server with docker:
+# How to run _Chirp_
 
-#### 1. Pull docker image
+Ensure that docker is running.
 
-Run the following to pull the docker image
-
-`docker pull mcr.microsoft.com/azure-sql-edge`
-
-
-#### 2. Run the image in a container
-Replacing `<YOUR_DB_PASSWORD>` with a strong password (requires 1 upper case, 1 lower case, 1 number, and no special characters), run
-
+At the root directory run this command:
 ```shell
-docker run -e "ACCEPT_EULA=Y" \
-   -e "MSSQL_SA_PASSWORD=<YOUR_DB_PASSWORD>" \
-   -p 1433:1433 --name azure-sql-server \
-   -d mcr.microsoft.com/azure-sql-edge
+DB_PASSWORD=<your_actual_password> docker-compose up
 ```
 
-#### 3. Init secrets
-If not done yet, run the following to create a secrets file
+Wait for the magic to happen and go to http://localhost:8080/
 
-```shell
-dotnet user-secrets init --project ./src/Chirp.WebService
-```
-
-#### 4. Add DB password secret
-Add the DB secret by running the following command, replacing `<YOUR_DB_PASSWORD>` with the strong password you generated earlier
-
-```shell
-dotnet user-secrets set "DB:Password" "<YOUR_DB_PASSWORD>" \
-   --project ./src/Chirp.WebService
-```
+---
 
 ## How to set up tests
 Tests have only one requirement, which is needed to run end-to-end tests: playwright.
@@ -85,26 +62,6 @@ dotnet pwsh \
  ```
 
 Everything should now be set up in order to enable tests to run.
-
----
-
-# How to run _Chirp_
-After the project is set up (see [How to set up](#how-to-set-up)), it can now be run.
-
-When running the profile, make sure to run with the https profile.
-This can be done with the following command:
-```shell
-dotnet run --launch-profile https --project src/Chirp.WebService
-```
-We would however recommend running it through an IDE such a Rider, which automatically detects launch profiles.
-
-Furthermore, since the project needs to be run on HTTPS, a certificate will be needed.
-
-In our case, using Rider as our IDE, a HTTPS certificate was added after being prompted when running _Chirp_ the first time.
-However, a certificate can also be added with:
-```shell
-dotnet dev-certs https
-```
 
 ---
 

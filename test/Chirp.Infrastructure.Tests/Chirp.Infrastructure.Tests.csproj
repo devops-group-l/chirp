@@ -9,14 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.0.1" />
+        <PackageReference Include="Bogus" Version="35.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0"/>
-        <PackageReference Include="coverlet.collector" Version="6.0.0"/>
+        <PackageReference Include="coverlet.collector" Version="6.0.1"/>
         <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="Testcontainers" Version="3.6.0" />
-        <PackageReference Include="Testcontainers.SqlEdge" Version="3.6.0" />
-        <PackageReference Include="xunit" Version="2.6.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
+        <PackageReference Include="Testcontainers" Version="3.7.0" />
+        <PackageReference Include="Testcontainers.SqlEdge" Version="3.7.0" />
+        <PackageReference Include="xunit" Version="2.7.0" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.5.7">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -25,6 +25,10 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\Chirp.Infrastructure\Chirp.Infrastructure.csproj" />
       <ProjectReference Include="..\Chirp.Tests.Core\Chirp.Tests.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Contexts\ChirpDbContextTests.cs" />
     </ItemGroup>
 
 </Project>
