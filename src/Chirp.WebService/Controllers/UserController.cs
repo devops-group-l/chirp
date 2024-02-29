@@ -3,13 +3,14 @@ using Chirp.Core.Dto;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
+using Chirp.Infrastructure.Contexts;
 
 namespace Chirp.WebService.Controllers
 {
     public class UserController : BaseController
     {
         private readonly IAuthorRepository _authorRepository;
-        public UserController(ChirpDbContext chirpDbContext, IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
+        public UserController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
         {
             _authorRepository = authorRepository;
         }
