@@ -173,21 +173,21 @@ public class SimulationController : BaseController
     }
 
     [HttpPost("fllws/{username}")]
-    public ActionResult HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel)
+    public ActionResult HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel, string username)
     {
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
         if (illegalRequest) return ForbidAccess();
 
-        if (!user_id_exists(requestModel.username)) return NotFound();
+        if (!user_id_exists(username)) return NotFound();
         
         //Determine if follow or unfollow request
         if (requestModel.follow != null)
         {
             if (!user_id_exists(requestModel.follow)) return NotFound();
 
-            SimulationRepository.AddFollower(requestModel.username, requestModel.follow);
+            SimulationRepository.AddFollower(username, requestModel.follow);
             return NoContent();
         }
 
@@ -195,7 +195,7 @@ public class SimulationController : BaseController
         {
             if (!user_id_exists(requestModel.unfollow)) return NotFound();
 
-            SimulationRepository.RemoveFollower(requestModel.username, requestModel.unfollow);
+            SimulationRepository.RemoveFollower(username, requestModel.unfollow);
             return NoContent();
         }
 
