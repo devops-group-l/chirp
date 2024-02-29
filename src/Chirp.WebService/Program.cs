@@ -91,6 +91,7 @@ public class Startup
         app.UseAuthorization();
 
         // Use the custom middleware
+        /*
         app.Use(async (context, next) =>
         {
             var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
@@ -115,12 +116,13 @@ public class Startup
                     context.Response.Redirect("/?error=UserNotFound");
                     return;
                 }
-                // Store the user information for later use
+                // Store the user information for later use 
                 context.Items["user"] = user;
             }
 
             await next.Invoke();
         });
+        */
 
         app.UseEndpoints(endpoints =>
         {
