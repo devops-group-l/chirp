@@ -130,7 +130,7 @@ public class SimulationController : BaseController
     }
 
     [HttpPost("msgs/{username}")]
-    public async Task<ActionResult> HandleMsgsUsernamePost(HTTPPostMessageModel requestModel)
+    public async Task<ActionResult> HandleMsgsUsernamePost(HTTPPostMessageModel requestModel, string username)
     {
         update_latest(HttpContext);
         
@@ -139,7 +139,7 @@ public class SimulationController : BaseController
 
         await SimulationRepository.AddMessage(new SimulationMessageDto()
         { 
-            username = requestModel.username,
+            username = username,
             text = requestModel.content,
             pub_date = DateTime.UtcNow.ToString(CultureInfo.CurrentCulture)
         });
