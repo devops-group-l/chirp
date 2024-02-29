@@ -4,6 +4,7 @@ using Chirp.Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chirp.Infrastructure.Migrations
 {
     [DbContext(typeof(ChirpDbContext))]
-    partial class ChirpDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240222212458_simulationNew")]
+    partial class simulationNew
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -138,27 +141,6 @@ namespace Chirp.Infrastructure.Migrations
                     b.HasIndex("CheepId");
 
                     b.ToTable("Likes");
-                });
-
-            modelBuilder.Entity("Chirp.Infrastructure.Models.SimulationFollows", b =>
-                {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
-
-                    b.Property<string>("Follower")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Follows")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SimulationFollows");
                 });
 
             modelBuilder.Entity("Chirp.Infrastructure.Models.SimulationMessage", b =>
