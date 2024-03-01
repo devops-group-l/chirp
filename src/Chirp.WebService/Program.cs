@@ -58,7 +58,10 @@ public class Program
             options.Cookie.IsEssential = true;
         });
         
-        var sqlConnectionString = new SqlConnectionStringBuilder(configuration.GetConnectionString("ChirpSqlDb"));
+        var sqlConnectionString = new SqlConnectionStringBuilder(configuration.GetConnectionString("ChirpSqlDb"))
+            {
+                Pooling = true
+            };
         Console.WriteLine($"Connection String: {sqlConnectionString}");
         string? password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
