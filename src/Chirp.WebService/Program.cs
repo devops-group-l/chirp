@@ -47,7 +47,7 @@ public class Program
         services.AddScoped<ICheepRepository, CheepRepository>();
         services.AddScoped<ILikeRepository, LikeRepository>();
         services.AddScoped<ICommentRepository, CommentRepository>();
-        services.AddScoped<ISimulationRepository, SimulationRepository>();
+        services.AddSingleton<ISimulationRepository, SimulationRepository>();
         services.AddSingleton(configuration);
         services.AddSingleton(new UpdateLatestTracker());
 
