@@ -98,8 +98,6 @@ public class SimulationRepository : ISimulationRepository
 
     public Boolean CheckIfUserExists(string username)
     {
-        SimulationUser? user = _chirpDbContext.SimulationUsers.FirstOrDefault(p => p.Username == username.Trim());
-
-        return user != null;
+        return _chirpDbContext.SimulationUsers.Any(u => u.Username == username.Trim());
     }
 }
