@@ -15,7 +15,7 @@ public class Program
     {
         var host = CreateHostBuilder(args).Build();
 
-        host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
+        // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
         
         host.Run();
     }
