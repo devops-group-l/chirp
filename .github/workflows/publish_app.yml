@@ -1,9 +1,11 @@
 name: .NET Publish CLI App
+
 permissions:
   contents: write
+
 on:
-  release:
-    types: [ published ]
+  schedule:
+    - cron: '0 0 * * 4'  # This runs at 00:00 UTC every Thursday
 
 jobs:
   ReleaseApp:
