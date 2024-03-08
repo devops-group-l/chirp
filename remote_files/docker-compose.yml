@@ -1,8 +1,8 @@
 version: '3.4'
 
 networks:
-  itu-minitwit-network:
-    name: itu-minitwit-network
+  chirp-network:
+    name: chirp-network
     external: false
 
 services:
@@ -18,7 +18,7 @@ services:
       - prometheus
     container_name: azure-sql-server
     networks:
-      - itu-minitwit-network
+      - chirp-network
 
   chirpwebservice:
     image: minitwit
@@ -35,7 +35,7 @@ services:
       - grafana
       - prometheus
     networks:
-      - itu-minitwit-network
+      - chirp-network
   
   prometheus:
     image: prom/prometheus
@@ -45,11 +45,11 @@ services:
     ports:
       - "9090:9090"
     networks:
-      - itu-minitwit-network
+      - chirp-network
 
   grafana:
     image: grafana/grafana:10.2.4
     ports:
       - "3000:3000"
     networks:
-      - itu-minitwit-network
+      - chirp-network
