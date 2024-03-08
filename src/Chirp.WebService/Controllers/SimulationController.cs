@@ -246,10 +246,11 @@ public class SimulationController : BaseController
         if (!string.IsNullOrEmpty(parsedCommandIdString))
         {
             if (int.TryParse(parsedCommandIdString, out int intValue)) parsedCommandId = intValue;
+            _updateLatestTracker.num = parsedCommandId;
         }
         
         //Got the value
-        _updateLatestTracker.num = parsedCommandId;
+        
         
         //If command is valid -> store in .txt file
         //if (parsedCommandId != -1) System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
