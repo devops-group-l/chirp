@@ -8,6 +8,7 @@ networks:
 services:
   azure-sql-server:
     image: mcr.microsoft.com/mssql/server:2017-latest
+    platform: linux/amd64
     environment:
       - SA_PASSWORD=${DB_PASSWORD}
       - ACCEPT_EULA=Y
