@@ -1,4 +1,10 @@
 version: '3.4'
+
+networks:
+  chirp-network:
+    name: chirp-network
+    external: false
+
 services:
   azure-sql-server:
     image: mcr.microsoft.com/mssql/server:2017-latest
@@ -7,6 +13,9 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - "1433:1433"
+    depends_on:
+      - grafana
+      - prometheus
     container_name: azure-sql-server
     networks:
       - chirp-network
@@ -23,8 +32,24 @@ services:
       - "8080:80"
     depends_on:
       - azure-sql-server
+      - grafana
+      - prometheus
+    networks:
+      - chirp-network
+  
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
     networks:
       - chirp-network
 
-networks:
-  chirp-network:
+  grafana:
+    image: grafana/grafana:10.2.4
+    ports:
+      - "3000:3000"
+    networks:
+      - chirp-network
