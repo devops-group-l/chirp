@@ -95,25 +95,25 @@ public class Startup
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        app.Use(async (context, next) =>
-        {
-            //CPU Gauge
-            context.Request.Headers.Add("StartTime", DateTime.UtcNow.ToLong().ToString());
-            Infrastructure.Prometheus.HardwareInfo.RefreshAll();
-            ulong processorTotalTime = 0;
-            foreach (var cpu in Infrastructure.Prometheus.HardwareInfo.CpuList)
-            {
-                processorTotalTime += cpu.PercentProcessorTime;
-                
-            }
-            Infrastructure.Prometheus.CpuGauge.Set(processorTotalTime / ulong.Parse(Infrastructure.Prometheus.HardwareInfo.CpuList.Count.ToString()));
-            await next.Invoke();
-            Infrastructure.Prometheus.ResponseCounter.Inc();
-            var elapsedMs = DateTime.UtcNow.ToLong() - long.Parse(context.Response.Headers["StartTime"]);
-            Infrastructure.Prometheus.ReqDurationSummary.Observe(elapsedMs);
-            
-            
-        });
+        // app.Use(async (context, next) =>
+        // {
+        //     //CPU Gauge
+        //     context.Request.Headers.Add("StartTime", DateTime.UtcNow.ToLong().ToString());
+        //     Infrastructure.Prometheus.HardwareInfo.RefreshAll();
+        //     ulong processorTotalTime = 0;
+        //     foreach (var cpu in Infrastructure.Prometheus.HardwareInfo.CpuList)
+        //     {
+        //         processorTotalTime += cpu.PercentProcessorTime;
+        //         
+        //     }
+        //     Infrastructure.Prometheus.CpuGauge.Set(processorTotalTime / ulong.Parse(Infrastructure.Prometheus.HardwareInfo.CpuList.Count.ToString()));
+        //     await next.Invoke();
+        //     Infrastructure.Prometheus.ResponseCounter.Inc();
+        //     var elapsedMs = DateTime.UtcNow.ToLong() - long.Parse(context.Response.Headers["StartTime"]);
+        //     Infrastructure.Prometheus.ReqDurationSummary.Observe(elapsedMs);
+        //     
+        //     
+        // });
 
         app.UseRouting();
         // app.UseSession();
