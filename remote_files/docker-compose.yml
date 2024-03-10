@@ -14,8 +14,8 @@ services:
   chirpwebservice:
     image: minitwit
     build:
-      context: .
-      dockerfile: ../src/Chirp.WebService/Dockerfile
+      context: ..
+      dockerfile: Dockerfile
     container_name: minitwit
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
@@ -23,6 +23,25 @@ services:
       - "8080:80"
     depends_on:
       - azure-sql-server
+      - grafana
+      - prometheus
+    networks:
+      - chirp-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - chirp-network
+
+  grafana:
+    image: grafana/grafana:10.2.4
+    ports:
+      - "3000:3000"
     networks:
       - chirp-network
 
