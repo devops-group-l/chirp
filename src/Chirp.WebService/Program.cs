@@ -144,43 +144,43 @@ public class Startup
         app.UseHttpMetrics();
 
         // Use the custom middleware
-        app.Use(async (context, next) =>
-        {
-            // var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
-            
-            // if (context.Request.Cookies.TryGetValue("UserId", out var userIdBytee))
-            // {
-            //     context.Items["userId"] = userId;
-            // }
-            
-            await next.Invoke();
-
-            if (context.Request.Cookies.TryGetValue("UserId", out var userIdByte))
-            {
-                var userId = new Guid(userIdByte);
-
-                // Store the userId in a way that it can be accessed during the request
-                // context.Items["user_id"] = userId;
-
-                // // Optionally, query the database using userId
-                // var user = await authorRepository.GetAuthorById(userId);
-                //
-                // if (user == null)
-                // {
-                //     // User not found in the database
-                //     // Log an error message
-                //     Console.WriteLine($"User with ID {userId} not found in the database.");
-                //
-                //     // Redirect to the homepage with an error message
-                //     context.Response.Redirect("/?error=UserNotFound");
-                //     return;
-                // }
-                // Store the user information for later use 
-                context.Items["userId"] = userId;
-            }
-
-            await next.Invoke();
-        });
+        // app.Use(async (context, next) =>
+        // {
+        //     // var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
+        //     
+        //     // if (context.Request.Cookies.TryGetValue("UserId", out var userIdBytee))
+        //     // {
+        //     //     context.Items["userId"] = userId;
+        //     // }
+        //     
+        //     await next.Invoke();
+        //
+        //     if (context.Request.Cookies.TryGetValue("UserId", out var userIdByte))
+        //     {
+        //         var userId = new Guid(userIdByte);
+        //
+        //         // Store the userId in a way that it can be accessed during the request
+        //         // context.Items["user_id"] = userId;
+        //
+        //         // // Optionally, query the database using userId
+        //         // var user = await authorRepository.GetAuthorById(userId);
+        //         //
+        //         // if (user == null)
+        //         // {
+        //         //     // User not found in the database
+        //         //     // Log an error message
+        //         //     Console.WriteLine($"User with ID {userId} not found in the database.");
+        //         //
+        //         //     // Redirect to the homepage with an error message
+        //         //     context.Response.Redirect("/?error=UserNotFound");
+        //         //     return;
+        //         // }
+        //         // Store the user information for later use 
+        //         context.Items["userId"] = userId;
+        //     }
+        //
+        //     await next.Invoke();
+        // });
 
         app.UseEndpoints(endpoints =>
         {
