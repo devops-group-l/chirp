@@ -141,7 +141,7 @@ public class Startup
         // app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseHttpMetrics();
+        // app.UseHttpMetrics();
 
         // Use the custom middleware
         // app.Use(async (context, next) =>
