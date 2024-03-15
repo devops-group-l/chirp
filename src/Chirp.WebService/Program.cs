@@ -138,7 +138,7 @@ public class Startup
         
 
         app.UseRouting();
-        app.UseSession();
+        // app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseHttpMetrics();
@@ -147,8 +147,15 @@ public class Startup
         app.Use(async (context, next) =>
         {
             // var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
+            
+            // if (context.Request.Cookies.TryGetValue("UserId", out var userIdBytee))
+            // {
+            //     context.Items["userId"] = userId;
+            // }
+            
+            await next.Invoke();
 
-            if (context.Session.TryGetValue("UserId", out var userIdByte))
+            if (context.Request.Cookies.TryGetValue("UserId", out var userIdByte))
             {
                 var userId = new Guid(userIdByte);
 
