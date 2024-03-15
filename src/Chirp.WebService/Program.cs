@@ -102,34 +102,48 @@ public class Startup
         app.UseStaticFiles();
         app.Use(async (context, next) =>
         {
-            //CPU Gauge
-            using (Infrastructure.Prometheus.ReqDurationSummary.NewTimer())
-            { 
-                Infrastructure.Prometheus.HardwareInfo.RefreshAll();
-                ulong processorTotalTime = 0;
-                foreach (var cpu in Infrastructure.Prometheus.HardwareInfo.CpuList)
-                {
-                    processorTotalTime += cpu.PercentProcessorTime;
-                    
-                }
-                Infrastructure.Prometheus.CpuGauge.Set(processorTotalTime / ulong.Parse(Infrastructure.Prometheus.HardwareInfo.CpuList.Count.ToString()));
-                await next.Invoke();
-                Infrastructure.Prometheus.ResponseCounter.Inc();
+            // Log request time per path
+            var path = context.Request.Path.Value ?? "";
+            var isSimulationEndpoint = path.Contains("/Simulation/");
+            if (Infrastructure.Prometheus.ReqDurations.ContainsKey(path))
+            {
+                using (Infrastructure.Prometheus.ReqDurations[path].NewTimer())
+                { 
+                    await next.Invoke();
 
+                }
+            }
+            else
+            {
+                var histogram = Metrics.CreateHistogram($"minitwit_request_duration_miliseconds_{path}", $"Request duration for endpoint {path}");
+                Infrastructure.Prometheus.ReqDurations.Add(path, histogram);
+                using (histogram.NewTimer())
+                { 
+                    await next.Invoke();
+
+                }
             }
             
+            // Log request count
+            if (isSimulationEndpoint)
+            {
+                Infrastructure.Prometheus.ResponseCounterSim.Inc();
+            }
+            else
+            {
+                Infrastructure.Prometheus.ResponseCounter.Inc();
+            }
         });
 
         
 
         app.UseRouting();
-        // app.UseSession();
+        app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseHttpMetrics();
 
         // Use the custom middleware
-        /*
         app.Use(async (context, next) =>
         {
             var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
@@ -160,7 +174,6 @@ public class Startup
 
             await next.Invoke();
         });
-        */
 
         app.UseEndpoints(endpoints =>
         {
