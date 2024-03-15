@@ -103,7 +103,7 @@ public class Startup
         app.Use(async (context, next) =>
         {
             // Log request time per path
-            var path = (context.Request.Path.Value ?? "").Replace("/", "");
+            var path = (context.Request.Path.Value ?? "").Replace("/", "_").Replace(" ", "_");
             var isSimulationEndpoint = path.Contains("/Simulation/");
             if (Infrastructure.Prometheus.ReqDurations.ContainsKey(path))
             {
