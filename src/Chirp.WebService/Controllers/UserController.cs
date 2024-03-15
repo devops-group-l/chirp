@@ -122,11 +122,11 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete()
         {
-            AuthorDto? user = (AuthorDto?)HttpContext.Items["user"];
-            if (user is null) {
+            Guid? userId = (Guid?)HttpContext.Items["userId"];
+            if (userId is null) {
                 return RedirectWithError("No users found to be deleted!");
             }
-            await _authorRepository.DeleteAuthor(user.Id);
+            await _authorRepository.DeleteAuthor(userId.Value);
 
             HttpContext.Session.Remove("UserId");
             

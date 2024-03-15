@@ -146,7 +146,7 @@ public class Startup
         // Use the custom middleware
         app.Use(async (context, next) =>
         {
-            var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
+            // var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
 
             if (context.Session.TryGetValue("UserId", out var userIdByte))
             {
@@ -155,21 +155,21 @@ public class Startup
                 // Store the userId in a way that it can be accessed during the request
                 // context.Items["user_id"] = userId;
 
-                // Optionally, query the database using userId
-                var user = await authorRepository.GetAuthorById(userId);
-
-                if (user == null)
-                {
-                    // User not found in the database
-                    // Log an error message
-                    Console.WriteLine($"User with ID {userId} not found in the database.");
-
-                    // Redirect to the homepage with an error message
-                    context.Response.Redirect("/?error=UserNotFound");
-                    return;
-                }
+                // // Optionally, query the database using userId
+                // var user = await authorRepository.GetAuthorById(userId);
+                //
+                // if (user == null)
+                // {
+                //     // User not found in the database
+                //     // Log an error message
+                //     Console.WriteLine($"User with ID {userId} not found in the database.");
+                //
+                //     // Redirect to the homepage with an error message
+                //     context.Response.Redirect("/?error=UserNotFound");
+                //     return;
+                // }
                 // Store the user information for later use 
-                context.Items["user"] = user;
+                context.Items["userId"] = userId;
             }
 
             await next.Invoke();
