@@ -2,8 +2,7 @@ version: '3.4'
 
 networks:
   chirp-network:
-    name: chirp-network
-    external: false
+      name: chirp-network
 
 services:
   azure-sql-server:
@@ -13,9 +12,6 @@ services:
       - ACCEPT_EULA=Y
     ports:
       - "1433:1433"
-    depends_on:
-      - grafana
-      - prometheus
     container_name: azure-sql-server
     networks:
       - chirp-network
@@ -23,8 +19,8 @@ services:
   chirpwebservice:
     image: minitwit
     build:
-      context: .
-      dockerfile: ../src/Chirp.WebService/Dockerfile
+      context: ..
+      dockerfile: Dockerfile
     container_name: minitwit
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
@@ -36,7 +32,7 @@ services:
       - prometheus
     networks:
       - chirp-network
-  
+
   prometheus:
     image: prom/prometheus
     container_name: prometheus

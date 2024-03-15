@@ -22,6 +22,7 @@ public class Program
         host.Run();
     }
 
+
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host
             .CreateDefaultBuilder(args)
@@ -52,6 +53,7 @@ public class Program
         services.AddScoped<ISimulationRepository, SimulationRepository>();
         services.AddSingleton(configuration);
         services.AddSingleton(new UpdateLatestTracker());
+        services.UseHttpClientMetrics();
 
         services.AddSession(options =>
         {
@@ -83,6 +85,9 @@ public class Startup
 {
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
+        using var server = new KestrelMetricServer(port: 8080);
+        server.Start();
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -95,30 +100,33 @@ public class Startup
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        // app.Use(async (context, next) =>
-        // {
-        //     //CPU Gauge
-        //     context.Request.Headers.Add("StartTime", DateTime.UtcNow.ToLong().ToString());
-        //     Infrastructure.Prometheus.HardwareInfo.RefreshAll();
-        //     ulong processorTotalTime = 0;
-        //     foreach (var cpu in Infrastructure.Prometheus.HardwareInfo.CpuList)
-        //     {
-        //         processorTotalTime += cpu.PercentProcessorTime;
-        //         
-        //     }
-        //     Infrastructure.Prometheus.CpuGauge.Set(processorTotalTime / ulong.Parse(Infrastructure.Prometheus.HardwareInfo.CpuList.Count.ToString()));
-        //     await next.Invoke();
-        //     Infrastructure.Prometheus.ResponseCounter.Inc();
-        //     var elapsedMs = DateTime.UtcNow.ToLong() - long.Parse(context.Response.Headers["StartTime"]);
-        //     Infrastructure.Prometheus.ReqDurationSummary.Observe(elapsedMs);
-        //     
-        //     
-        // });
+        app.Use(async (context, next) =>
+        {
+            //CPU Gauge
+            using (Infrastructure.Prometheus.ReqDurationSummary.NewTimer())
+            { 
+                Infrastructure.Prometheus.HardwareInfo.RefreshAll();
+                ulong processorTotalTime = 0;
+                foreach (var cpu in Infrastructure.Prometheus.HardwareInfo.CpuList)
+                {
+                    processorTotalTime += cpu.PercentProcessorTime;
+                    
+                }
+                Infrastructure.Prometheus.CpuGauge.Set(processorTotalTime / ulong.Parse(Infrastructure.Prometheus.HardwareInfo.CpuList.Count.ToString()));
+                await next.Invoke();
+                Infrastructure.Prometheus.ResponseCounter.Inc();
+
+            }
+            
+        });
+
+        
 
         app.UseRouting();
         // app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseHttpMetrics();
 
         // Use the custom middleware
         /*
