@@ -5,7 +5,7 @@ public struct CheepPartialModel
 {
     public Guid CheepId;
     public Guid AuthorId;
-    public string AuthorAvatarUrl;
+    public string? AuthorAvatarUrl;
     public string AuthorEmail;
     public string AuthorUsername;
     public DateTime Timestamp;
@@ -48,6 +48,26 @@ public struct CheepPartialModel
                     Text = c.Text,
                     CheepId = c.CheepId
                 }).ToList()
+        };
+    }
+    
+    public static CheepPartialModel BuildCheepPartialModelFromSimulation(
+        SimulationMessageDto messageDto
+    )
+    {
+        return new CheepPartialModel
+        {
+            CheepId = Guid.NewGuid(),
+            AuthorId = Guid.NewGuid(),
+            AuthorAvatarUrl = "https://static.vecteezy.com/system/resources/thumbnails/001/840/618/small/picture-profile-icon-male-icon-human-or-people-sign-and-symbol-free-vector.jpg",
+            AuthorEmail = messageDto.username,
+            AuthorUsername = messageDto.username,
+            Timestamp = DateTime.Parse(messageDto.pub_date),
+            Text = messageDto.text,
+            LikesAmount = 0,
+            IsLikedByUser = false,
+            IsFollowedByUser = false,
+            CheepComments = new List<CommentPartialModel>()
         };
     }
 }
