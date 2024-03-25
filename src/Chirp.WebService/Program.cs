@@ -6,6 +6,8 @@ using Chirp.Infrastructure.Repositories;
 using Microsoft.CodeAnalysis.Elfie.Extensions;
 using Microsoft.Data.SqlClient;
 using Prometheus;
+using OpenTelemetry.Metrics;
+using Microsoft.Build.Framework;
 
 namespace Chirp.WebService;
 
@@ -19,7 +21,9 @@ public class Program
 
         // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
         
+     
         host.Run();
+    
     }
 
 
@@ -39,6 +43,7 @@ public class Program
                 ConfigureServices(context.Configuration, services);
             });
 
+
     private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
         services.AddHttpClient();
@@ -52,6 +57,7 @@ public class Program
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<ISimulationRepository, SimulationRepository>();
         services.AddSingleton(configuration);
+    
         services.AddSingleton(new UpdateLatestTracker());
         services.UseHttpClientMetrics();
 
@@ -87,7 +93,8 @@ public class Startup
     {
         using var server = new KestrelMetricServer(port: 8080);
         server.Start();
-
+        
+        
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -97,96 +104,88 @@ public class Startup
             app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
-
+        
+       
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-        // app.Use(async (context, next) =>
-        // {
-        //     // Log request time per path
-        //     var path = (context.Request.Path.Value ?? "").Replace("/", "_").Replace(" ", "_");
-        //     var isSimulationEndpoint = path.Contains("/Simulation/");
-        //     if (Infrastructure.Prometheus.ReqDurations.ContainsKey(path))
-        //     {
-        //         using (Infrastructure.Prometheus.ReqDurations[path].NewTimer())
-        //         { 
-        //             await next.Invoke();
-        //
-        //         }
-        //     }
-        //     else
-        //     {
-        //         var histogram = Metrics.CreateHistogram($"minitwit_request_duration_miliseconds_{path}", $"Request duration for endpoint {path}");
-        //         Infrastructure.Prometheus.ReqDurations.Add(path, histogram);
-        //         using (histogram.NewTimer())
-        //         { 
-        //             await next.Invoke();
-        //
-        //         }
-        //     }
-        //     
-        //     // Log request count
-        //     if (isSimulationEndpoint)
-        //     {
-        //         Infrastructure.Prometheus.ResponseCounterSim.Inc();
-        //     }
-        //     else
-        //     {
-        //         Infrastructure.Prometheus.ResponseCounter.Inc();
-        //     }
-        // });
+        app.UseMetricServer();
+        app.Use(async (context, next) =>
+        {
+            // Log request time per path
+            var path = (context.Request.Path.Value ?? "").Replace("/", "_").Replace(" ", "_");
+            var isSimulationEndpoint = path.Contains("/Simulation/");
+            if (Infrastructure.Prometheus.ReqDurations.ContainsKey(path))
+            {
+                using (Infrastructure.Prometheus.ReqDurations[path].NewTimer())
+                { 
+                    await next.Invoke();
+        
+                }
+            }
+            else
+            {
+                var histogram = Metrics.CreateHistogram($"minitwit_request_duration_miliseconds_{path}", $"Request duration for endpoint {path}");
+                Infrastructure.Prometheus.ReqDurations.Add(path, histogram);
+                using (histogram.NewTimer())
+                { 
+                    await next.Invoke();
+        
+                }
+            }
+            
+            // Log request count
+            if (isSimulationEndpoint)
+            {
+                Infrastructure.Prometheus.ResponseCounterSim.Inc();
+            }
+            else
+            {
+                Infrastructure.Prometheus.ResponseCounter.Inc();
+            }
+        });
 
         
 
         app.UseRouting();
-        // app.UseSession();
+        app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
-        // app.UseHttpMetrics();
+        app.UseHttpMetrics();
+        
 
-        // Use the custom middleware
-        // app.Use(async (context, next) =>
-        // {
-        //     // var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
-        //     
-        //     // if (context.Request.Cookies.TryGetValue("UserId", out var userIdBytee))
-        //     // {
-        //     //     context.Items["userId"] = userId;
-        //     // }
-        //     
-        //     await next.Invoke();
-        //
-        //     if (context.Request.Cookies.TryGetValue("UserId", out var userIdByte))
-        //     {
-        //         var userId = new Guid(userIdByte);
-        //
-        //         // Store the userId in a way that it can be accessed during the request
-        //         // context.Items["user_id"] = userId;
-        //
-        //         // // Optionally, query the database using userId
-        //         // var user = await authorRepository.GetAuthorById(userId);
-        //         //
-        //         // if (user == null)
-        //         // {
-        //         //     // User not found in the database
-        //         //     // Log an error message
-        //         //     Console.WriteLine($"User with ID {userId} not found in the database.");
-        //         //
-        //         //     // Redirect to the homepage with an error message
-        //         //     context.Response.Redirect("/?error=UserNotFound");
-        //         //     return;
-        //         // }
-        //         // Store the user information for later use 
-        //         context.Items["userId"] = userId;
-        //     }
-        //
-        //     await next.Invoke();
-        // });
-
+         // Use the custom middleware
+        app.Use(async (context, next) =>
+        {
+            var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
+            if (context.Session.TryGetValue("UserId", out var userIdByte))
+            {
+                var userId = new Guid(userIdByte);
+                // Store the userId in a way that it can be accessed during the request
+                // context.Items["user_id"] = userId;
+                // Optionally, query the database using userId
+                var user = await authorRepository.GetAuthorById(userId);
+                if (user == null)
+                {
+                    // User not found in the database
+                    // Log an error message
+                    Console.WriteLine($"User with ID {userId} not found in the database.");
+                    // Redirect to the homepage with an error message
+                    context.Response.Redirect("/?error=UserNotFound");
+                    return;
+                }
+                // Store the user information for later use
+                context.Items["user"] = user;
+            }
+            await next(context);
+        });
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapRazorPages();
             endpoints.MapControllers();
             endpoints.MapMetrics();
+            
+        
+        
         });
     }
 }
