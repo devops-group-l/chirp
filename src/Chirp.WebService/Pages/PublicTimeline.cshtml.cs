@@ -28,7 +28,8 @@ public class PublicTimelineModel: PageModel
     public async Task<IActionResult> OnGet()
     {
         Infrastructure.Prometheus.PublicAccess.Inc();
-        var cheepCount = await _cheepRepository.GetCheepCount();
+        //var cheepCount = await _cheepRepository.GetCheepCount();
+        var cheepCount = await _simulationRepository.GetCheepCount();
         var amountOfPages = (int)Math.Ceiling((double)cheepCount / 32);
         int pageNumber = 1;
         

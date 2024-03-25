@@ -51,6 +51,28 @@ public class SimulationRepository : ISimulationRepository
             .ToListAsync();
     }
 
+    public async Task<int> GetCheepCount()
+    {
+        return await _chirpDbContext.SimulationMessages.CountAsync();
+    }
+
+    public async Task<int> GetAuthorCheepCount(string authorUsername)
+    {
+        return await _chirpDbContext.SimulationMessages.Where(m => m.username == authorUsername).CountAsync();
+    }
+    
+    public Task<List<SimulationMessageDto>> GetAuthorCheepsForPage(string authorUsername, int pageNumber)
+    {
+        return _chirpDbContext
+            .SimulationMessages
+            .Where(m => m.username == authorUsername)
+            .OrderByDescending(m => m.pub_date)
+            .Skip(int.Max(pageNumber -1, 0) * 32)
+            .Take(32)
+            .Select<SimulationMessage, SimulationMessageDto>(m => MapMessageToDto(m))
+            .ToListAsync();
+    }
+    
     public async Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount)
     {
         List<SimulationMessageDto> dtoList = await _chirpDbContext.SimulationMessages
