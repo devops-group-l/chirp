@@ -34,13 +34,9 @@ public abstract class BaseController : Controller, IController
     {
         try
         {
-            Guid? rawUserId = (Guid?)HttpContext.Items["userId"];
-            if (rawUserId is null) throw new ArgumentException("User is null in Auth async");
-            // var user = rawUserId;
-
-            var user = await AuthorRepository.GetAuthorById(rawUserId.Value);
-
-            if (user is null) return RedirectWithError("UserNotFound");
+            AuthorDto? rawUser = (AuthorDto?)HttpContext.Items["user"];
+            if (rawUser is null) throw new ArgumentException("User is null in Auth async");
+            var user = rawUser;
             
             await AuthorRepository.AddAuthor(new AuthorDto
             {
