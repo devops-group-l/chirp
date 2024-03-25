@@ -12,21 +12,24 @@ public class PublicTimelineModel: PageModel
     private readonly ICheepRepository _cheepRepository;
     private readonly IAuthorRepository _authorRepository;
     private readonly ILikeRepository _likeRepository;
+    private readonly ISimulationRepository _simulationRepository;
     
     public List<CheepPartialModel> Cheeps { get; set; } = new ();
     public FooterPartialModel FooterPartialModel { get; set; }
     
-    public PublicTimelineModel(ICheepRepository cheepRepository, IAuthorRepository authorRepository, ILikeRepository likeRepository)
+    public PublicTimelineModel(ICheepRepository cheepRepository, IAuthorRepository authorRepository, ILikeRepository likeRepository, ISimulationRepository simulationRepository)
     {
         _cheepRepository = cheepRepository;
         _authorRepository = authorRepository;
         _likeRepository = likeRepository;
+        _simulationRepository = simulationRepository;
     }
 
     public async Task<IActionResult> OnGet()
     {
         Infrastructure.Prometheus.PublicAccess.Inc();
-        var cheepCount = await _cheepRepository.GetCheepCount();
+        //var cheepCount = await _cheepRepository.GetCheepCount();
+        var cheepCount = await _simulationRepository.GetCheepCount();
         var amountOfPages = (int)Math.Ceiling((double)cheepCount / 32);
         int pageNumber = 1;
         
@@ -36,7 +39,9 @@ public class PublicTimelineModel: PageModel
             pageNumber = (pageParameter > amountOfPages) ? amountOfPages : pageParameter;
         }
         
-        var cheepDtos = await _cheepRepository.GetCheepsForPage(pageNumber);
+        //var cheepDtos = await _cheepRepository.GetCheepsForPage(pageNumber);
+
+        var messageDtos = await _simulationRepository.GetMessagesSorted(pageNumber);
         
         var cheepPartialModels = new List<CheepPartialModel>();
 
@@ -52,9 +57,9 @@ public class PublicTimelineModel: PageModel
         }
         
         //Generate a cheep model for each CheepDto on page
-        foreach (CheepDto cheepDto in cheepDtos)
+        foreach (SimulationMessageDto messageDto in messageDtos)
         {
-            cheepPartialModels.Add(CheepPartialModel.BuildCheepPartialModel(cheepDto, likes, follows));
+            cheepPartialModels.Add(CheepPartialModel.BuildCheepPartialModelFromSimulation(messageDto));
         }
 
         Cheeps = cheepPartialModels;

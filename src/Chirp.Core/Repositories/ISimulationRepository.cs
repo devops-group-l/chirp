@@ -8,6 +8,14 @@ public interface ISimulationRepository
 
     public Task<List<SimulationMessageDto>> GetMessages(int amount);
 
+    public Task<List<SimulationMessageDto>> GetMessagesSorted(int pageNumber);
+    
+    public Task<int> GetCheepCount();
+    
+    public Task<int> GetAuthorCheepCount(string authorUsername);
+    
+    public Task<List<SimulationMessageDto>> GetAuthorCheepsForPage(string authorUsername, int pageNumber);
+
     public Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount);
 
     public Task AddMessage(SimulationMessageDto message);

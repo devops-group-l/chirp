@@ -41,6 +41,38 @@ public class SimulationRepository : ISimulationRepository
         return dtoList.Take(amountToRetrieve).ToList();
     }
 
+    public async Task<List<SimulationMessageDto>> GetMessagesSorted(int pageNumber)
+    {
+        return await _chirpDbContext.SimulationMessages
+            .OrderByDescending(m => m.pub_date)
+            .Skip(int.Max(pageNumber - 1, 0) * 32)
+            .Take(32)
+            .Select<SimulationMessage, SimulationMessageDto>(m => MapMessageToDto(m))
+            .ToListAsync();
+    }
+
+    public async Task<int> GetCheepCount()
+    {
+        return await _chirpDbContext.SimulationMessages.CountAsync();
+    }
+
+    public async Task<int> GetAuthorCheepCount(string authorUsername)
+    {
+        return await _chirpDbContext.SimulationMessages.Where(m => m.username == authorUsername).CountAsync();
+    }
+    
+    public Task<List<SimulationMessageDto>> GetAuthorCheepsForPage(string authorUsername, int pageNumber)
+    {
+        return _chirpDbContext
+            .SimulationMessages
+            .Where(m => m.username == authorUsername)
+            .OrderByDescending(m => m.pub_date)
+            .Skip(int.Max(pageNumber -1, 0) * 32)
+            .Take(32)
+            .Select<SimulationMessage, SimulationMessageDto>(m => MapMessageToDto(m))
+            .ToListAsync();
+    }
+    
     public async Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount)
     {
         List<SimulationMessageDto> dtoList = await _chirpDbContext.SimulationMessages
@@ -100,4 +132,11 @@ public class SimulationRepository : ISimulationRepository
     {
         return _chirpDbContext.SimulationUsers.AsNoTracking().Any(u => u.Username == username.Trim());
     }
+    
+    private static SimulationMessageDto MapMessageToDto(SimulationMessage message) =>
+        new () {
+            username = message.username,
+            pub_date = message.pub_date,
+            text = message.text
+        };
 }
