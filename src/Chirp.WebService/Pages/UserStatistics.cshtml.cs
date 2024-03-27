@@ -36,20 +36,21 @@ public class UserStatisticsModel : PageModel
             Likes = await _likeRepository.GetLikesByAuthorId(user.Id);
         }
 
-        HashSet<Guid> likeIds = new HashSet<Guid>();
-        foreach(LikeDto like in Likes)
-        {
-            likeIds.Add(like.CheepId);
-        }
-        
-        
-        var follows = await _authorRepository.GetFollowsForAuthor(user.Id);
-        var likes = await _likeRepository.GetLikesByAuthorId(user.Id);
+            HashSet<Guid> likeIds = new HashSet<Guid>();
+            foreach (LikeDto like in Likes)
+            {
+                likeIds.Add(like.CheepId);
+            }
 
-        LikedCheeps = (await _cheepRepository.GetCheepsFromIds(likeIds))
-            .Select(cheepDto =>
-                CheepPartialModel.BuildCheepPartialModel(cheepDto, likes, follows)
-            ).ToList();
+
+            var follows = await _authorRepository.GetFollowsForAuthor(user.Id);
+            var likes = await _likeRepository.GetLikesByAuthorId(user.Id);
+
+            LikedCheeps = (await _cheepRepository.GetCheepsFromIds(likeIds))
+                .Select(cheepDto =>
+                    CheepPartialModel.BuildCheepPartialModel(cheepDto, likes, follows)
+                ).ToList();
+        
         
         return Page();
     }
