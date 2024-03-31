@@ -1,4 +1,5 @@
-﻿using Chirp.Core.Dto;
+﻿using System.Globalization;
+using Chirp.Core.Dto;
 using Chirp.Core.Repositories;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Models;
@@ -9,91 +10,101 @@ namespace Chirp.Infrastructure.Repositories;
 public class SimulationRepository : ISimulationRepository
 {
     private readonly ChirpDbContext _chirpDbContext;
+    private readonly IAuthorRepository _authorRepository;
+    private readonly ICheepRepository _cheepRepository;
 
-    public SimulationRepository(ChirpDbContext chirpDbContext)
+    public SimulationRepository(ChirpDbContext chirpDbContext, IAuthorRepository authorRepository, ICheepRepository cheepRepository)
     {
         _chirpDbContext = chirpDbContext;
+        _authorRepository = authorRepository;
+        _cheepRepository = cheepRepository;
     }
 
     public async Task AddUser(SimulationUserDto sud)
     {
-        SimulationUser user = new SimulationUser
+        var user = new SimulationUser()
         {
             Username = sud.Username.Trim(),
             Email = sud.Email.Trim(),
             PwdHashed = sud.PwdHashed.Trim()
         };
 
-        await _chirpDbContext.SimulationUsers.AddAsync(user);
-        await _chirpDbContext.SaveChangesAsync();
-    }
+        var dto = new AuthorDto()
+        {
+            Email = user.Email,
+            Id = new Guid(),
+            Password = user.PwdHashed,
+            Username = user.Username,
+        };
 
+        await _authorRepository.AddAuthor(dto);
+    }
+    
     public async Task<List<SimulationMessageDto>> GetMessages(int amountToRetrieve)
     {
-        List<SimulationMessageDto> dtoList = await _chirpDbContext.SimulationMessages.Select(p => 
-            new SimulationMessageDto
-            {
-                username = p.username.Trim(),
-                text = p.text,
-                pub_date = p.pub_date
-            }).ToListAsync();
-            
-        return dtoList.Take(amountToRetrieve).ToList();
+        return await _chirpDbContext
+            .Cheeps
+            .OrderByDescending(c => c.Timestamp)
+            .Take(amountToRetrieve)
+            .Select(c =>
+                new SimulationMessageDto()
+                {
+                    username = c.Author.Username.Trim(),
+                    text = c.Text,
+                    pub_date = c.Timestamp.ToString(CultureInfo.CurrentCulture),
+                })
+            .ToListAsync();
     }
 
     public async Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount)
     {
-        List<SimulationMessageDto> dtoList = await _chirpDbContext.SimulationMessages
-            .Where(sm => sm.username == username.Trim()).Select(p =>
+        return await _chirpDbContext.Cheeps
+            .Where(c => c.Author.Username == username.Trim())
+            .Select(c =>
                 new SimulationMessageDto
                 {
-                    username = p.username.Trim(),
-                    text = p.text,
-                    pub_date = p.pub_date
-                }).OrderByDescending(x => x.pub_date).ToListAsync();
-
-        return dtoList.Take(amount).ToList();
+                    username = c.Author.Username.Trim(),
+                    text = c.Text,
+                    pub_date = c.Timestamp.ToString(CultureInfo.CurrentCulture),
+                }).OrderByDescending(x => x.pub_date)
+            .Take(amount)
+            .ToListAsync();
     }
 
     public async Task AddMessage(SimulationMessageDto message)
     {
-        await _chirpDbContext.SimulationMessages.AddAsync(new SimulationMessage
+        var author = await _authorRepository.GetAuthorByName(message.username);
+            
+        await _cheepRepository.AddCheep(new AddCheepDto
         {
-            pub_date = message.pub_date,
-            text = message.text,
-            username = message.username.Trim()
+            AuthorId = author.Id,
+            Text = message.text
         });
-
-        await _chirpDbContext.SaveChangesAsync();
     }
 
-    public List<string> GetFollowsForUser(string username, int amount)
+    public async Task<List<string>> GetFollowsForUser(string username, int amount)
     {
-        var query = _chirpDbContext.SimulationFollows.Where(p => p.Follower == username.Trim()).Select(p => p.Follows)
-            .Take(amount).ToList();
+        var author = await _authorRepository.GetAuthorByName(username.Trim());
 
-        return query;
+        var followers = await _authorRepository.GetFollowsForAuthor(author.Id);
+
+        return followers.Take(amount).ToList();
     }
 
     public async Task AddFollower(string follower, string following)
     {
-        await _chirpDbContext.SimulationFollows.AddAsync(new SimulationFollows()
-        {
-            Follower = follower.Trim(),
-            Follows = following.Trim()
-        });
+        AuthorDto? followerDto = await _authorRepository.GetAuthorByName(follower.Trim());
+        AuthorDto? followingDto = await _authorRepository.GetAuthorByName(following.Trim());
 
-        await _chirpDbContext.SaveChangesAsync();
+        await _authorRepository.AddFollow(followingDto.Id, followerDto.Id);
     }
 
-    public void RemoveFollower(string follower, string following)
+    public async Task RemoveFollower(string follower, string following)
     {
-        SimulationFollows? follow =
-            _chirpDbContext.SimulationFollows.FirstOrDefault(p => p.Follower == follower.Trim() && p.Follows == following.Trim());
+        AuthorDto? followerDto = await _authorRepository.GetAuthorByName(follower.Trim());
+        AuthorDto? followingDto = await _authorRepository.GetAuthorByName(following.Trim());
 
-        if (follow != null) _chirpDbContext.SimulationFollows.Remove(follow);
-
-        _chirpDbContext.SaveChanges();
+        await _authorRepository.AddFollow(followingDto.Id, followerDto.Id);
     }
 
     public Boolean CheckIfUserExists(string username)
