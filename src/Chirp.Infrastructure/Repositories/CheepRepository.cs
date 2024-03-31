@@ -164,8 +164,7 @@ public class CheepRepository : ICheepRepository
         
         return true; 
     }
-
-    private static CheepDto MapCheepToDto(Cheep cheep) =>
+        private static CheepDto MapCheepToDto(Cheep cheep) =>
         new () {
             CheepId = cheep.CheepId,
             AuthorId = cheep.Author.AuthorId,
