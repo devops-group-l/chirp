@@ -117,8 +117,8 @@ public class AuthorRepository : IAuthorRepository
 
     public async Task RemoveFollow(Guid authorId, Guid unfollowId)
     {
-        Author? userAuthor = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == authorId);
-        Author? unfollowAuthor = await _chirpDbContext.Authors.FirstOrDefaultAsync(a => a.AuthorId == unfollowId);
+        Author? userAuthor = await _chirpDbContext.Authors.Include(a => a.Follows).FirstOrDefaultAsync(a => a.AuthorId == authorId);
+        Author? unfollowAuthor = await _chirpDbContext.Authors.Include(c => c.FollowedBy).FirstOrDefaultAsync(a => a.AuthorId == unfollowId);
         
         if (userAuthor == null) return;
         if (unfollowAuthor == null) return;
