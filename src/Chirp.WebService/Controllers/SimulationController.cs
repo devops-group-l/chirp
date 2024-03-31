@@ -13,10 +13,14 @@ public class SimulationController : BaseController
 {
     private readonly string _latestFileLocation = "latest_processed_sim_action_id.txt";
     private readonly UpdateLatestTracker _updateLatestTracker;
+    private readonly IAuthorRepository _authorRepository;
+    private readonly ICheepRepository _cheepRepository;
     
     public SimulationController(UpdateLatestTracker updateLatestTracker, IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
     {
         _updateLatestTracker = updateLatestTracker;
+        _authorRepository = authorRepository;
+        _cheepRepository = cheepRepository;
     }
 
     [HttpGet("latest")]
@@ -50,7 +54,7 @@ public class SimulationController : BaseController
         else if (string.IsNullOrEmpty(requestModel.email) || !requestModel.email.Contains("@"))
             error = "You have to enter a valid email address";
         else if (string.IsNullOrEmpty(requestModel.pwd)) error = "You have to enter a password";
-        else if (user_id_exists(requestModel.username)) error = "The username is already taken";
+        else if (await user_id_exists(requestModel.username)) error = "The username is already taken";
 
         if (error != null)
         {
@@ -115,7 +119,7 @@ public class SimulationController : BaseController
         string? noMsgsString = HttpContext.Request.Query["no"];
         if (int.TryParse(noMsgsString, out int value)) noMsgs = value;
 
-        if (!user_id_exists(username)) return NotFound();
+        if (! await user_id_exists(username)) return NotFound();
 
         List<SimulationMessageDto> dtos = await SimulationRepository.GetSpecificMessages(username, noMsgs);
         
@@ -153,21 +157,21 @@ public class SimulationController : BaseController
     }
     
     [HttpGet("fllws/{username}")]
-    public ActionResult HandleFllwsUsernameGet(string username)
+    public async Task<ActionResult> HandleFllwsUsernameGet(string username)
     {
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
         if (illegalRequest) return ForbidAccess();
 
-        bool userExists = user_id_exists(username);
+        bool userExists = await user_id_exists(username);
         if (!userExists) return NotFound();
 
         int noFollowers = 0;
         string? noFollowersString = HttpContext.Request.Query["no"];
         if (int.TryParse(noFollowersString, out int value)) noFollowers = value;
 
-        List<string> follows = SimulationRepository.GetFollowsForUser(username, noFollowers);
+        List<string> follows = await SimulationRepository.GetFollowsForUser(username, noFollowers);
 
         JObject returnable = new JObject
         {
@@ -185,12 +189,12 @@ public class SimulationController : BaseController
         bool illegalRequest = not_req_from_simulator(HttpContext);
         if (illegalRequest) return ForbidAccess();
 
-        if (!user_id_exists(username)) return NotFound();
+        if (! await user_id_exists(username)) return NotFound();
         
         //Determine if follow or unfollow request
         if (requestModel.follow != null)
         {
-            if (!user_id_exists(requestModel.follow)) return NotFound();
+            if (! await user_id_exists(requestModel.follow)) return NotFound();
 
             await SimulationRepository.AddFollower(username, requestModel.follow);
             return NoContent();
@@ -198,7 +202,7 @@ public class SimulationController : BaseController
 
         if (requestModel.unfollow != null)
         {
-            if (!user_id_exists(requestModel.unfollow)) return NotFound();
+            if (! await user_id_exists(requestModel.unfollow)) return NotFound();
 
             SimulationRepository.RemoveFollower(username, requestModel.unfollow);
             return NoContent();
@@ -248,16 +252,12 @@ public class SimulationController : BaseController
             if (int.TryParse(parsedCommandIdString, out int intValue)) parsedCommandId = intValue;
             _updateLatestTracker.num = parsedCommandId;
         }
-        
-        //Got the value
-        
-        
-        //If command is valid -> store in .txt file
-        //if (parsedCommandId != -1) System.IO.File.WriteAllText(_latestFileLocation, parsedCommandId.ToString());
     }
     
-    private Boolean user_id_exists(string username)
+    private async Task<bool> user_id_exists(string username)
     {
-        return SimulationRepository.CheckIfUserExists(username);
+        //return SimulationRepository.CheckIfUserExists(username);
+        var exists = await _authorRepository.AuthorWithUsernameExists(username.Trim());
+        return exists == true;
     }
 }
