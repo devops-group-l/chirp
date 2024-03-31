@@ -16,4 +16,11 @@ public static class Prometheus
     //     Metrics.CreateHistogram("minitwit_sim_request_duration_miliseconds", "Request duration distribution.");
 
     public static Dictionary<string, Histogram> ReqDurations { get; set; } = new ();
+    public static Counter endpointRequestsCounter { get; set; } = Metrics.CreateCounter(
+            "endpoint_requests_total",
+            "Total number of requests to each endpoint",
+            new CounterConfiguration
+            {
+                LabelNames = new[] { "endpoint"}
+            });
 }

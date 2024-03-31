@@ -8,6 +8,7 @@ using Microsoft.Data.SqlClient;
 using Prometheus;
 using OpenTelemetry.Metrics;
 using Microsoft.Build.Framework;
+using System.Text.RegularExpressions;
 
 namespace Chirp.WebService;
 
@@ -109,40 +110,6 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseMetricServer();
-        app.Use(async (context, next) =>
-        {
-            // Log request time per path
-            var path = (context.Request.Path.Value ?? "").Replace("/", "_").Replace(" ", "_");
-            var isSimulationEndpoint = path.Contains("/Simulation/");
-            if (Infrastructure.Prometheus.ReqDurations.ContainsKey(path))
-            {
-                using (Infrastructure.Prometheus.ReqDurations[path].NewTimer())
-                { 
-                    await next.Invoke();
-        
-                }
-            }
-            else
-            {
-                var histogram = Metrics.CreateHistogram($"minitwit_request_duration_miliseconds_{path}", $"Request duration for endpoint {path}");
-                Infrastructure.Prometheus.ReqDurations.Add(path, histogram);
-                using (histogram.NewTimer())
-                { 
-                    await next.Invoke();
-        
-                }
-            }
-            
-            // Log request count
-            if (isSimulationEndpoint)
-            {
-                Infrastructure.Prometheus.ResponseCounterSim.Inc();
-            }
-            else
-            {
-                Infrastructure.Prometheus.ResponseCounter.Inc();
-            }
-        });
 
         
 

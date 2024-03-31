@@ -46,6 +46,7 @@ public class SimulationController : BaseController
     [HttpPost("register")]
     public async Task<ActionResult> HandleRegister(HTTPHandleRegisterModel requestModel)
     {
+        Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Register").Inc();
         update_latest(HttpContext);
 
         string? error = null;
@@ -81,6 +82,7 @@ public class SimulationController : BaseController
     [HttpGet("msgs")]
     public async Task<ActionResult> HandleMsgs()
     {
+        Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Get messages").Inc();
         update_latest(HttpContext);
 
         bool illegalRequest = not_req_from_simulator(HttpContext);
@@ -110,6 +112,7 @@ public class SimulationController : BaseController
     [HttpGet("msgs/{username}")]
     public async Task<ActionResult> HandleMsgsUsernameGet(string username)
     {
+        Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Get messages from user").Inc();
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
@@ -141,6 +144,7 @@ public class SimulationController : BaseController
     [HttpPost("msgs/{username}")]
     public async Task<ActionResult> HandleMsgsUsernamePost(HTTPPostMessageModel requestModel, string username)
     {
+        Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Post message").Inc();
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
@@ -159,6 +163,7 @@ public class SimulationController : BaseController
     [HttpGet("fllws/{username}")]
     public async Task<ActionResult> HandleFllwsUsernameGet(string username)
     {
+        Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Get followers").Inc();
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
@@ -184,6 +189,7 @@ public class SimulationController : BaseController
     [HttpPost("fllws/{username}")]
     public async Task<ActionResult> HandleFllwsUsernamePost(HTTPHandleFollowModel requestModel, string username)
     {
+        
         update_latest(HttpContext);
         
         bool illegalRequest = not_req_from_simulator(HttpContext);
@@ -194,6 +200,7 @@ public class SimulationController : BaseController
         //Determine if follow or unfollow request
         if (requestModel.follow != null)
         {
+            Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Follow user").Inc();
             if (! await user_id_exists(requestModel.follow)) return NotFound();
 
             await SimulationRepository.AddFollower(username, requestModel.follow);
@@ -202,6 +209,7 @@ public class SimulationController : BaseController
 
         if (requestModel.unfollow != null)
         {
+            Infrastructure.Prometheus.endpointRequestsCounter.WithLabels("Unfollow user").Inc();
             if (! await user_id_exists(requestModel.unfollow)) return NotFound();
 
             SimulationRepository.RemoveFollower(username, requestModel.unfollow);
