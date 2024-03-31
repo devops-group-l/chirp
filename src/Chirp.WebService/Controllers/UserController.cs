@@ -10,9 +10,11 @@ namespace Chirp.WebService.Controllers
     public class UserController : BaseController
     {
         private readonly IAuthorRepository _authorRepository;
+        private readonly ISimulationRepository _simulationRepository;
         public UserController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
         {
             _authorRepository = authorRepository;
+            _simulationRepository = simulationRepository;
         }
 
         // POST: User/Register
@@ -49,6 +51,10 @@ namespace Chirp.WebService.Controllers
             {
                 return RedirectWithError("The username is already taken");
             }
+            
+            //Check if a "simulation-user" exist
+            if (_simulationRepository.CheckIfUserExists(username))
+                return RedirectWithError("The username is already taken");
 
             if (password != password2)
             {
@@ -83,8 +89,7 @@ namespace Chirp.WebService.Controllers
             {
                 return RedirectWithError("You have to enter a password");
             }
-
-
+            
             var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(username);
 
             if ((bool)!authorWithUsernameExists)
