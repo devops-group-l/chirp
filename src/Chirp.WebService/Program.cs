@@ -11,7 +11,7 @@ using Microsoft.Build.Framework;
 using System.Text.RegularExpressions;
 using Serilog;
 using Serilog.Formatting.Compact;
-using Serilog.Sinks.Grafana.Loki;
+using Serilog.Sinks.Loki;
 
 namespace Chirp.WebService;
 
@@ -26,6 +26,7 @@ public class Program
                                 .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
                                 .Enrich.FromLogContext()
                                 .WriteTo.Console()
+                                .WriteTo.LokiHttp("http://loki:3100/loki/api/v1/push")
                                 .CreateLogger();
 
             //try/catch block will ensure any configuration issues are appropriately logged
@@ -74,6 +75,7 @@ public class Program
                     //Override Few of the Configurations
                     cfg.Enrich.WithProperty("Application", ctx.HostingEnvironment.ApplicationName)
                        .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+                       .WriteTo.LokiHttp("http://loki:3100/loki/api/v1/push")
                        .WriteTo.Console();
                 })
             .ConfigureServices((context, services) =>

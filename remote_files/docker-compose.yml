@@ -36,6 +36,8 @@ services:
   
   loki:
     image: grafana/loki:latest
+    volumes:
+    - ./loki-config.yml:/etc/loki/loki-config.yml
     ports:
       - "3100:3100"
     networks:
