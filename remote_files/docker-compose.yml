@@ -36,21 +36,22 @@ services:
   
   loki:
     image: grafana/loki:latest
-    volumes:
-    - ./loki-config.yml:/etc/loki/loki-config.yml
     ports:
       - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/loki-config.yml
+    command: -config.file=/etc/loki/loki-config.yml
     networks:
       - chirp-network
 
-  # promtail:
-  #   image: grafana/promtail:latest
-  #   volumes:
-  #     - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
-  #   networks:
-  #     - chirp-network
-  #   depends_on:
-  #     - loki
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
+    networks:
+      - chirp-network
+    depends_on:
+      - loki
 
   grafana:
     image: grafana/grafana:10.2.4

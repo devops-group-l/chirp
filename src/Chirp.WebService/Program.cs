@@ -22,31 +22,31 @@ public class Program
     public static void Main(string[] args)
     {
         //Creating the Logger with Minimum Settings
-            Log.Logger = new LoggerConfiguration()
-                                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-                                .Enrich.FromLogContext()
-                                .WriteTo.Console()
-                                .WriteTo.LokiHttp("http://loki:3100/loki/api/v1/push")
-                                .CreateLogger();
+            // Log.Logger = new LoggerConfiguration()
+            //                     .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+            //                     .Enrich.FromLogContext()
+            //                     .WriteTo.Console()
+            //                     .WriteTo.LokiHttp("http://loki:3100")
+            //                     .CreateLogger();
 
-            //try/catch block will ensure any configuration issues are appropriately logged
-            try
-            {
-                Log.Information("Staring the Host");
+            // //try/catch block will ensure any configuration issues are appropriately logged
+            // try
+            // {
+                // Log.Information("Staring the Host");
 
                 var host = CreateHostBuilder(args).Build();
                 host.Run();
         
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Host Terminated Unexpectedly");
-            }
+            // }
+            // catch (Exception ex)
+            // {
+            //     // Log.Fatal(ex, "Host Terminated Unexpectedly");
+            // }
 
-            finally
-            {
-                Log.CloseAndFlush();
-            }
+            // finally
+            // {
+            //     // Log.CloseAndFlush();
+            // }
 
 
         
@@ -70,14 +70,14 @@ public class Program
             {
                 builder.AddEnvironmentVariables();
             })
-            .UseSerilog((ctx,cfg)=>
-                {
-                    //Override Few of the Configurations
-                    cfg.Enrich.WithProperty("Application", ctx.HostingEnvironment.ApplicationName)
-                       .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
-                       .WriteTo.LokiHttp("http://loki:3100/loki/api/v1/push")
-                       .WriteTo.Console();
-                })
+            // .UseSerilog((ctx,cfg)=>
+            //     {
+            //         //Override Few of the Configurations
+            //         cfg.Enrich.WithProperty("Application", ctx.HostingEnvironment.ApplicationName)
+            //            .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+            //            .WriteTo.LokiHttp("http://loki:3100")
+            //            .WriteTo.Console();
+            //     })
             .ConfigureServices((context, services) =>
             {
                 ConfigureServices(context.Configuration, services);
@@ -157,7 +157,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseHttpMetrics();
-        app.UseSerilogRequestLogging();
+        // app.UseSerilogRequestLogging();
         
 
          // Use the custom middleware
