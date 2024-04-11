@@ -38,9 +38,9 @@ services:
     image: grafana/loki:latest
     ports:
       - "3100:3100"
-    volumes:
-      - ./loki-config.yml:/etc/loki/loki-config.yml
-    command: -config.file=/etc/loki/loki-config.yml
+    # volumes:
+    #   - ./loki-config.yml:/etc/loki/loki-config.yml
+    # command: -config.file=/etc/loki/loki-config.yml
     networks:
       - chirp-network
 
