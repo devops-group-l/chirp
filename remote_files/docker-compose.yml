@@ -50,6 +50,7 @@ services:
       - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
     networks:
       - chirp-network
+      
     depends_on:
       - loki
 
