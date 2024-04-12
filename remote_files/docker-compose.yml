@@ -27,10 +27,15 @@ services:
       - loki=http://loki:3100
     ports:
       - "8080:80"
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "fluentd:24224"
     depends_on:
       - azure-sql-server
       - grafana
       - prometheus
+      - fluentd
     networks:
       - chirp-network
   
@@ -70,6 +75,15 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    networks:
+      - chirp-network
+
+  fluentd:
+    image: fluent/fluentd:edge-debian
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    ports:
+      - "24224:24224"
     networks:
       - chirp-network
   
