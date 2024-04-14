@@ -1,6 +1,7 @@
 using Chirp.Core.Repositories;
 using Chirp.Core.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Chirp.WebService.Controllers
 {

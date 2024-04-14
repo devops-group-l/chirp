@@ -27,15 +27,10 @@ services:
       - loki=http://loki:3100
     ports:
       - "8080:80"
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: "fluentd:24224"
     depends_on:
       - azure-sql-server
       - grafana
       - prometheus
-      - fluentd
     networks:
       - chirp-network
   
@@ -52,6 +47,7 @@ services:
   promtail:
     image: grafana/promtail:latest
     volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
       - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
     networks:
       - chirp-network
@@ -78,41 +74,11 @@ services:
     networks:
       - chirp-network
 
-  fluentd:
-    image: fluent/fluentd:edge-debian
-    volumes:
-      - ./fluentd/conf:/fluentd/etc
-    ports:
-      - "24224:24224"
-    networks:
-      - chirp-network
-  
-  # loki:
-  #   image: grafana/loki:2.4.0
+  # fluentd:
+  #   image: fluent/fluentd:edge-debian
   #   volumes:
-  #     - ./loki-config.yml:/etc/loki/loki-config.yml
+  #     - ./fluentd/conf:/fluentd/etc
   #   ports:
-  #     - "3100:3100"
-  #   restart: unless-stopped
-  #   command: -config.file=/etc/loki/loki-config.yml
-  #   networks:
-  #     - chirp-network
-
-  # promtail:
-  #   image: grafana/promtail:2.4.0
-  #   volumes:
-  #     - /var/log:/var/log
-  #     - ./promtail-config.yml:/etc/promtail/promtail-config.yml
-  #   # ports:
-  #   #   - "1514:1514" # this is only needed if you are going to send syslogs
-  #   restart: unless-stopped
-  #   command: -config.file=/etc/promtail/promtail-config.yml
-  #   networks:
-  #     - chirp-network
-
-  # grafana:
-  #   image: grafana/grafana:10.2.4
-  #   ports:
-  #     - "3000:3000"
+  #     - "24224:24224"
   #   networks:
   #     - chirp-network

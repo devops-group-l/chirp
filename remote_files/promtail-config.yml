@@ -12,8 +12,7 @@ scrape_configs:
 - job_name: system
   static_configs:
   - targets:
-      - fluentd:24224
+      - localhost
     labels:
-      job: varlogs
-      # target_label: "minitwit"
-      # __path__: /var/log/*log
+      job: ops
+      __path__: /var/lib/docker/containers/*/*.log

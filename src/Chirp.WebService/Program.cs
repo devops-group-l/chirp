@@ -22,31 +22,32 @@ public class Program
     public static void Main(string[] args)
     {
         //Creating the Logger with Minimum Settings
-            // Log.Logger = new LoggerConfiguration()
-            //                     .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-            //                     .Enrich.FromLogContext()
-            //                     .WriteTo.Console()
-            //                     .WriteTo.LokiHttp("http://loki:3100")
-            //                     .CreateLogger();
+            Log.Logger = new LoggerConfiguration()
+                                .Enrich.WithProperty("Application", "minitwit")
+                                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+                                .Enrich.FromLogContext()
+                                .WriteTo.Console()
+                                .WriteTo.LokiHttp("http://loki:3100")
+                                .CreateLogger();
 
-            // //try/catch block will ensure any configuration issues are appropriately logged
-            // try
-            // {
-                // Log.Information("Staring the Host");
+            //try/catch block will ensure any configuration issues are appropriately logged
+            try
+            {
+                Log.Information("Staring the Host");
 
                 var host = CreateHostBuilder(args).Build();
                 host.Run();
         
-            // }
-            // catch (Exception ex)
-            // {
-            //     // Log.Fatal(ex, "Host Terminated Unexpectedly");
-            // }
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host Terminated Unexpectedly");
+            }
 
-            // finally
-            // {
-            //     // Log.CloseAndFlush();
-            // }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
 
 
         
@@ -90,7 +91,7 @@ public class Program
         services
             .AddRazorPages(_ => { })
             .AddMvcOptions(_ => { });
-        
+        services.AddSerilog();
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<ICheepRepository, CheepRepository>();
         services.AddScoped<ILikeRepository, LikeRepository>();
