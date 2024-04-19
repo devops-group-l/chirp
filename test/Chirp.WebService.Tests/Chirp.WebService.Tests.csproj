@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.14" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.16" />
         <PackageReference Include="AngleSharp" Version="1.1.1" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.16" />
