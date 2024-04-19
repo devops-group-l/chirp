@@ -38,9 +38,6 @@ services:
     image: grafana/loki:latest
     ports:
       - "3100:3100"
-    # volumes:
-    #   - ./loki-config.yml:/etc/loki/loki-config.yml
-    # command: -config.file=/etc/loki/loki-config.yml
     networks:
       - chirp-network
 
@@ -73,12 +70,3 @@ services:
       - "9090:9090"
     networks:
       - chirp-network
-
-  # fluentd:
-  #   image: fluent/fluentd:edge-debian
-  #   volumes:
-  #     - ./fluentd/conf:/fluentd/etc
-  #   ports:
-  #     - "24224:24224"
-  #   networks:
-  #     - chirp-network
