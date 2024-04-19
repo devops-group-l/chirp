@@ -24,7 +24,7 @@ public class SimulationController : BaseController
     }
 
     [HttpGet("latest")]
-    public ActionResult HandleLatest()
+    public async Task<ActionResult> HandleLatest()
     {
         // int latestProcessedCommandId;
         //
@@ -40,7 +40,8 @@ public class SimulationController : BaseController
 
         // return Ok(new {latest = latestProcessedCommandId });
 
-        return Ok(new {latest=_updateLatestTracker.num});
+        var latestValue = await SimulationRepository.GetLatest();
+        return Ok(new { latest = latestValue });
     }
 
     [HttpPost("register")]
@@ -258,7 +259,7 @@ public class SimulationController : BaseController
         if (!string.IsNullOrEmpty(parsedCommandIdString))
         {
             if (int.TryParse(parsedCommandIdString, out int intValue)) parsedCommandId = intValue;
-            _updateLatestTracker.num = parsedCommandId;
+            SimulationRepository.UpdateLatest(parsedCommandId);
         }
     }
     
