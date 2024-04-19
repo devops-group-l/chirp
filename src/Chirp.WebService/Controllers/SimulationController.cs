@@ -15,12 +15,15 @@ public class SimulationController : BaseController
     private readonly UpdateLatestTracker _updateLatestTracker;
     private readonly IAuthorRepository _authorRepository;
     private readonly ICheepRepository _cheepRepository;
+
+    private readonly ISimulationRepository _simulationRepository;
     
     public SimulationController(UpdateLatestTracker updateLatestTracker, IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
     {
         _updateLatestTracker = updateLatestTracker;
         _authorRepository = authorRepository;
         _cheepRepository = cheepRepository;
+        _simulationRepository = simulationRepository;
     }
 
     [HttpGet("latest")]
@@ -40,8 +43,9 @@ public class SimulationController : BaseController
 
         // return Ok(new {latest = latestProcessedCommandId });
 
-        var latestValue = await SimulationRepository.GetLatest();
+        var latestValue = SimulationRepository.GetLatest();
         return Ok(new { latest = latestValue });
+       
     }
 
     [HttpPost("register")]
@@ -259,7 +263,8 @@ public class SimulationController : BaseController
         if (!string.IsNullOrEmpty(parsedCommandIdString))
         {
             if (int.TryParse(parsedCommandIdString, out int intValue)) parsedCommandId = intValue;
-            SimulationRepository.UpdateLatest(parsedCommandId);
+             _simulationRepository.UpdateLatest(parsedCommandId);
+            _updateLatestTracker.num = parsedCommandId;
         }
     }
     

@@ -20,7 +20,7 @@ public interface ISimulationRepository
 
     public Boolean CheckIfUserExists(string username);
 
-    public Task UpdateLatest(int value);
+    public void UpdateLatest(int value);
 
-    public Task<int> GetLatest();
+    public int GetLatest();
 }
