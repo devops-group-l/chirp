@@ -10,9 +10,11 @@ namespace Chirp.WebService.Controllers
     public class UserController : BaseController
     {
         private readonly IAuthorRepository _authorRepository;
-        public UserController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
+        private readonly ILogger<UserController> _logger;
+        public UserController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository, ILogger<UserController> logger) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
         {
             _authorRepository = authorRepository;
+            _logger = logger;
         }
 
         // POST: User/Register
@@ -21,6 +23,7 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(IFormCollection collection)
         {
+            _logger.LogInformation("UserController.Register was called");
             string? username = collection["username"];
             string? email = collection["email"];
             string? password = collection["password"];
@@ -70,6 +73,7 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(IFormCollection collection)
         {
+            _logger.LogInformation("UserController.Login was called");
             string? username = collection["username"];
             string? enteredPassword = collection["password"];
 
@@ -112,6 +116,8 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            _logger.LogInformation("UserController.Logout was called");
+            
             HttpContext.Session.Remove("UserId");
 
             return Redirect("/");
@@ -122,8 +128,10 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete()
         {
+            _logger.LogInformation("UserController.Delete was called");
             Guid? userId = (Guid?)HttpContext.Items["userId"];
             if (userId is null) {
+                _logger.LogDebug("UserController.Delete was called, but no user was found on ID: {userId}", userId);
                 return RedirectWithError("No users found to be deleted!");
             }
             await _authorRepository.DeleteAuthor(userId.Value);

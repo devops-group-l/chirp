@@ -1,13 +1,16 @@
 using Chirp.Core.Repositories;
 using Chirp.Core.Dto;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Chirp.WebService.Controllers
 {
     public class CheepController : BaseController
     {
-        public CheepController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
+        private readonly ILogger<CheepController> _logger;
+        public CheepController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository, ILogger<CheepController> logger) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
         {
+            _logger = logger;
         }
         
         // POST: Cheep/Like
@@ -16,6 +19,7 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Like(IFormCollection collection)
         {
+            _logger.LogInformation("Controller.Like was called");
             return await WithAuthAsync(async user =>
             {
                 String? cheepId = collection["cheepId"];
@@ -36,6 +40,7 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unlike(IFormCollection collection)
         {
+            _logger.LogInformation("Controller.Unlike was called");
             return await WithAuthAsync(async user =>
             {
                 String? cheepId = collection["cheepId"];
@@ -57,6 +62,7 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(IFormCollection collection)
         {
+            _logger.LogInformation("Controller.Create was called");
             return await WithAuthAsync(async user =>
             {
                 string? cheepText = collection["cheepText"];
@@ -87,12 +93,14 @@ namespace Chirp.WebService.Controllers
         //public IActionResult Delete(Guid id)
         public async Task<IActionResult> Delete(IFormCollection collection)
         {
+            _logger.LogInformation("Controller.Delete was called");
             return await WithAuthAsync(async _ =>
             {
                 string? cheepId = collection["cheepId"];
                 
                 if (String.IsNullOrEmpty(cheepId))
                 {
+                    _logger.LogDebug("Controller.Delete was called and the Cheep Id was invalid, cheepId: " + cheepId);
                     return RedirectWithError("Invalid Cheep Id");
                 }
                 
@@ -108,10 +116,13 @@ namespace Chirp.WebService.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Follow(IFormCollection collection)
         {
+            
             return await WithAuthAsync(async user =>
             {
                 //The new account to follow
                 Guid authorToBeFollowed = Guid.Parse(collection["CheepAuthorId"].ToString());
+
+                _logger.LogInformation("Controller.Follow was called with user: {user.Id} try to follow user: {authorToBeFollowed}", user.Id, authorToBeFollowed);
                 
                 await AuthorRepository.AddFollow(user.Id, authorToBeFollowed);
                 
@@ -128,7 +139,11 @@ namespace Chirp.WebService.Controllers
             return await WithAuthAsync(async user =>
             {
                 Guid authorToBeUnfollowed = Guid.Parse(collection["CheepAuthorId"].ToString());//The new account to follow
+
+                _logger.LogInformation("Controller.UnFollow was called with user: {user.Id} try to unfollow user: {authorToBeUnfollowed}", user.Id, authorToBeUnfollowed);
+
                 await AuthorRepository.RemoveFollow(user.Id, authorToBeUnfollowed);
+                
                 return Redirect(GetPathUrl());//Redirect to same page
             });
         }

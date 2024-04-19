@@ -24,6 +24,7 @@ services:
     container_name: minitwit
     environment:
       - DB_PASSWORD=${DB_PASSWORD}
+      - loki=http://loki:3100
     ports:
       - "8080:80"
     depends_on:
@@ -32,6 +33,33 @@ services:
       - prometheus
     networks:
       - chirp-network
+  
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    networks:
+      - chirp-network
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
+    networks:
+      - chirp-network
+      
+    depends_on:
+      - loki
+
+  grafana:
+    image: grafana/grafana:10.2.4
+    ports:
+      - "3000:3000"
+    networks:
+      - chirp-network
+    depends_on:
+      - loki
 
   prometheus:
     image: prom/prometheus
@@ -40,12 +68,5 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    networks:
-      - chirp-network
-
-  grafana:
-    image: grafana/grafana:10.2.4
-    ports:
-      - "3000:3000"
     networks:
       - chirp-network

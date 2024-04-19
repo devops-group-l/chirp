@@ -9,6 +9,9 @@ using Prometheus;
 using OpenTelemetry.Metrics;
 using Microsoft.Build.Framework;
 using System.Text.RegularExpressions;
+using Serilog;
+using Serilog.Formatting.Compact;
+using Serilog.Sinks.Loki;
 
 namespace Chirp.WebService;
 
@@ -18,12 +21,41 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var host = CreateHostBuilder(args).Build();
+        //Creating the Logger with Minimum Settings
+            Log.Logger = new LoggerConfiguration()
+                                .Enrich.WithProperty("Application", "minitwit")
+                                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+                                .Enrich.FromLogContext()
+                                .WriteTo.Console()
+                                .WriteTo.LokiHttp("http://loki:3100")
+                                .CreateLogger();
+
+            //try/catch block will ensure any configuration issues are appropriately logged
+            try
+            {
+                Log.Information("Staring the Host");
+
+                var host = CreateHostBuilder(args).Build();
+                host.Run();
+        
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Host Terminated Unexpectedly");
+            }
+
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+
+
+        
 
         // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
         
      
-        host.Run();
+       
     
     }
 
@@ -39,6 +71,14 @@ public class Program
             {
                 builder.AddEnvironmentVariables();
             })
+            // .UseSerilog((ctx,cfg)=>
+            //     {
+            //         //Override Few of the Configurations
+            //         cfg.Enrich.WithProperty("Application", ctx.HostingEnvironment.ApplicationName)
+            //            .Enrich.WithProperty("Environment", ctx.HostingEnvironment.EnvironmentName)
+            //            .WriteTo.LokiHttp("http://loki:3100")
+            //            .WriteTo.Console();
+            //     })
             .ConfigureServices((context, services) =>
             {
                 ConfigureServices(context.Configuration, services);
@@ -51,7 +91,7 @@ public class Program
         services
             .AddRazorPages(_ => { })
             .AddMvcOptions(_ => { });
-        
+        services.AddSerilog();
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<ICheepRepository, CheepRepository>();
         services.AddScoped<ILikeRepository, LikeRepository>();
@@ -118,6 +158,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseHttpMetrics();
+        // app.UseSerilogRequestLogging();
         
 
          // Use the custom middleware
