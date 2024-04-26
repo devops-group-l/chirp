@@ -12,7 +12,7 @@
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.16" />
         <PackageReference Include="AngleSharp" Version="1.1.1" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.59" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.16" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.18" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
         <PackageReference Include="Moq" Version="4.20.70" />
         <PackageReference Include="Microsoft.Playwright.NUnit" Version="1.41.2" />
