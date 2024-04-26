@@ -19,4 +19,8 @@ public interface ISimulationRepository
     public Task RemoveFollower(string follower, string following);
 
     public Boolean CheckIfUserExists(string username);
+
+    public void UpdateLatest(int value);
+
+    public int GetLatest();
 }

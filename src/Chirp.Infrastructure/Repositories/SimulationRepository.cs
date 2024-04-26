@@ -111,4 +111,34 @@ public class SimulationRepository : ISimulationRepository
     {
         return _chirpDbContext.SimulationUsers.AsNoTracking().Any(u => u.Username == username.Trim());
     }
+
+    public void UpdateLatest(int value)
+    {
+        var latest = _chirpDbContext.SimulationLatests.FirstOrDefault();
+
+        if (latest == null)
+        {
+            //This should happen the first the database is initialized, as there does not exist a "latest" yet
+            var newLatest = new SimulationLatest
+            {
+                LatestValue = value
+            };
+             _chirpDbContext.SimulationLatests.Add(newLatest);
+             _chirpDbContext.SaveChanges();
+            return;
+        }
+
+        latest.LatestValue = value;
+
+        _chirpDbContext.SaveChanges();
+    }
+
+    public int GetLatest()
+    {
+        var latest = _chirpDbContext.SimulationLatests.FirstOrDefault();
+
+        if (latest == null) return -1;
+
+        return latest.LatestValue;
+    }
 }
