@@ -14,16 +14,16 @@ Vagrant.configure("2") do |config|
     server.vm.provider :digital_ocean do |provider|
       provider.ssh_key_name = "do_ssh_key"
       provider.token = ENV["DIGITAL_OCEAN_TOKEN"]
-      provider.image = 'ubuntu-22-04-x64'
+      provider.image = 'ubuntu-23-10-x64'
       provider.region = 'fra1'
-      provider.size = 's-1vcpu-1gb'
+      provider.size = 's-1vcpu-2gb'
     end
 
-    server.vm.hostname = "minitwit-ci-server"
+    server.vm.hostname = "minitwit-ci-server1"
 
     server.vm.provision "shell", inline: 'echo "export DOCKER_USERNAME=' + "'" + ENV["DOCKER_USERNAME"] + "'" + '" >> ~/.bash_profile'
     server.vm.provision "shell", inline: 'echo "export DOCKER_PASSWORD=' + "'" + ENV["DOCKER_PASSWORD"] + "'" + '" >> ~/.bash_profile'
-    server.vm.provision "shell", inline: 'echo "export DB_PASSWORD=' + "'" + ENV["DB_PASSWORD"] + "'" + '" >> ~/.bash_profile'
+    server.vm.provision "shell", inline: 'echo "export DB_STRING=' + "'" + ENV["DB_STRING"] + "'" + '" >> ~/.bash_profile'
 
     server.vm.provision "shell", inline: <<-SHELL
 

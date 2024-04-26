@@ -2,20 +2,9 @@ version: '3.4'
 
 networks:
   chirp-network:
-      name: chirp-network
+    name: chirp-network
 
 services:
-  azure-sql-server:
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=${DB_PASSWORD}
-      - ACCEPT_EULA=Y
-    ports:
-      - "1433:1433"
-    container_name: azure-sql-server
-    networks:
-      - chirp-network
-
   chirpwebservice:
     image: minitwit
     build:
@@ -23,12 +12,11 @@ services:
       dockerfile: Dockerfile
     container_name: minitwit
     environment:
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_STRING=${DB_STRING}
       - loki=http://loki:3100
     ports:
       - "8080:80"
     depends_on:
-      - azure-sql-server
       - grafana
       - prometheus
     networks:
@@ -48,7 +36,7 @@ services:
       - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
     networks:
       - chirp-network
-      
+    
     depends_on:
       - loki
 

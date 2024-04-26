@@ -3,14 +3,9 @@ using Chirp.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Repositories;
-using Microsoft.CodeAnalysis.Elfie.Extensions;
-using Microsoft.Data.SqlClient;
 using Prometheus;
-using OpenTelemetry.Metrics;
-using Microsoft.Build.Framework;
-using System.Text.RegularExpressions;
+using Npgsql;
 using Serilog;
-using Serilog.Formatting.Compact;
 using Serilog.Sinks.Loki;
 
 namespace Chirp.WebService;
@@ -36,6 +31,7 @@ public class Program
                 Log.Information("Staring the Host");
 
                 var host = CreateHostBuilder(args).Build();
+                // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
                 host.Run();
         
             }
@@ -52,7 +48,7 @@ public class Program
 
         
 
-        // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
+        
         
      
        
@@ -108,12 +104,18 @@ public class Program
             options.IdleTimeout = TimeSpan.FromSeconds(10);
             options.Cookie.IsEssential = true;
         });
+
+        var dbString = Environment.GetEnvironmentVariable("DB_STRING");
+
+        if (dbString is null) throw new Exception("DB_STRING is null");
         
-        var sqlConnectionString = new SqlConnectionStringBuilder(configuration.GetConnectionString("ChirpSqlDb"))
+        var sqlConnectionString = new NpgsqlConnectionStringBuilder(dbString)
             {
                 Pooling = true
             };
+        
         Console.WriteLine($"Connection String: {sqlConnectionString}");
+        
         string? password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
         if (string.IsNullOrEmpty(sqlConnectionString.Password) && password != null)
@@ -121,10 +123,10 @@ public class Program
             // Add local password
             sqlConnectionString.Password = password;
             Console.WriteLine($"Password from environment variable: {password}");
-        } 
-        
+        }
+
         services.AddDbContext<ChirpDbContext>(options =>
-            options.UseSqlServer(sqlConnectionString.ConnectionString));
+            options.UseNpgsql(sqlConnectionString.ConnectionString));
     }
 }
 
