@@ -6,7 +6,7 @@ networks:
 
 services:
   chirpwebservice:
-    image: minitwit
+    image: ituminitwit/minitwitimage
     build:
       context: ..
       dockerfile: Dockerfile
