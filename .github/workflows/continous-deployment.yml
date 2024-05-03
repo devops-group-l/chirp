@@ -93,8 +93,21 @@ jobs:
 #          SSH_USER: ${{ secrets.SSH_USER }}
 #          SSH_HOST: ${{ secrets.SSH_HOST }}
 
+      - name: Try curl echo 1
+        run: |
+          curl -X GET \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}"
+        
+      - name: Try curl echo 2
+        run: |
+          echo $(curl -X GET \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}")
 
-      - name: Try curl echo
+      - name: Try curl echo 3
         run: |
           echo "GREEN_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
