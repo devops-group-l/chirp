@@ -107,9 +107,9 @@ jobs:
             -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> $GITHUB_OUTPUT
 
-      - name: Wait 1min
-        run: |
-          sleep 1m 0s
+#      - name: Wait 1min
+#        run: |
+#          sleep 1m 0s
 
       - name: Unassign dev IP
         run: |
@@ -118,16 +118,24 @@ jobs:
           -H "Content-Type: application/json" \
           -d '{"type":"unassign"}'
 
-      - name: Reassign prod IP to green droplet
+      - name: Echo blue
         run: |
-          curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.PROD_IP }}/actions" \
-          -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{"type":"assign","droplet_id":${{ steps.vars.outputs.GREEN_DROPLET_ID }}}'
+          echo ${{ steps.vars.outputs.BLUE_DROPLET_ID }}
 
-      - name: Reassign dev IP to blue droplet
+      - name: Echo green
         run: |
-          curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.SSH_HOST }}/actions" \
-          -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{"type":"assign","droplet_id":${{ steps.vars.outputs.BLUE_DROPLET_ID }}}'
+          echo ${{ steps.vars.outputs.GREEN_DROPLET_ID }}
+
+#      - name: Reassign prod IP to green droplet
+#        run: |
+#          curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.PROD_IP }}/actions" \
+#          -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
+#          -H "Content-Type: application/json" \
+#          -d '{"type":"assign","droplet_id":${{ steps.vars.outputs.GREEN_DROPLET_ID }}}'
+#
+#      - name: Reassign dev IP to blue droplet
+#        run: |
+#          curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.SSH_HOST }}/actions" \
+#          -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
+#          -H "Content-Type: application/json" \
+#          -d '{"type":"assign","droplet_id":${{ steps.vars.outputs.BLUE_DROPLET_ID }}}'
