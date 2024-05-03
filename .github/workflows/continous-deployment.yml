@@ -121,12 +121,16 @@ jobs:
 #          -d '{"type":"unassign"}'
 
       - name: Echo blue
+        env:
+          BLUE_DROPLET_ID: ${{ steps.get-blue-id.outputs.BLUE_DROPLET_ID }}
         run: |
-          echo ${{ steps.get-blue-id.outputs.BLUE_DROPLET_ID }}
+          echo $BLUE_DROPLET_ID
 
       - name: Echo green
+        env:
+          GREEN_DROPLET_ID: ${{ steps.get-green-id.outputs.GREEN_DROPLET_ID }}
         run: |
-          echo ${{ steps.get-green-id.outputs.GREEN_DROPLET_ID }}
+          echo $GREEN_DROPLET_ID
 
 #      - name: Reassign prod IP to green droplet
 #        run: |
