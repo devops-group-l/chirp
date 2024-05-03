@@ -97,21 +97,21 @@ jobs:
         run: |
           curl -X GET \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            -H "Authorization: Bearer $DIGITAL_OCEAN_KEY" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}"
         
       - name: Try curl echo 2
         run: |
           echo $(curl -X GET \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            -H "Authorization: Bearer $DIGITAL_OCEAN_KEY" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}")
 
       - name: Try curl echo 3
         run: |
           echo "GREEN_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            -H "Authorization: Bearer $DIGITAL_OCEAN_KEY" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)"
 
       - name: Get blue droplet id
@@ -119,7 +119,7 @@ jobs:
         run: |
           { echo "BLUE_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            -H "Authorization: Bearer $DIGITAL_OCEAN_KEY" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" } >> "$GITHUB_OUTPUT"
           
       - name: Get green droplet id
@@ -127,7 +127,7 @@ jobs:
         run: |
           { echo "GREEN_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
-            -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
+            -H "Authorization: Bearer $DIGITAL_OCEAN_KEY" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" } >> "$GITHUB_OUTPUT"
 
 #      - name: Wait 1min
