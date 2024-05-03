@@ -95,7 +95,7 @@ jobs:
 
       - name: Get blue droplet id
         run: |
-          echo "GREEN_DROPLET_ID=$(curl -X GET \
+          echo "BLUE_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" >> $GITHUB_OUTPUT
