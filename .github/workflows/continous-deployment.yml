@@ -98,25 +98,25 @@ jobs:
           echo "BLUE_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_ENV"
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" >> $GITHUB_ENV
           
       - name: Get green droplet id
         run: |
           echo "GREEN_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_ENV"
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> $GITHUB_ENV
 
 #      - name: Wait 1min
 #        run: |
 #          sleep 1m 0s
 
-      - name: Unassign dev IP
-        run: |
-          curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.SSH_HOST }}/actions" \
-          -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-          -H "Content-Type: application/json" \
-          -d '{"type":"unassign"}'
+#      - name: Unassign dev IP
+#        run: |
+#          curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.SSH_HOST }}/actions" \
+#          -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
+#          -H "Content-Type: application/json" \
+#          -d '{"type":"unassign"}'
 
       - name: Echo blue
         run: |
