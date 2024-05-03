@@ -93,42 +93,21 @@ jobs:
 #          SSH_USER: ${{ secrets.SSH_USER }}
 #          SSH_HOST: ${{ secrets.SSH_HOST }}
 
-      - name: Try curl echo 1
-        run: |
-          curl -X GET \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}"
-        
-      - name: Try curl echo 2
-        run: |
-          echo $(curl -X GET \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}")
-
-      - name: Try curl echo 3
-        run: |
-          echo "GREEN_DROPLET_ID=$(curl -X GET \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)"
-
       - name: Get blue droplet id
         id: get-blue-id
         run: |
-          { echo "BLUE_DROPLET_ID=$(curl -X GET \
+          echo "BLUE_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" } >> "$GITHUB_OUTPUT"
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_OUTPUT"
           
       - name: Get green droplet id
         id: get-green-id
         run: |
-          { echo "GREEN_DROPLET_ID=$(curl -X GET \
+          echo "GREEN_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" } >> "$GITHUB_OUTPUT"
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_OUTPUT"
 
 #      - name: Wait 1min
 #        run: |
