@@ -98,14 +98,14 @@ jobs:
           echo "BLUE_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" >> $GITHUB_OUTPUT
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.PROD_IP }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_ENV"
           
       - name: Get green droplet id
         run: |
           echo "GREEN_DROPLET_ID=$(curl -X GET \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $DIGITALOCEAN_TOKEN" \
-            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> $GITHUB_OUTPUT
+            "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_ENV"
 
 #      - name: Wait 1min
 #        run: |
@@ -120,11 +120,11 @@ jobs:
 
       - name: Echo blue
         run: |
-          echo ${{ steps.vars.outputs.BLUE_DROPLET_ID }}
+          echo $BLUE_DROPLET_ID
 
       - name: Echo green
         run: |
-          echo ${{ steps.vars.outputs.GREEN_DROPLET_ID }}
+          echo $GREEN_DROPLET_ID
 
 #      - name: Reassign prod IP to green droplet
 #        run: |
