@@ -36,7 +36,7 @@ public abstract class BaseController : Controller, IController
         GetPathUrl = () => Request.GetPathUrl();
     }
 
-    protected async Task<IActionResult> dotneWithAuthAsync(
+    protected async Task<IActionResult> WithAuthAsync(
         Func<AuthorDto, Task<IActionResult>> protectedFunction
     )
     {
