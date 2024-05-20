@@ -20,9 +20,9 @@ jobs:
           base: ${{ github.ref }}
           filters: |     
             report:
-              - 'docs/report.md'
-              - 'docs/images/*'
-              - 'docs/diagrams/*'
+              - 'report/report.md'
+              - 'report/images/*'
+              - 'report/diagrams/*'
         
   buildReport:
     name: Build Report
@@ -49,7 +49,7 @@ jobs:
           sudo apt-get install -y --reinstall texlive-fonts-recommended
 
       - name: Generate report pdf
-        run: pandoc docs/report.md -o docs/2023_itubdsa_group_11_report.pdf --highlight-style=tango
+        run: pandoc report/report.md -o report/build/BSc_group_l.pdf --highlight-style=tango
         
       - uses: EndBug/add-and-commit@v9
         with:
