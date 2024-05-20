@@ -1,11 +1,12 @@
 ## System's Perspective
 ### Design and architecture
+![alt text](img/Onion_architecture.png "User sequence")
 Design and architecture of your ITU-MiniTwit systems
 ### Dependencies
 All dependencies of your ITU-MiniTwit systems on all levels of abstraction and development stages. That is, list and briefly describe all technologies and tools you applied and depend on.
 ### Interactions of subsystems
 - For example, via an illustrative UML Sequence diagram that shows the flow of information through your system from user request in the browser, over all subsystems, hitting the database, and a response that is returned to the user.
-- Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
+  ![alt text](img/User_Sequence.png "User sequence")
 ### State of systems
 Describe the current state of your systems, for example using results of static analysis and quality assessments.
 
