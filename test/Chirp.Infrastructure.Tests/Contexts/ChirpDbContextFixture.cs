@@ -9,17 +9,17 @@ public class ChirpDbContextFixture : IDisposable
 {
     private readonly DbContextOptions<ChirpDbContext> _options;
     private readonly SqlEdgeContainer _container;
-    public DataGenerator.AuthorCheepsData Data = DataGenerator.GenerateAuthorsAndCheeps(generateIds:false);
+    public DataGenerator.AuthorCheepsData Data = DataGenerator.GenerateAuthorsAndCheeps(
+        generateIds: false
+    );
 
     public ChirpDbContextFixture()
     {
         // Start up test container
-        _container = new SqlEdgeBuilder()
-            .WithImage("mcr.microsoft.com/azure-sql-edge")
-            .Build();
-        
+        _container = new SqlEdgeBuilder().WithImage("mcr.microsoft.com/azure-sql-edge").Build();
+
         _container.StartAsync().Wait();
-        
+
         // Build options
         _options = new DbContextOptionsBuilder<ChirpDbContext>()
             .UseSqlServer(_container.GetConnectionString())
@@ -28,20 +28,19 @@ public class ChirpDbContextFixture : IDisposable
         // Add mock data to DB
         using var context = new ChirpDbContext(_options);
         context.Database.Migrate();
-        
+
         context.Cheeps.RemoveRange(context.Cheeps);
         context.Authors.RemoveRange(context.Authors);
         context.Likes.RemoveRange(context.Likes);
         context.SaveChanges();
-        
+
         context.Authors.AddRange(Data.Authors);
         context.Cheeps.AddRange(Data.Cheeps);
         context.SaveChanges();
-        
     }
 
-    public ChirpDbContext GetContext() => new (_options);
-    
+    public ChirpDbContext GetContext() => new(_options);
+
     public void Dispose()
     {
         _container.DisposeAsync().AsTask().Wait();

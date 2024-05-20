@@ -10,41 +10,52 @@ public abstract class BaseController : Controller, IController
 {
     public virtual Func<ClaimsUser?> GetUser { get; }
     public virtual Func<string> GetPathUrl { get; }
-    
+
     protected readonly IAuthorRepository AuthorRepository;
     protected readonly ICheepRepository CheepRepository;
     protected readonly ILikeRepository LikeRepository;
     protected readonly ICommentRepository CommentRepository;
     protected readonly ISimulationRepository SimulationRepository;
-    
-    protected BaseController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository)
+
+    protected BaseController(
+        IAuthorRepository authorRepository,
+        ICheepRepository cheepRepository,
+        ILikeRepository likeRepository,
+        ICommentRepository commentRepository,
+        ISimulationRepository simulationRepository
+    )
     {
         AuthorRepository = authorRepository;
         CheepRepository = cheepRepository;
         CommentRepository = commentRepository;
         SimulationRepository = simulationRepository;
-        
+
         GetUser = () => User.GetUser();
         LikeRepository = likeRepository;
         GetUser = () => User.GetUser();
         GetPathUrl = () => Request.GetPathUrl();
     }
-    
-    protected async Task<IActionResult> WithAuthAsync(Func<AuthorDto, Task<IActionResult>> protectedFunction)
+
+    protected async Task<IActionResult> dotneWithAuthAsync(
+        Func<AuthorDto, Task<IActionResult>> protectedFunction
+    )
     {
         try
         {
             AuthorDto? rawUser = (AuthorDto?)HttpContext.Items["user"];
-            if (rawUser is null) throw new ArgumentException("User is null in Auth async");
+            if (rawUser is null)
+                throw new ArgumentException("User is null in Auth async");
             var user = rawUser;
-            
-            await AuthorRepository.AddAuthor(new AuthorDto
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Username = user.Username,
-                AvatarUrl = user.AvatarUrl,
-            });
+
+            await AuthorRepository.AddAuthor(
+                new AuthorDto
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Username = user.Username,
+                    AvatarUrl = user.AvatarUrl,
+                }
+            );
 
             return await protectedFunction(user);
         }
@@ -56,13 +67,14 @@ public abstract class BaseController : Controller, IController
         {
             return BadRequest("Unknown Error Occurred");
         }
-    }                
+    }
 
     public ActionResult RedirectWithError(string errorMessage)
     {
         var pathUrl = GetPathUrl();
-        if (pathUrl.Contains("errorMessage=")) return Redirect(pathUrl);
-        
+        if (pathUrl.Contains("errorMessage="))
+            return Redirect(pathUrl);
+
         var queryDelimiter = pathUrl.Contains('?') ? "&" : "?";
         return Redirect(GetPathUrl() + $"{queryDelimiter}errorMessage={errorMessage}");
     }

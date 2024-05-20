@@ -10,9 +10,7 @@ namespace Chirp.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Email",
-                table: "Authors");
+            migrationBuilder.DropColumn(name: "Email", table: "Authors");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -22,22 +20,22 @@ namespace Chirp.Infrastructure.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(50)",
-                oldMaxLength: 50);
+                oldMaxLength: 50
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "Login",
                 table: "Authors",
                 type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: ""
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Login",
-                table: "Authors");
+            migrationBuilder.DropColumn(name: "Login", table: "Authors");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -49,7 +47,8 @@ namespace Chirp.Infrastructure.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(50)",
                 oldMaxLength: 50,
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "Email",
@@ -57,7 +56,8 @@ namespace Chirp.Infrastructure.Migrations
                 type: "nvarchar(100)",
                 maxLength: 100,
                 nullable: false,
-                defaultValue: "");
+                defaultValue: ""
+            );
         }
     }
 }

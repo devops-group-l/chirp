@@ -8,8 +8,9 @@ namespace Chirp.Infrastructure.Tests.Repositories;
 
 public class AuthorRepositoryTest
 {
-    private readonly MockChirpRepositories _mockChirpRepositories = MockRepositoryFactory.GetMockCheepRepositories();
-    
+    private readonly MockChirpRepositories _mockChirpRepositories =
+        MockRepositoryFactory.GetMockCheepRepositories();
+
     [Fact]
     public async Task AddAuthorTest()
     {
@@ -19,17 +20,21 @@ public class AuthorRepositoryTest
         string username = new Faker().Internet.UserName(name);
         string authorDtoMail = new Faker().Internet.Email();
         //Act
-        await _mockChirpRepositories.AuthorRepository.AddAuthor(new AuthorDto
-        {
-            Id = authorDtoId,
-            Email = authorDtoMail,
-            Username = username,
-            AvatarUrl = new Faker().Internet.Avatar()
-        });
+        await _mockChirpRepositories.AuthorRepository.AddAuthor(
+            new AuthorDto
+            {
+                Id = authorDtoId,
+                Email = authorDtoMail,
+                Username = username,
+                AvatarUrl = new Faker().Internet.Avatar()
+            }
+        );
         //Assert
         _mockChirpRepositories.MockAuthorsDbSet.Verify(m => m.Add(It.IsAny<Author>()), Times.Once);
-        _mockChirpRepositories.MockChirpDbContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        
+        _mockChirpRepositories.MockChirpDbContext.Verify(
+            m => m.SaveChangesAsync(It.IsAny<CancellationToken>()),
+            Times.Once
+        );
     }
 
     [Fact] //Tests if the follow is added to an author
@@ -39,10 +44,15 @@ public class AuthorRepositoryTest
         Author authorToBeFollowed = _mockChirpRepositories.TestAuthors.Last();
         Author followingAuthor = _mockChirpRepositories.TestAuthors.First();
         //Act
-        await _mockChirpRepositories.AuthorRepository.AddFollow(followingAuthor.AuthorId, authorToBeFollowed.AuthorId);
+        await _mockChirpRepositories.AuthorRepository.AddFollow(
+            followingAuthor.AuthorId,
+            authorToBeFollowed.AuthorId
+        );
         //Assert
-        Assert.Contains(authorToBeFollowed.FollowedBy,
-            a => a.AuthorId.ToString().Equals(followingAuthor.AuthorId.ToString()));
+        Assert.Contains(
+            authorToBeFollowed.FollowedBy,
+            a => a.AuthorId.ToString().Equals(followingAuthor.AuthorId.ToString())
+        );
     }
 
     [Fact]
@@ -51,7 +61,8 @@ public class AuthorRepositoryTest
         //Arrange
         Author author = _mockChirpRepositories.TestAuthors.Last();
         //Act
-        List<string> followerList = await _mockChirpRepositories.AuthorRepository.GetFollowsForAuthor(author.AuthorId);
+        List<string> followerList =
+            await _mockChirpRepositories.AuthorRepository.GetFollowsForAuthor(author.AuthorId);
         //Assert
         Assert.NotEmpty(followerList);
     }
@@ -63,14 +74,22 @@ public class AuthorRepositoryTest
         Author author = _mockChirpRepositories.TestAuthors.First();
         Author unfollowAuthor = author.Follows.First();
         //Act
-        await _mockChirpRepositories.AuthorRepository.RemoveFollow(author.AuthorId, unfollowAuthor.AuthorId);
-        
+        await _mockChirpRepositories.AuthorRepository.RemoveFollow(
+            author.AuthorId,
+            unfollowAuthor.AuthorId
+        );
+
         bool isFollowingRemoved = author.Follows.All(a => a.AuthorId != unfollowAuthor.AuthorId);
-        bool isFollowedByRemoved = unfollowAuthor.FollowedBy.All(a => a.AuthorId != author.AuthorId);
+        bool isFollowedByRemoved = unfollowAuthor.FollowedBy.All(a =>
+            a.AuthorId != author.AuthorId
+        );
         //Assert
         Assert.True(isFollowingRemoved);
         Assert.True(isFollowedByRemoved);
-        _mockChirpRepositories.MockChirpDbContext.Verify(db => db.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
+        _mockChirpRepositories.MockChirpDbContext.Verify(
+            db => db.SaveChangesAsync(It.IsAny<CancellationToken>()),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -81,12 +100,13 @@ public class AuthorRepositoryTest
         //Act
         await _mockChirpRepositories.AuthorRepository.DeleteAuthor(author.AuthorId);
         //Assert
-        _mockChirpRepositories.MockAuthorsDbSet.Verify(m => m.Remove(It.IsAny<Author>()), Times.Once);
-        _mockChirpRepositories.MockChirpDbContext.Verify(m => m.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
-        
+        _mockChirpRepositories.MockAuthorsDbSet.Verify(
+            m => m.Remove(It.IsAny<Author>()),
+            Times.Once
+        );
+        _mockChirpRepositories.MockChirpDbContext.Verify(
+            m => m.SaveChangesAsync(It.IsAny<CancellationToken>()),
+            Times.Once
+        );
     }
-    
-   
-    
 }
-

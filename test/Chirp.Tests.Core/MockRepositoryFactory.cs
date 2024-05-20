@@ -32,11 +32,20 @@ public static class MockRepositoryFactory
     {
         var mockChirpDbContext = DataGenerator.GenerateMockChirpDbContext(withErrorProvocation);
 
-        IAuthorRepository authorRepository = new AuthorRepository(mockChirpDbContext.MockChirpDbContext.Object);
-        ICheepRepository cheepRepository = new CheepRepository(mockChirpDbContext.MockChirpDbContext.Object, authorRepository);
-        ILikeRepository likeRepository = new LikeRepository(mockChirpDbContext.MockChirpDbContext.Object);
-        ICommentRepository commentRepository = new CommentRepository(mockChirpDbContext.MockChirpDbContext.Object);
-        
+        IAuthorRepository authorRepository = new AuthorRepository(
+            mockChirpDbContext.MockChirpDbContext.Object
+        );
+        ICheepRepository cheepRepository = new CheepRepository(
+            mockChirpDbContext.MockChirpDbContext.Object,
+            authorRepository
+        );
+        ILikeRepository likeRepository = new LikeRepository(
+            mockChirpDbContext.MockChirpDbContext.Object
+        );
+        ICommentRepository commentRepository = new CommentRepository(
+            mockChirpDbContext.MockChirpDbContext.Object
+        );
+
         return new MockChirpRepositories
         {
             CheepRepository = cheepRepository,

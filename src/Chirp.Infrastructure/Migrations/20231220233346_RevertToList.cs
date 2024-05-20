@@ -17,7 +17,8 @@ namespace Chirp.Infrastructure.Migrations
                 maxLength: 40,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "AvatarUrl",
@@ -26,7 +27,8 @@ namespace Chirp.Infrastructure.Migrations
                 maxLength: 300,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
         }
 
         /// <inheritdoc />
@@ -39,7 +41,8 @@ namespace Chirp.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(40)",
-                oldMaxLength: 40);
+                oldMaxLength: 40
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "AvatarUrl",
@@ -48,7 +51,8 @@ namespace Chirp.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(300)",
-                oldMaxLength: 300);
+                oldMaxLength: 300
+            );
         }
     }
 }

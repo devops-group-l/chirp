@@ -16,12 +16,16 @@ public class MockWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureTestServices(servicesConfiguration =>
         {
             var mockRepositories = MockRepositoryFactory.GetMockCheepRepositories();
-            
-            servicesConfiguration.AddScoped<ICheepRepository>(_ => mockRepositories.CheepRepository);
-            servicesConfiguration.AddScoped<IAuthorRepository>(_ => mockRepositories.AuthorRepository);
+
+            servicesConfiguration.AddScoped<ICheepRepository>(_ =>
+                mockRepositories.CheepRepository
+            );
+            servicesConfiguration.AddScoped<IAuthorRepository>(_ =>
+                mockRepositories.AuthorRepository
+            );
             servicesConfiguration.AddScoped<ILikeRepository>(_ => mockRepositories.LikeRepository);
         });
-        
+
         builder.UseEnvironment("Development");
     }
 }

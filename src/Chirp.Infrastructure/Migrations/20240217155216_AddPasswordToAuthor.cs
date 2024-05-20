@@ -17,7 +17,8 @@ namespace Chirp.Infrastructure.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(300)",
-                oldMaxLength: 300);
+                oldMaxLength: 300
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "Password",
@@ -25,15 +26,14 @@ namespace Chirp.Infrastructure.Migrations
                 type: "nvarchar(300)",
                 maxLength: 300,
                 nullable: false,
-                defaultValue: "");
+                defaultValue: ""
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Password",
-                table: "Authors");
+            migrationBuilder.DropColumn(name: "Password", table: "Authors");
 
             migrationBuilder.AlterColumn<string>(
                 name: "AvatarUrl",
@@ -42,7 +42,8 @@ namespace Chirp.Infrastructure.Migrations
                 maxLength: 300,
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+                oldType: "nvarchar(max)"
+            );
         }
     }
 }

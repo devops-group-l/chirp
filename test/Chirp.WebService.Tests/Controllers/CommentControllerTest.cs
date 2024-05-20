@@ -11,17 +11,21 @@ namespace Chirp.WebService.Tests.Controllers;
 
 public class CommentControllerTest
 {
-    private readonly MockChirpRepositories _mockChirpRepositories = MockRepositoryFactory.GetMockCheepRepositories();
+    private readonly MockChirpRepositories _mockChirpRepositories =
+        MockRepositoryFactory.GetMockCheepRepositories();
     private readonly CommentController _commentController;
 
     public CommentControllerTest()
     {
-        Mock<CommentController> mockController = new(_mockChirpRepositories.AuthorRepository,
-            _mockChirpRepositories.CheepRepository,
-            _mockChirpRepositories.LikeRepository,
-            _mockChirpRepositories.CommentRepository);
+        Mock<CommentController> mockController =
+            new(
+                _mockChirpRepositories.AuthorRepository,
+                _mockChirpRepositories.CheepRepository,
+                _mockChirpRepositories.LikeRepository,
+                _mockChirpRepositories.CommentRepository
+            );
         mockController.CallBase = true;
-        
+
         string name = new Faker().Name.FullName();
         var user = new ClaimsUser
         {
@@ -31,7 +35,10 @@ public class CommentControllerTest
             AvatarUrl = new Faker().Internet.Avatar()
         };
         mockController.As<IController>().Setup(bc => bc.GetUser).Returns(() => user);
-        mockController.As<IController>().Setup(bc => bc.GetPathUrl).Returns(() => new Faker().Internet.UrlWithPath());
+        mockController
+            .As<IController>()
+            .Setup(bc => bc.GetPathUrl)
+            .Returns(() => new Faker().Internet.UrlWithPath());
 
         _commentController = mockController.Object;
     }
@@ -45,7 +52,7 @@ public class CommentControllerTest
         string cheepId = cheep.CheepId.ToString();
         string authorId = author.AuthorId.ToString();
         string commentText = new Faker().Random.Words();
-        
+
         IFormCollection collection = new FormCollection(
             new Dictionary<string, StringValues>
             {
@@ -73,12 +80,9 @@ public class CommentControllerTest
         string commentId = comment.CommentId.ToString();
 
         IFormCollection collection = new FormCollection(
-            new Dictionary<string, StringValues>
-            {
-                { "CommentId", commentId }
-            }
+            new Dictionary<string, StringValues> { { "CommentId", commentId } }
         );
-        
+
         // Act
         var result = await _commentController.Delete(collection);
 
@@ -89,24 +93,20 @@ public class CommentControllerTest
         Assert.False(string.IsNullOrEmpty(redirectResult.Url));
     }
 
-   [Fact] 
+    [Fact]
     public async Task TestDeleteCommentFail()
     {
         //Arrange
         string fakeCommentId = "not_an_id";
 
         IFormCollection collection = new FormCollection(
-            new Dictionary<string, StringValues>
-            {
-                { "CommentId", fakeCommentId }
-            }
+            new Dictionary<string, StringValues> { { "CommentId", fakeCommentId } }
         );
-        
+
         //Act
         IActionResult actionResult = await _commentController.Delete(collection);
-        
+
         //Assert
         Assert.False(actionResult is RedirectResult);
-
     }
 }

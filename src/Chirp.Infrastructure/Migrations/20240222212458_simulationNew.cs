@@ -14,7 +14,8 @@ namespace Chirp.Infrastructure.Migrations
                 name: "SimulationMessages",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     text = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     pub_date = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -23,13 +24,15 @@ namespace Chirp.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SimulationMessages", x => x.Id);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "SimulationUsers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    Id = table
+                        .Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -38,17 +41,16 @@ namespace Chirp.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SimulationUsers", x => x.Id);
-                });
+                }
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "SimulationMessages");
+            migrationBuilder.DropTable(name: "SimulationMessages");
 
-            migrationBuilder.DropTable(
-                name: "SimulationUsers");
+            migrationBuilder.DropTable(name: "SimulationUsers");
         }
     }
 }

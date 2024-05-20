@@ -17,6 +17,6 @@ public class CheepDto
     public required DateTime Timestamp { get; init; }
 
     public required List<CommentDto> CommentDtos { get; init; }
-    
+
     public required int LikeCount { get; init; }
 }
