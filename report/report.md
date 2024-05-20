@@ -27,6 +27,12 @@ In case you have used AI-assistants during your project briefly explain which sy
 ## Lessons Learned Perspective
 Describe the biggest issues, how you solved them, and which are major lessons learned with regards to:
 
+### Continuous refactoring
+At the beginning of the simulation, we implemented functionality for receiving HTTP requests and storing data in separate tables unrelated to 'real' data. This data served the relevant HTTP simulation endpoints, but was purposely not visible on our applications feed. 
+Later on we then had to display this simulation data, which initially prompted us to change how we processed incoming requests. However this would require a migration, which we feared could cause a wipe of our database. 
+Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data in feed-viable data, without changing models. 
+Through this we learned the value of `SKRIV MERE HER`
+
 - evolution and refactoring
 - operation, and
 - maintenance
