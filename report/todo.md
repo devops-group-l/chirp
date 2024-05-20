@@ -3,8 +3,11 @@
 - [ ] Implement testing in our CI/CD, to use test as a quality gate
 - [ ] Clean up workflows, remove old remnants from BDSA.
 - [ ] Add static analysis tools so we have 3.
-    - There should maybe be one at the moment, but check.
-- [ ] Add Maintainability and Technical Debt estimation tools to your projects
+    - [ ] One linter for your mani programming language
+    - [ ] One code formatter for your main programming language
+    - [ ] One linter for your dockerfiles
+    - [ ] Use these 3 as quality gates in CI/CD
+- [X] Add Maintainability and Technical Debt estimation tools to your projects
 - [ ] Do we have replication/backup?
 - [ ] Infrastructure as Code 
     - automating also the creation of infrastructure.
