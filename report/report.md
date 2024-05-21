@@ -16,12 +16,12 @@ hence promoting loose coupling.
   - `Controllers` to handle HTTP request and responses with access to the `repositories`
   - `Pages` that contains UI components to render the data to the user. In our project they're referred to as Partials
 - Web layer
-  - The web layer is outside of the main project and shows the `Frameworks`, `Tests` and the `Database`
+  - The web layer is outside of the main project and represents outside dependencies `Frameworks`, `Tests` and the `Database`
 ### Dependencies
 All dependencies of your ITU-MiniTwit systems on all levels of abstraction and development stages. That is, list and briefly describe all technologies and tools you applied and depend on.
 ### Interactions of subsystems
-- For example, via an illustrative UML Sequence diagram that shows the flow of information through your system from user request in the browser, over all subsystems, hitting the database, and a response that is returned to the user.
   ![alt text](img/User_Sequence.png "User sequence")
+- Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
 ### State of systems
 Describe the current state of your systems, for example using results of static analysis and quality assessments.
 
@@ -76,7 +76,11 @@ Brief results of the security assessment and brief description of how did you ha
 ### Strategy for scaling and upgrades
 Applied strategy for scaling and upgrades
 ### Reflection on AI assistance
-In case you have used AI-assistants during your project briefly explain which system(s) you used during the project and reflect how it supported/hindered your process.
+During the project we've used ChatGPT to search for information and code snippets for guidance.
+It is a mutual opinion in the group that copy-pasting our code to any chat bot or other AI tools should be avoided
+as we're unaware of where the data is stored and exactly who has access. Therefor we view AI tools such as ChatGPT 
+as an addition to Google where we can search for information and get answers to our questions.
+Additionally, manual development has the best learning outcome.
 
 ## Lessons Learned Perspective
 Describe the biggest issues, how you solved them, and which are major lessons learned with regards to:
