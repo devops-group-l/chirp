@@ -12,8 +12,9 @@
 - [ ] Infrastructure as Code 
     - automating also the creation of infrastructure.
     - Tror vi snakkede om at bruge vagrant, men nåede vi i mål med det.
+- [ ] Fix links in the repos
+
 - [ ] Merge dependabot updates into main
- 
 
 # What to include in the report?
 

@@ -1,5 +1,6 @@
 using Bogus;
 using Chirp.Infrastructure.Contexts;
+using Chirp.Infrastructure.Extensions;
 using Chirp.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
@@ -34,6 +35,8 @@ public class DataGenerator
     {
         var authorsFaker = new Faker<Author>()
             .RuleFor(a => a.Username, f => f.Internet.UserName())
+            .RuleFor(a => a.Email, f => f.Internet.Email())
+            .RuleFor(a => a.Password, f => f.Internet.Password())
             .RuleFor(a => a.AvatarUrl, f => f.Internet.Avatar());
 
         if (generateIds)
@@ -48,7 +51,7 @@ public class DataGenerator
     {
         var cheepsFaker = new Faker<Cheep>()
             .RuleFor(c => c.Text, f => f.Random.Words())
-            .RuleFor(c => c.Timestamp, f => f.Date.Past())
+            .RuleFor(c => c.Timestamp, f => f.Date.Past().SetKindUtc())
             .RuleFor(c => c.Author, f => f.PickRandom(authors));
 
         if (generateIds)
@@ -104,7 +107,7 @@ public class DataGenerator
         var commentsFaker = new Faker<Comment>()
             .RuleFor(c => c.CommentAuthor, f => f.PickRandom(authors))
             .RuleFor(c => c.Cheep, f => f.PickRandom(cheeps))
-            .RuleFor(c => c.Timestamp, f => f.Date.Past())
+            .RuleFor(c => c.Timestamp, f => f.Date.Past().SetKindUtc())
             .RuleFor(c => c.Text, f => f.Random.Words());
         if (generateIds)
         {
@@ -115,12 +118,12 @@ public class DataGenerator
     }
 
     public static AuthorCheepsData GenerateAuthorsAndCheeps(
-        int minAuthors = 100,
-        int maxAuthors = 200,
-        int minCheeps = 500,
-        int maxCheeps = 1000,
-        int minLikes = 1000,
-        int maxLikes = 2000,
+        int minAuthors = 50,
+        int maxAuthors = 100,
+        int minCheeps = 100,
+        int maxCheeps = 500,
+        int minLikes = 100,
+        int maxLikes = 500,
         int minComments = 5,
         int maxComments = 100,
         bool generateIds = true

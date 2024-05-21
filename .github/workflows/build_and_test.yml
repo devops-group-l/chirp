@@ -3,7 +3,7 @@ name: .NET Build and Test
 on:
   pull_request:
     branches:
-      - main
+      - itu-minitwit
 
 jobs:
   BuildAndTest:

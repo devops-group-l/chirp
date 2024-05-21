@@ -109,7 +109,7 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
             "https://api.digitalocean.com/v2/reserved_ips/${{ secrets.SSH_HOST }}" | jq .reserved_ip.droplet.id)" >> "$GITHUB_OUTPUT"
 
-      - name: Unassign dev IP
+      - name: Un-assign green IP
         run: |
           curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.SSH_HOST }}/actions" \
           -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
@@ -120,7 +120,7 @@ jobs:
         run: |
           sleep 30s
 
-      - name: Reassign prod IP to green droplet
+      - name: Reassign blue IP to green droplet
         run: |
           curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.PROD_IP }}/actions" \
           -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \
@@ -131,7 +131,7 @@ jobs:
         run: |
           sleep 30s
 
-      - name: Reassign dev IP to blue droplet
+      - name: Reassign green IP to blue droplet
         run: |
           curl -X POST "https://api.digitalocean.com/v2/floating_ips/${{ secrets.SSH_HOST }}/actions" \
           -H "Authorization: Bearer ${{ secrets.DIGITAL_OCEAN_KEY }}" \

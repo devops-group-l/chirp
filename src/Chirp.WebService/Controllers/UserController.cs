@@ -3,6 +3,7 @@ using System.Text;
 using Chirp.Core.Dto;
 using Chirp.Core.Repositories;
 using Chirp.Infrastructure.Contexts;
+using Chirp.WebService.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Chirp.WebService.Controllers
@@ -75,7 +76,7 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("The two passwords do not match");
             }
 
-            string hashedPassword = SimpleHashPassword(password);
+            string hashedPassword = password.SimpleHashPassword();
 
             var user = new AuthorDto
             {
@@ -100,7 +101,7 @@ namespace Chirp.WebService.Controllers
             string? username = collection["username"];
             string? enteredPassword = collection["password"];
 
-            string password = SimpleHashPassword(enteredPassword);
+            string password = enteredPassword?.SimpleHashPassword() ?? "";
 
             if (String.IsNullOrEmpty(username))
             {
@@ -124,7 +125,7 @@ namespace Chirp.WebService.Controllers
 
             if (user.Password != password)
             {
-                return RedirectWithError("Invalid password");
+                return RedirectWithError("Invalid password " + user.Password + " - " + password);
             }
             else
             {
@@ -167,15 +168,6 @@ namespace Chirp.WebService.Controllers
             HttpContext.Session.Remove("UserId");
 
             return Redirect("/");
-        }
-
-        static string SimpleHashPassword(string password)
-        {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashBytes);
-            }
         }
     }
 }

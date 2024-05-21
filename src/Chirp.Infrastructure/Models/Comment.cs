@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Chirp.Infrastructure.Extensions;
 
 namespace Chirp.Infrastructure.Models;
 
@@ -34,5 +35,5 @@ public class Comment
     [Required, MaxLength(160, ErrorMessage = "Comment must contain less than 160 characters")]
     public string Text { get; set; } = "";
 
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow.SetKindUtc();
 }

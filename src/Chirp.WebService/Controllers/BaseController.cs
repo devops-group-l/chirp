@@ -8,7 +8,7 @@ namespace Chirp.WebService.Controllers;
 
 public abstract class BaseController : Controller, IController
 {
-    public virtual Func<ClaimsUser?> GetUser { get; }
+    public virtual Func<AuthorDto?> GetUser { get; }
     public virtual Func<string> GetPathUrl { get; }
 
     protected readonly IAuthorRepository AuthorRepository;
@@ -30,9 +30,8 @@ public abstract class BaseController : Controller, IController
         CommentRepository = commentRepository;
         SimulationRepository = simulationRepository;
 
-        GetUser = () => User.GetUser();
         LikeRepository = likeRepository;
-        GetUser = () => User.GetUser();
+        GetUser = () => (AuthorDto?)HttpContext.Items["user"];
         GetPathUrl = () => Request.GetPathUrl();
     }
 
@@ -42,7 +41,7 @@ public abstract class BaseController : Controller, IController
     {
         try
         {
-            AuthorDto? rawUser = (AuthorDto?)HttpContext.Items["user"];
+            AuthorDto? rawUser = GetUser();
             if (rawUser is null)
                 throw new ArgumentException("User is null in Auth async");
             var user = rawUser;
