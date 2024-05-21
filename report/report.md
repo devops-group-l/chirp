@@ -1,7 +1,22 @@
 ## System's Perspective
-### Design and architecture
+### The onion architecture
 ![alt text](img/Onion_architecture.png "User sequence")
-Design and architecture of your ITU-MiniTwit systems
+We chose to work with the onion architecture. The architecture provides loose coupling with the dependencies only
+flowing inwards. The interactions between the layers are facilitated through interfaces and abstractions,
+hence promoting loose coupling.
+### The layers
+- The Domain/Core layer
+  - `DTOs` (Data Transfer Objects) to transfer data between layers in the system
+  - `Interfaces` of the `repositories` to promote loose coupling
+- The Infrastructure Layer
+  - `Repositories` for data access with the Entity Framework in the `DbContext`
+  - `Models`as the entities used in the `DbContext` on the same layer 
+  - Additional services such as `Prometheus` and `UpdateLatestTracker` for monitoring the system
+- The Webservice/Presentation layer
+  - `Controllers` to handle HTTP request and responses with access to the `repositories`
+  - `Pages` that contains UI components to render the data to the user. In our project they're referred to as Partials
+- Web layer
+  - The web layer is outside of the main project and shows the `Frameworks`, `Tests` and the `Database`
 ### Dependencies
 All dependencies of your ITU-MiniTwit systems on all levels of abstraction and development stages. That is, list and briefly describe all technologies and tools you applied and depend on.
 ### Interactions of subsystems
