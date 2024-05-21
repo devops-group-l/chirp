@@ -60,7 +60,7 @@ It has the following steps:
 This chain ensures that, when a developer implements a feature, the project can build, and works as intended.
 
 ##### Code coverage CI Chain
-The code coverage CI chain works as an extension to the build and test CI chain, since it both builds and tests the project, in addition to creating a test coverage report.
+The code coverage CI chain works as an extension to the build and test CI chain, since they both build and test the project, in addition to creating a test coverage report.
 It is run, along with the build and test CI chain, on every created pull request to our `itu-minitwit` branch.
 
 It has the following steps:
@@ -78,19 +78,19 @@ It has the following steps:
 |    9     |         Build Code Coverage Summary Report         |                                                                                   Takes the `Cobertura` report, and converts it to a markdown format, which can be used to showcase the code coverage as a PR comment. |
 |    10    |              Add Coverage PR Comment               |                                                                                                                This step takes the generated markdown-format code coverage report, and adds it as a sticky PR comment. |
 |    11    |                Write to Job Summary                |                                                                                                    This step takes the generated markdown-format code coverage report, and adds it as a summary to the given workflow. |
-|    12    | Test Check Failure of Code Coverage Summary Report |                                                      Takes the code coverage report, and given a minimum threshold of 60%, fails the check if the code coverage % is below 60%. If below 80%, only a warning is given. |
+|    12    | Test Check Failure of Code Coverage Summary Report |                                            Takes the code coverage report, and given a minimum threshold of 60%, fails the check if the code coverage % is below 60%. If between 60% and 80%, only a warning is given. |
 
 This chain ensures that enough of the code is tested at all times.
 Furthermore, it is also used as a reminder for the developers to write tests to their newly implemented features.
 
 ##### CI Chain reflections
 Looking back at it now, we should have been better at utilising and respecting our CI chains.
-This is mainly due to there being other more pressing tasks for this project, which ended up taking most of the time we allocated to the project.
+This is mainly due to use prioritising other tasks, which ended up taking most of the time we allocated to the project.
 
 Although setting up Dependabot, we weren't good at continuously updating the recommended dependencies, which we should have done as a weekly ritual.
 
 Furthermore, early on in the project, we had commented out our 2 primary CI chains during a major refactoring of the project, and had forgotten to un-comment it.
-Looking back at it, we should have never uncommented them, but rather just adjust to them, as it could have led to some serious consequences.
+Looking back at it, we should have never uncommented them, but rather just adjusted to them, as it could have led to some serious consequences.
 Moreover, we could probably have done without the build and test chain, and just simply used the code coverage chain alone instead, as it will also fail if the project can't build or the tests fail.
 
 #### CD Chain
@@ -139,7 +139,7 @@ It has the following steps:
 |    10    |            Wait 30secs            |                                                                           We wait 30 seconds whilst Digital Ocean finishes un-assigning the reserved IP. |
 |    11    | Reassign blue IP to green droplet |                   We reassign the blue reserved IP to the green droplet, which is running with our latest Docker image and becomes our new blue droplet. |
 |    12    |            Wait 30secs            |                                                                            We wait 30 seconds whilst Digital Ocean finishes reassigning the reserved IP. |
-|    13    | Reassign green IP to blue droplet |                                                           We reassign the green reserved IP to the old blue droplet, which is not our new green droplet. |
+|    13    | Reassign green IP to blue droplet |                                                           We reassign the green reserved IP to the old blue droplet, which is now our new green droplet. |
 
 In short, when we start a deployment, we:
 - Build and upload the new docker image to Docker Hub
