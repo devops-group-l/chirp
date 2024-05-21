@@ -40,6 +40,7 @@ This perspective should clarify how code or other artifacts come from idea into 
 #### CI Chain
 Our CI Chain can be split into the following 3 workflows, where the latter 2 can be considered our main CI chains:
 - Dependabot
+- Sonarcloud
 - Build and test Chain
 - Code coverage Chain
 
@@ -47,6 +48,11 @@ Our CI Chain can be split into the following 3 workflows, where the latter 2 can
 Dependabot is used to, on a weekly basis, make us aware of dependencies which have new versions, such that we stay up-to-date with our dependency ecosystem.
 It creates a PR for each out-of-date dependency, which we can then choose to accept or decline.
 This is a built-in bot provided by Github.
+
+##### Sonarcloud
+SonarCloud is a tool which enables use to get an analysis of our project.
+When a PR is created, an analysis is added as a sticky comment, which showcases potential issues with the implemented code, along with new potential security flaws.
+It is also run on our default branch, which gives us an general analysis of the project.
 
 ##### Build and test CI Chain
 The build and test CI chain is a github action, which is run on every pull request to our `itu-minitwit` branch.
