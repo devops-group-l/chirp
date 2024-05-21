@@ -1,14 +1,14 @@
 using Chirp.Infrastructure.Contexts;
 using Chirp.Tests.Core;
 using Microsoft.EntityFrameworkCore;
-using Testcontainers.SqlEdge;
+using Testcontainers.PostgreSql;
 
 namespace Chirp.Infrastructure.Tests.Contexts;
 
 public class ChirpDbContextFixture : IDisposable
 {
     private readonly DbContextOptions<ChirpDbContext> _options;
-    private readonly SqlEdgeContainer _container;
+    private readonly PostgreSqlContainer _container;
     public DataGenerator.AuthorCheepsData Data = DataGenerator.GenerateAuthorsAndCheeps(
         generateIds: false
     );
@@ -16,7 +16,7 @@ public class ChirpDbContextFixture : IDisposable
     public ChirpDbContextFixture()
     {
         // Start up test container
-        _container = new SqlEdgeBuilder().WithImage("mcr.microsoft.com/azure-sql-edge").Build();
+        _container = new PostgreSqlBuilder().Build();
 
         _container.StartAsync().Wait();
 
