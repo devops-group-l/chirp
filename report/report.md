@@ -31,41 +31,129 @@ This perspective should clarify how code or other artifacts come from idea into 
 #### CI Chain
 Our CI Chain can be split into the following 3 workflows, where the latter 2 can be considered our main CI chains:
 - Dependabot
-- Build and test chain
-- Code coverage chain
+- Build and test Chain
+- Code coverage Chain
 
-Dependabot is used to, on a weekly basis, make us aware of dependencies which have new versions, such that we stay up-to-date.
-We were, however not very good at continuously updating the recommended dependencies, mainly due to other more pressing tasks for this project.
+##### Dependabot
+Dependabot is used to, on a weekly basis, make us aware of dependencies which have new versions, such that we stay up-to-date with our dependency ecosystem.
+It creates a PR for each out-of-date dependency, which we can then choose to accept or decline.
+This is a built-in bot provided by Github.
 
-##### Build and test CI chain
-Build and test CI chain is a github action, which is run on every pull request to our main branch.
+##### Build and test CI Chain
+The build and test CI chain is a github action, which is run on every pull request to our `itu-minitwit` branch.
 This chain attempts to build our project, along with running the tests written for it.
+
 It has the following steps:
-1. Checkout latest git revision
-2. Set up .NET
-3. Restore dependencies
-4. Restore tools
-5. Build the project
-6. Install playwright (required for E2E tests)
-7. Run tests
 
-- Description of stages and tools
-- Deploys or releases?
+| Step Nr. |                 Step Title                  |                                                                              Step Description |
+|:--------:|:-------------------------------------------:|----------------------------------------------------------------------------------------------:|
+|    1     |                  Checkout                   | Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
+|    2     |                 Set up .NET                 |                                Sets up .NET so that the project can be set up, built and run. |
+|    3     |            Restore dependencies             |                             Restores the nuget packages which are the project's dependencies. |
+|    4     |                Restore tools                |          Restores the .NET tools the project uses (such as `pwsh` to run install playwright). |
+|    5     |              Build the project              |      Builds the project. If it fails, the CI chain fails, and thus the Github PR check fails. |
+|    6     | Install playwright (required for E2E tests) |                                      Installs playwright, which is used for end-to-end tests. |
+|    7     |                  Run tests                  |              Runs tests. If it fails, the CI chain fails, and thus the Github PR check fails. |
 
-##### Code coverage CI chain
-- Description of stages and tools
-- Deploys or releases?
+This chain ensures that, when a developer implements a feature, the project can build, and works as intended.
+
+##### Code coverage CI Chain
+The code coverage CI chain works as an extension to the build and test CI chain, since it both builds and tests the project, in addition to creating a test coverage report.
+It is run, along with the build and test CI chain, on every created pull request to our `itu-minitwit` branch.
+
+It has the following steps:
+
+| Step Nr. |                     Step Title                     |                                                                                                                                                                                                       Step Description |
+|:--------:|:--------------------------------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|    1     |                      Checkout                      |                                                                                                                          Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
+|    2     |                    Set up .NET                     |                                                                                                                                                         Sets up .NET so that the project can be set up, built and run. |
+|    3     |                Restore dependencies                |                                                                                                                                                      Restores the nuget packages which are the project's dependencies. |
+|    4     |                   Restore tools                    |                                                                                                                                   Restores the .NET tools the project uses (such as `pwsh` to run install playwright). |
+|    5     |                 Build the project                  |                                                                                                                               Builds the project. If it fails, the CI chain fails, and thus the Github PR check fails. |
+|    6     |    Install playwright (required for E2E tests)     |                                                                                                                                                               Installs playwright, which is used for end-to-end tests. |
+|    7     |              Run tests with coverage               | Runs tests. If it fails, the CI chain fails, and thus the Github PR check fails. The tests are run using the `dotcover` tool, which generates a code coverage report, using the `dotcoverConfig.xml` as configuration. |
+|    8     |                  Report Generator                  |                                                    Takes the dotcover-generated `analysis.xml` report, and transforms it to a `Cobertura` format that can be used to create a PR message showcasing the code coverage. |
+|    9     |         Build Code Coverage Summary Report         |                                                                                   Takes the `Cobertura` report, and converts it to a markdown format, which can be used to showcase the code coverage as a PR comment. |
+|    10    |              Add Coverage PR Comment               |                                                                                                                This step takes the generated markdown-format code coverage report, and adds it as a sticky PR comment. |
+|    11    |                Write to Job Summary                |                                                                                                    This step takes the generated markdown-format code coverage report, and adds it as a summary to the given workflow. |
+|    12    | Test Check Failure of Code Coverage Summary Report |                                                      Takes the code coverage report, and given a minimum threshold of 60%, fails the check if the code coverage % is below 60%. If below 80%, only a warning is given. |
+
+This chain ensures that enough of the code is tested at all times.
+Furthermore, it is also used as a reminder for the developers to write tests to their newly implemented features.
+
+##### CI Chain reflections
+Looking back at it now, we should have been better at utilising and respecting our CI chains.
+This is mainly due to there being other more pressing tasks for this project, which ended up taking most of the time we allocated to the project.
+
+Although setting up Dependabot, we weren't good at continuously updating the recommended dependencies, which we should have done as a weekly ritual.
+
+Furthermore, early on in the project, we had commented out our 2 primary CI chains during a major refactoring of the project, and had forgotten to un-comment it.
+Looking back at it, we should have never uncommented them, but rather just adjust to them, as it could have led to some serious consequences.
+Moreover, we could probably have done without the build and test chain, and just simply used the code coverage chain alone instead, as it will also fail if the project can't build or the tests fail.
 
 #### CD Chain
-- Publish App
-- Continuous Deployment
+Our CD Chain can be split into the following 2 workflows:
+- Publish App Chain
+- Continuous Deployment Chain
 
-##### Publish App CD chain
-- Description of stages and tools
-- Deploys or releases?
-##### Continuous Deployment CD chain
-- Description of stages and tools
-- Deploys or releases?
+##### Publish App CD Chain
+Our publish app CD chain is run on a schedule, which is every Thursday. It is responsible for creating a minor release at once a week.
+
+It can be split into the `prepare release` and `release app` jobs, where the latter job runs as a matrix for the OS' `linux-x64`, `win-x64` and `osx-x64`.
+It has the following steps:
+
+| Step Nr. |                     Step Title                     |                                                                                                                                                                   Step Description |
+|:--------:|:--------------------------------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|    1     |                 Checkout (prepare)                 | Checks out the given commit history for the `itu-minitwit` branch. It does so with a `fetch-depth: 0` to ensure we get the history of all tags, which are used later in the chain. |
+|    2     |        Determine new version tag (prepare)         |                                                                                                Gets the latest tag, and adds 1 to the minor version, to create the new future tag. |
+|    3     |                 Checkout (release)                 |                                                                                      Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
+|    4     |               Set up .NET (release)                |                                                                                                                     Sets up .NET so that the project can be set up, built and run. |
+|    5     |            Build and publish (release)             |                                                                                                 Builds and publishes the project to a zip file given the current OS in the matrix. |
+|    6     |         Create and push new tag (release)          |                                                                                                                    Creates the new tag given the `Determine new version tag` step. |
+|    7     |               Publish app (release)                |                                                                                 Generates a release if not yet existent given the new tag, and adds the generated zip files to it. |
+
+This ensures that we continuously deliver releases.
+
+[//]: # (TODO: Something about why we need to continuously deliver releases?)
+
+##### Continuous Deployment CD Chain
+In Digital Ocean, we have already provisioned 2 VMs, along with 2 reserved IPs pointing to them, following the green-blue deployment model.
+Our CD chain is responsible for updating our VMs in Digital Ocean, and switch the reserved IPs in order to minimise downtime during deployments.
+This CD chain is run on every push to the `itu-minitwit` branch, and can be triggered manually.
+
+It has the following steps:
+
+| Step Nr. |            Step Title             |                                                                                                                                         Step Description |
+|:--------:|:---------------------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|    1     |             Checkout              |                                                            Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
+|    2     |        Login to Docker Hub        |                                    Given secrets in our github repository, logs in to Docker Hub, so that we later can push our image to our repository. |
+|    3     |       Set up Docker Buildx        |                                                                                                                                   Sets up Docker Buildx. |
+|    4     |   Build and push minitwitimage    |                                         Builds an image from our Dockerfile, and pushes it to our repository on Docker Hub, along with the tag `latest`. |
+|    5     |           Configure SSH           |      Adds the SSH key, which is stored in our github repository's secrets, to our working directory. This is so we can SSH to our VM later in the chain. |
+|    6     |         Deploy to server          | We SSH into our green droplet/VM, and run the `deploy.sh` script, which pulls our newly created image, and re-runs the container through docker-compose. |
+|    7     |        Get blue droplet id        |                                                                       We fetch the blue droplet id, so we later can use it to reassign our reserved IPs. |
+|    8     |       Get green droplet id        |                                                                      We fetch the green droplet id, so we later can use it to reassign our reserved IPs. |
+|    9     |        Un-assign green IP         |                                               We un-assign the reserved IP pointing to our green droplet, so we later can re-assign to our blue droplet. |
+|    10    |            Wait 30secs            |                                                                           We wait 30 seconds whilst Digital Ocean finishes un-assigning the reserved IP. |
+|    11    | Reassign blue IP to green droplet |                   We reassign the blue reserved IP to the green droplet, which is running with our latest Docker image and becomes our new blue droplet. |
+|    12    |            Wait 30secs            |                                                                            We wait 30 seconds whilst Digital Ocean finishes reassigning the reserved IP. |
+|    13    | Reassign green IP to blue droplet |                                                           We reassign the green reserved IP to the old blue droplet, which is not our new green droplet. |
+
+In short, when we start a deployment, we:
+- Build and upload the new docker image to Docker Hub
+- SSH into our green droplet
+- Update the Docker image and restart using docker-compose
+- Switch reserved IPs
+
+This ensures that we continuously deliver the latest version of our application, whilst minimising our downtime during deployment thanks to our green-blue deployment model.
+In this scenario, we decided to use Digital Ocean's API to make the switch between green and blue droplets, and have used the reserved IPs as our router.
+Furthermore, with this CD pipeline, we can also easily can go back to the "non-live" droplet by switching the reserved IPs, in case the live droplet is somehow erroneous.
+
+The main potential weakness we see with this CD chain, is if case 2 deployments are started in quick succession.
+In that case, we don't know how the deployments will interact.
+
+For a more robust CD chain, we should probably ensure that only one deployment can run at once.
+However, due to time constraints, we weren't able to implement this.
 
 ### Monitoring
 How do you monitor your systems and what precisely do you monitor?
