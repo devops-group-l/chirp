@@ -5,7 +5,7 @@
 - [ ] Add static analysis tools so we have 3.
     - [X] One linter for your main programming language
     - [X] One code formatter for your main programming language
-    - [ ] One linter for your dockerfiles
+    - [X] One linter for your dockerfiles
     - [ ] Use these 3 as quality gates in CI/CD
 - [X] Add Maintainability and Technical Debt estimation tools to your projects
 - [ ] Do we have replication/backup?
