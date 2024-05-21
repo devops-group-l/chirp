@@ -147,7 +147,11 @@ We use the .Net log framework Serilog to collect custom as well as system logs f
 #### What do we log
 Per default we log everything from 'log level' information. This is to ensure, that in case something goes wrong while live, we can get access to all necessary information as normally displayed in the terminal. Furthermore, we have also implemented some custom log prints, which prints whenever a controller is called, to help us trace user behavior.
 ### Security
-Brief results of the security assessment and brief description of how did you harden the security of your system based on the analysis
+From the security assessment we realized that our ports on different containers were public. This is a theoretical security issue, both since software such as Grafana is authenticated with a user-login, we felt this was not a major risk. 
+
+Another reflection was on using SSH keys. This enabled us to not send password through network traffic, thereby reducing risk of interception. Our project was also layered with SSL while hosted on Digital Ocean. 
+
+In general, our simulation endpoints were 'protected' with an auth-header and sensitive information such as configuration secrets were ensured to not be committed to VCS. User passwords stored in database were encrypted with SHA256. 
 
 ### Strategy for scaling and upgrades
 #### Scaling strategy
