@@ -175,8 +175,36 @@ We use the .Net log framework Serilog to collect custom as well as system logs f
 Per default we log everything from 'log level' information. This is to ensure, that in case something goes wrong while live, we can get access to all necessary information as normally displayed in the terminal. Furthermore, we have also implemented some custom log prints, which prints whenever a controller is called, to help us trace user behavior.
 ### Security
 Brief results of the security assessment and brief description of how did you harden the security of your system based on the analysis
+
 ### Strategy for scaling and upgrades
 Applied strategy for scaling and upgrades
+#### Scaling strategy
+When it comes to scaling, we didn't have enough time to implement a solution.
+However, we did still make some considerations regarding it.
+
+The first thing we would have done would be to implement some kind of horizontal scaling strategy. 
+We wanted to do this with Docker Swarm, where on our droplet, we could orchestrate container replication, along with utilising load balancing.
+
+This would have improved the availability of our application.
+However, it might have also caused some problems, as we would've started building a distributed system.
+This would have likely led us to have issues with having had to synchronise our logging and monitoring tools across our container replicas and our load balancer.
+
+
+#### Upgrades
+Regarding which upgrades we made to our project, one notable one was the implementation of the green-blue deployment model.
+The diagram below shows our setup in Digital Ocean, along with how our toolchain interacts.
+![Cloud Diagram](img/DevopsCd.png "Cloud Diagram")
+The way we implemented green-blue, was by having 2 droplets at all times, with 2 reserved/floating IPs pointing to them.
+One of those IPs is pointing to our live droplet (green), whilst the other one is pointing to a non-live one (blue).
+Furthermore, the droplets also share the same Managed PostgreSQL DB.
+
+Our CD chain ensures that the deployment is applied to the droplet to which our non-live reserved IP is pointing to.
+Thereafter, the CD chain switches the reserved IPs, such that the live reserved IP now pointing to our previously non-live droplet, and the non-live reserved IP is now pointing to our previously live droplet.
+This repeats on every deployment.
+
+The objective with this setup is to ensure very low, to no downtime during deployments.
+Furthermore, this also allows us, in case we find out our live droplet is erroneous, to switch back to a our previously live droplet.
+
 ### Reflection on AI assistance
 During the project we've used ChatGPT to search for information and code snippets for guidance.
 It is a mutual opinion in the group that copy-pasting our code to any chat bot or other AI tools should be avoided
