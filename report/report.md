@@ -47,15 +47,7 @@ This chain attempts to build our project, along with running the tests written f
 
 It has the following steps:
 
-| Step Nr. |                 Step Title                  |                                                                              Step Description |
-|:--------:|:-------------------------------------------:|----------------------------------------------------------------------------------------------:|
-|    1     |                  Checkout                   | Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
-|    2     |                 Set up .NET                 |                                Sets up .NET so that the project can be set up, built and run. |
-|    3     |            Restore dependencies             |                             Restores the nuget packages which are the project's dependencies. |
-|    4     |                Restore tools                |          Restores the .NET tools the project uses (such as `pwsh` to run install playwright). |
-|    5     |              Build the project              |      Builds the project. If it fails, the CI chain fails, and thus the Github PR check fails. |
-|    6     | Install playwright (required for E2E tests) |                                      Installs playwright, which is used for end-to-end tests. |
-|    7     |                  Run tests                  |              Runs tests. If it fails, the CI chain fails, and thus the Github PR check fails. |
+![Build and Test Chain](img/build-test-chain.png "Build and Test Chain")
 
 This chain ensures that, when a developer implements a feature, the project can build, and works as intended.
 
@@ -65,20 +57,7 @@ It is run, along with the build and test CI chain, on every created pull request
 
 It has the following steps:
 
-| Step Nr. |                     Step Title                     |                                                                                                                                                                                                       Step Description |
-|:--------:|:--------------------------------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|    1     |                      Checkout                      |                                                                                                                          Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
-|    2     |                    Set up .NET                     |                                                                                                                                                         Sets up .NET so that the project can be set up, built and run. |
-|    3     |                Restore dependencies                |                                                                                                                                                      Restores the nuget packages which are the project's dependencies. |
-|    4     |                   Restore tools                    |                                                                                                                                   Restores the .NET tools the project uses (such as `pwsh` to run install playwright). |
-|    5     |                 Build the project                  |                                                                                                                               Builds the project. If it fails, the CI chain fails, and thus the Github PR check fails. |
-|    6     |    Install playwright (required for E2E tests)     |                                                                                                                                                               Installs playwright, which is used for end-to-end tests. |
-|    7     |              Run tests with coverage               | Runs tests. If it fails, the CI chain fails, and thus the Github PR check fails. The tests are run using the `dotcover` tool, which generates a code coverage report, using the `dotcoverConfig.xml` as configuration. |
-|    8     |                  Report Generator                  |                                                    Takes the dotcover-generated `analysis.xml` report, and transforms it to a `Cobertura` format that can be used to create a PR message showcasing the code coverage. |
-|    9     |         Build Code Coverage Summary Report         |                                                                                   Takes the `Cobertura` report, and converts it to a markdown format, which can be used to showcase the code coverage as a PR comment. |
-|    10    |              Add Coverage PR Comment               |                                                                                                                This step takes the generated markdown-format code coverage report, and adds it as a sticky PR comment. |
-|    11    |                Write to Job Summary                |                                                                                                    This step takes the generated markdown-format code coverage report, and adds it as a summary to the given workflow. |
-|    12    | Test Check Failure of Code Coverage Summary Report |                                            Takes the code coverage report, and given a minimum threshold of 60%, fails the check if the code coverage % is below 60%. If between 60% and 80%, only a warning is given. |
+![Code Coverage Chain](img/code-coverage-chain.png "Code Coverage Chain")
 
 This chain ensures that enough of the code is tested at all times.
 Furthermore, it is also used as a reminder for the developers to write tests to their newly implemented features.
@@ -104,15 +83,7 @@ Our publish app CD chain is run on a schedule, which is every Thursday. It is re
 It can be split into the `prepare release` and `release app` jobs, where the latter job runs as a matrix for the OS' `linux-x64`, `win-x64` and `osx-x64`.
 It has the following steps:
 
-| Step Nr. |                     Step Title                     |                                                                                                                                                                   Step Description |
-|:--------:|:--------------------------------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|    1     |                 Checkout (prepare)                 | Checks out the given commit history for the `itu-minitwit` branch. It does so with a `fetch-depth: 0` to ensure we get the history of all tags, which are used later in the chain. |
-|    2     |        Determine new version tag (prepare)         |                                                                                                Gets the latest tag, and adds 1 to the minor version, to create the new future tag. |
-|    3     |                 Checkout (release)                 |                                                                                      Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
-|    4     |               Set up .NET (release)                |                                                                                                                     Sets up .NET so that the project can be set up, built and run. |
-|    5     |            Build and publish (release)             |                                                                                                 Builds and publishes the project to a zip file given the current OS in the matrix. |
-|    6     |         Create and push new tag (release)          |                                                                                                                    Creates the new tag given the `Determine new version tag` step. |
-|    7     |               Publish app (release)                |                                                                                 Generates a release if not yet existent given the new tag, and adds the generated zip files to it. |
+![Publish Chain](img/publish-chain.png "Publish Chain")
 
 This ensures that we continuously deliver releases.
 
@@ -125,21 +96,7 @@ This CD chain is run on every push to the `itu-minitwit` branch, and can be trig
 
 It has the following steps:
 
-| Step Nr. |            Step Title             |                                                                                                                                         Step Description |
-|:--------:|:---------------------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|    1     |             Checkout              |                                                            Checks out the latest git commit for the given PR, so that it can be used later in the chain. |
-|    2     |        Login to Docker Hub        |                                    Given secrets in our github repository, logs in to Docker Hub, so that we later can push our image to our repository. |
-|    3     |       Set up Docker Buildx        |                                                                                                                                   Sets up Docker Buildx. |
-|    4     |   Build and push minitwitimage    |                                         Builds an image from our Dockerfile, and pushes it to our repository on Docker Hub, along with the tag `latest`. |
-|    5     |           Configure SSH           |      Adds the SSH key, which is stored in our github repository's secrets, to our working directory. This is so we can SSH to our VM later in the chain. |
-|    6     |         Deploy to server          | We SSH into our green droplet/VM, and run the `deploy.sh` script, which pulls our newly created image, and re-runs the container through docker-compose. |
-|    7     |        Get blue droplet id        |                                                                       We fetch the blue droplet id, so we later can use it to reassign our reserved IPs. |
-|    8     |       Get green droplet id        |                                                                      We fetch the green droplet id, so we later can use it to reassign our reserved IPs. |
-|    9     |        Un-assign green IP         |                                               We un-assign the reserved IP pointing to our green droplet, so we later can re-assign to our blue droplet. |
-|    10    |            Wait 30secs            |                                                                           We wait 30 seconds whilst Digital Ocean finishes un-assigning the reserved IP. |
-|    11    | Reassign blue IP to green droplet |                   We reassign the blue reserved IP to the green droplet, which is running with our latest Docker image and becomes our new blue droplet. |
-|    12    |            Wait 30secs            |                                                                            We wait 30 seconds whilst Digital Ocean finishes reassigning the reserved IP. |
-|    13    | Reassign green IP to blue droplet |                                                           We reassign the green reserved IP to the old blue droplet, which is now our new green droplet. |
+![CD Chain](img/cd-chain.png "CD Chain")
 
 In short, when we start a deployment, we:
 - Build and upload the new docker image to Docker Hub
