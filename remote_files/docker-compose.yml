@@ -5,6 +5,19 @@ networks:
     name: chirp-network
 
 services:
+
+  # This is for running database locally.
+  # db:
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_DB: postgres
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - chirp-network
+
   chirpwebservice:
     image: ituminitwit/minitwitimage
     build:
@@ -17,6 +30,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
+      # - db
       - grafana
       - prometheus
     networks:
