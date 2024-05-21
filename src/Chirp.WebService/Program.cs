@@ -19,7 +19,6 @@ public class Program
         //Creating the Logger with Minimum Settings
         Log.Logger = new LoggerConfiguration()
             .Enrich.WithProperty("Application", "minitwit")
-            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .WriteTo.LokiHttp("http://loki:3100")
