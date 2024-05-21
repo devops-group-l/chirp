@@ -18,7 +18,14 @@ hence promoting loose coupling.
 - Web layer
   - The web layer is outside of the main project and represents outside dependencies `Frameworks`, `Tests` and the `Database`
 ### Dependencies
-All dependencies of your ITU-MiniTwit systems on all levels of abstraction and development stages. That is, list and briefly describe all technologies and tools you applied and depend on.
+We have utilized a range of tools. For coding and development, we have used: C# .NET and PostgreSQL for base functionality. We have used Tailwind CSS for UX/UI improvements. To ensure test-driven-development we have used Playwright and Moq in our test-suite. 
+
+For version control we have used GitHub.
+
+We have hosted our service at Digital Ocean, and done CI/CD through GitHub actions.
+
+For monitoring and logging we have used Grafana and Prometheus, which allowed us to `SKRIV MERE HER` ...
+
 ### Interactions of subsystems
   ![alt text](img/User_Sequence.png "User sequence")
 - Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
