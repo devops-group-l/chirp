@@ -26,3 +26,16 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
 - The second wants the Node version to be pinned to a specific version.
 - The third ensures that no additionally packages are installed with the node installment.
 - And the forth and last one says it is more efficient to run the two run commands in one.
+
+After these changes, a new INFO was provided by hedolint:
+```shell
+Dockerfile:12 DL3009 info: Delete the apt-get lists after installing something
+```
+Deleting the apt-get list will make the image size smaller, making the last change:
+```
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs=16.x.x-1nodesource1 \
+    && rm -rf /var/lib/apt/lists/*
+```
