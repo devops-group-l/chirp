@@ -139,7 +139,7 @@ namespace Chirp.WebService.Controllers
                 Guid authorToBeFollowed = Guid.Parse(collection["CheepAuthorId"].ToString());
 
                 _logger.LogInformation(
-                    "Controller.Follow was called with user: {user.Id} try to follow user: {authorToBeFollowed}",
+                    "Controller.Follow was called with user: {user} try to follow user: {authorToBeFollowed}",
                     user.Id,
                     authorToBeFollowed
                 );
@@ -161,7 +161,7 @@ namespace Chirp.WebService.Controllers
                 Guid authorToBeUnfollowed = Guid.Parse(collection["CheepAuthorId"].ToString()); //The new account to follow
 
                 _logger.LogInformation(
-                    "Controller.UnFollow was called with user: {user.Id} try to unfollow user: {authorToBeUnfollowed}",
+                    "Controller.UnFollow was called with user: {user} try to unfollow user: {authorToBeUnfollowed}",
                     user.Id,
                     authorToBeUnfollowed
                 );
