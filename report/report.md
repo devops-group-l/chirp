@@ -13,7 +13,45 @@ Describe the current state of your systems, for example using results of static 
 ## Process' perspective
 This perspective should clarify how code or other artifacts come from idea into the running system and everything that happens on the way.
 ### CI/CD Chain
-A complete description of stages and tools included in the CI/CD chains, including deployment and release of your systems.
+#### CI Chain
+Our CI Chain can be split into the following 3 workflows, where the latter 2 can be considered our main CI chains:
+- Dependabot
+- Build and test chain
+- Code coverage chain
+
+Dependabot is used to, on a weekly basis, make us aware of dependencies which have new versions, such that we stay up-to-date.
+We were, however not very good at continuously updating the recommended dependencies, mainly due to other more pressing tasks for this project.
+
+##### Build and test CI chain
+Build and test CI chain is a github action, which is run on every pull request to our main branch.
+This chain attempts to build our project, along with running the tests written for it.
+It has the following steps:
+1. Checkout latest git revision
+2. Set up .NET
+3. Restore dependencies
+4. Restore tools
+5. Build the project
+6. Install playwright (required for E2E tests)
+7. Run tests
+
+- Description of stages and tools
+- Deploys or releases?
+
+##### Code coverage CI chain
+- Description of stages and tools
+- Deploys or releases?
+
+#### CD Chain
+- Publish App
+- Continuous Deployment
+
+##### Publish App CD chain
+- Description of stages and tools
+- Deploys or releases?
+##### Continuous Deployment CD chain
+- Description of stages and tools
+- Deploys or releases?
+
 ### Monitoring
 How do you monitor your systems and what precisely do you monitor?
 ### Logging
