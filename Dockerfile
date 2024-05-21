@@ -8,8 +8,11 @@ ARG configuration=Release
 WORKDIR /src
 COPY ["src/Chirp.WebService/Chirp.WebService.csproj", "src/Chirp.WebService/"]
 # Install Node.js and npm
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
-RUN apt-get install -y nodejs
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs=16.20.2-1nodesource1 \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN dotnet restore "src/Chirp.WebService/Chirp.WebService.csproj"
 COPY . .
