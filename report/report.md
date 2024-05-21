@@ -23,7 +23,12 @@ All dependencies of your ITU-MiniTwit systems on all levels of abstraction and d
   ![alt text](img/User_Sequence.png "User sequence")
 - Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
 ### State of systems
-Describe the current state of your systems, for example using results of static analysis and quality assessments.
+The overall state of our system is good. We have been using SonarCloud to quantify the state of our system, and here we pass the quality gate. Though this comes with a caveat. Estimations from SonarCloud is that we have an estimated technical debt of 1 day and 3 hours. We have 95 issues spanning the following qualities:
+- Security (11 issues)
+- Reliability (18 issues)
+- Maintainability (88 issues)
+
+Therefore, if this project was to continue it would be preferable to address some of these, which could prevent vulnerabilities and increase the overall quality of the system.
 
 ## Process' perspective
 This perspective should clarify how code or other artifacts come from idea into the running system and everything that happens on the way.
