@@ -34,11 +34,6 @@ jobs:
 
       - name: Install playwright
         run: dotnet pwsh test/Chirp.WebService.Tests/bin/Debug/net7.0/playwright.ps1 install
-
-      - name: Open Web Client Directory
-        working-directory: .
-        run: |
-          ls -la
         
       - name: Test With Coverage
         run: dotnet dotcover test --dcXML=dotcoverConfig.xml
