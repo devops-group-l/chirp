@@ -177,7 +177,6 @@ Per default we log everything from 'log level' information. This is to ensure, t
 Brief results of the security assessment and brief description of how did you harden the security of your system based on the analysis
 
 ### Strategy for scaling and upgrades
-Applied strategy for scaling and upgrades
 #### Scaling strategy
 When it comes to scaling, we didn't have enough time to implement a solution.
 However, we did still make some considerations regarding it.
