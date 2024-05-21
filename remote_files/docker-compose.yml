@@ -7,16 +7,16 @@ networks:
 services:
 
   # This is for running database locally.
-  # db:
-  #   image: postgres:latest
-  #   environment:
-  #     POSTGRES_DB: postgres
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: ${DB_PASSWORD}
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     - chirp-network
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - chirp-network
 
   chirpwebservice:
     image: ituminitwit/minitwitimage
@@ -30,7 +30,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      # - db
+      - db
       - grafana
       - prometheus
     networks:
@@ -42,17 +42,6 @@ services:
       - "3100:3100"
     networks:
       - chirp-network
-
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - /var/lib/docker/containers:/var/lib/docker/containers
-      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml
-    networks:
-      - chirp-network
-    
-    depends_on:
-      - loki
 
   grafana:
     image: grafana/grafana:10.2.4
