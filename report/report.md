@@ -23,6 +23,8 @@ All dependencies of your ITU-MiniTwit systems on all levels of abstraction and d
   ![alt text](img/User_Sequence.png "User sequence")
 - Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
 ### State of systems
+
+
 Describe the current state of your systems, for example using results of static analysis and quality assessments.
 
 ## Process' perspective
@@ -156,9 +158,21 @@ For a more robust CD chain, we should probably ensure that only one deployment c
 However, due to time constraints, we weren't able to implement this.
 
 ### Monitoring
-How do you monitor your systems and what precisely do you monitor?
+#### How do we monitor
+We do pull-based monitoring, utilizing Prometheus and Grafana. Grafana pulls from Prometheus, which again pulls from our minitwit application.
+
+#### What do we monitor
+Our monitoring is passive blackbox. We monitor the following in our mini-twit application.
+- The duration of HTTP requests
+- Average duration of HTTP requests
+- What endpoints are being hit
+- What HTTP response is returned
+
 ### Logging
-What do you log in your systems and how do you aggregate logs?
+#### How do we log
+We use the .Net log framework Serilog to collect custom as well as system logs from our program. Serilog is a simple way to send logs to a specified output. In our case the collected logs are outputted to Loki, which is running as a node in the docker container. Loki acts as a log aggregator, which efficiently indexes the logs only based on its metadata, instead of the whole log text, which makes logs available milliseconds after they are received by Loki. We then use Grafana to visualize the collected logs from Loki.
+#### What do we log
+Per default we log everything from 'log level' information. This is to ensure, that in case something goes wrong while live, we can get access to all necessary information as normally displayed in the terminal. Furthermore, we have also implemented some custom log prints, which prints whenever a controller is called, to help us trace user behavior.
 ### Security
 Brief results of the security assessment and brief description of how did you harden the security of your system based on the analysis
 ### Strategy for scaling and upgrades
