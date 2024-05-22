@@ -1,7 +1,7 @@
 # To do list
-- [ ] Make test suite work again
-- [ ] Implement testing in our CI/CD, to use test as a quality gate
-- [ ] Clean up workflows, remove old remnants from BDSA.
+- [X] Make test suite work again
+- [X] Implement testing in our CI/CD, to use test as a quality gate
+- [X] Clean up workflows, remove old remnants from BDSA.
 - [ ] Add static analysis tools so we have 3.
     - [X] One linter for your main programming language
     - [X] One code formatter for your main programming language
