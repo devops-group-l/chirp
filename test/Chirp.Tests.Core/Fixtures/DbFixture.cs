@@ -11,10 +11,7 @@ public class DbFixture : IDisposable
         _container = new PostgreSqlBuilder().Build();
         _container.StartAsync().Wait();
 
-        Environment.SetEnvironmentVariable(
-            "DB_STRING",
-            _container.GetConnectionString()
-        );
+        Environment.SetEnvironmentVariable("DB_STRING", _container.GetConnectionString());
     }
 
     public void Dispose()
