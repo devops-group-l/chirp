@@ -1,6 +1,19 @@
+---
+title: DevOps Project Report
+subtitle: ITU Group L
+author:
+- "Andreas Bartholdy Christensen <anbc@itu.dk>"
+- "Marcus Andreas Aandahl <maraa@itu.dk>"
+- "Villads Grum-Schwensen <vilg@itu.dk>"
+- "Markus Brandt Højgaard <mbrh@itu.dk>"
+- "Lukas Brandt Pallesen <lupa@itu.dk>"
+numbersections: true
+---
+
 ## System's Perspective
 ### The onion architecture
-![alt text](img/Onion_architecture.png "User sequence")
+![Onion Architecture](img/Onion_architecture.png "Onion architecture")
+
 We chose to work with the onion architecture. The architecture provides loose coupling with the dependencies only
 flowing inwards. The interactions between the layers are facilitated through interfaces and abstractions,
 hence promoting loose coupling.
@@ -16,7 +29,7 @@ hence promoting loose coupling.
   - `Controllers` to handle HTTP request and responses with access to the `repositories`
   - `Pages` that contains UI components to render the data to the user. In our project they're referred to as Partials
 - Web layer
-  - The web layer is outside of the main project and represents outside dependencies `Frameworks`, `Tests` and the `Database`
+  - The web layer is outside of the main project and represents external dependencies such as `Frameworks`, `Tests` and the `Database`
 ### Dependencies
 We have utilized a range of tools. For coding and development, we have used: C# .NET and PostgreSQL for base functionality. We have used Tailwind CSS for UX/UI improvements. To ensure test-driven-development we have used Playwright and Moq in our test-suite. 
 
@@ -37,17 +50,13 @@ In addition, we also have the following dependencies:
 - EF Core
 - OpenTelemetry
 
-`Er i tvivl om tools som grafana og docker er dependencies? Til gennemlæsning lad os lige tjekke SNYK. Den har en god liste over dependencies:
-https://app.snyk.io/org/pallebrandt/project/9d8d435b-9ed4-432e-a16b-30afca0aec08
-`
-For monitoring and logging we have used Grafana and Prometheus, which allowed us to `SKRIV MERE HER` ...
-
 ### Interactions of subsystems
-![alt text](img/User_Sequence.png "User sequence")
+![User Sequence](img/User_Sequence.png "User sequence")
+
 ![Sequence Diagram](img/seq-diagram.jpg "Sequence Diagram")
-- Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
+
 ### State of systems
-The overall state of our system is good. We have been using SonarCloud to quantify the state of our system, and here we pass the quality gate. Though this comes with a caveat. Estimations from SonarCloud is that we have an estimated technical debt of 1 day and 3 hours. We have 95 issues spanning the following qualities:
+The overall state of our system is good. We have been using SonarCloud to quantify the state of our system, and here we pass the quality gate. Although this comes with a caveat. Estimations from SonarCloud is that we have an estimated technical debt of 1 day and 3 hours. We have 95 issues spanning the following qualities:
 - Security (11 issues)
 - Reliability (18 issues)
 - Maintainability (88 issues)
@@ -55,7 +64,6 @@ The overall state of our system is good. We have been using SonarCloud to quanti
 Therefore, if this project was to continue it would be preferable to address some of these, which could prevent vulnerabilities and increase the overall quality of the system.
 
 ## Process' perspective
-This perspective should clarify how code or other artifacts come from idea into the running system and everything that happens on the way.
 ### CI/CD Chain
 #### CI Chain
 Our CI Chain can be split into the following 3 workflows, where the latter 2 can be considered our main CI chains:
@@ -69,7 +77,7 @@ It creates a PR for each out-of-date dependency, which we can then choose to acc
 This is a built-in bot provided by Github.
 
 ##### Sonarcloud
-SonarCloud is a tool which enables use to get an analysis of our project.
+SonarCloud is a tool which enables us to get an analysis of our project.
 When a PR is created, an analysis is added as a sticky comment, which showcases potential issues with the implemented code, along with new potential security flaws.
 It is also run on our default branch, which gives us an general analysis of the project.
 
@@ -99,7 +107,7 @@ Our CD Chain can be split into the following 2 workflows:
 - Continuous Deployment Chain
 
 ##### Publish App CD Chain
-Our publish app CD chain is run on a schedule, which is every Thursday. It is responsible for creating a minor release at once a week.
+Our publish app CD chain is run on a schedule, which is every Thursday. It is responsible for creating a minor release once a week.
 
 It can be split into the `prepare release` and `release app` jobs, where the latter job runs as a matrix for the OS' `linux-x64`, `win-x64` and `osx-x64`.
 It has the following steps:
@@ -129,7 +137,7 @@ This ensures that we continuously deliver the latest version of our application,
 In this scenario, we decided to use Digital Ocean's API to make the switch between green and blue droplets, and have used the reserved IPs as our router.
 Furthermore, with this CD pipeline, we can also easily can go back to the "non-live" droplet by switching the reserved IPs, in case the live droplet is somehow erroneous.
 
-The main potential weakness we see with this CD chain, is if case 2 deployments are started in quick succession.
+The main potential weakness we see with this CD chain, is in case 2 deployments are started in quick succession.
 In that case, we don't know how the deployments will interact.
 
 For a more robust CD chain, we should probably ensure that only one deployment can run at once.
@@ -137,10 +145,10 @@ However, due to time constraints, we weren't able to implement this.
 
 ### Monitoring
 #### How do we monitor
-We do pull-based monitoring, utilizing Prometheus and Grafana. Grafana pulls from Prometheus, which again pulls from our minitwit application.
+We do pull-based monitoring, utilizing Prometheus and Grafana. Grafana pulls from Prometheus, which again pulls from our application.
 
 #### What do we monitor
-Our monitoring is passive blackbox. We monitor the following in our mini-twit application.
+Our monitoring is passive blackbox. We monitor the following in our application.
 - The duration of HTTP requests
 - Average duration of HTTP requests
 - What endpoints are being hit
@@ -148,7 +156,12 @@ Our monitoring is passive blackbox. We monitor the following in our mini-twit ap
 
 ### Logging
 #### How do we log
-We use the .Net log framework Serilog to collect custom as well as system logs from our program. Serilog is a simple way to send logs to a specified output. In our case the collected logs are outputted to Loki, which is running as a node in the docker container. Loki acts as a log aggregator, which efficiently indexes the logs only based on its metadata, instead of the whole log text, which makes logs available milliseconds after they are received by Loki. We then use Grafana to visualize the collected logs from Loki.
+We use the .NET log framework Serilog to collect custom as well as system logs from our program.
+Serilog is a simple way to send logs to a specified output.
+In our case the collected logs are outputted to Loki, which is running as a container.
+Loki acts as a log aggregator, which efficiently indexes the logs only based on its metadata,
+instead of the whole log text, which makes logs available milliseconds after they are received by Loki.
+We then use Grafana to visualize the collected logs from Loki.
 #### What do we log
 Per default we log everything from 'log level' information. This is to ensure, that in case something goes wrong while live, we can get access to all necessary information as normally displayed in the terminal. Furthermore, we have also implemented some custom log prints, which prints whenever a controller is called, to help us trace user behavior.
 ### Security
@@ -199,7 +212,7 @@ Describe the biggest issues, how you solved them, and which are major lessons le
 ### Continuous refactoring
 At the beginning of the simulation, we implemented functionality for receiving HTTP requests and storing data in separate tables unrelated to 'real' data. This data served the relevant HTTP simulation endpoints, but was purposely not visible on our applications feed. 
 Later on we then had to display this simulation data, which initially prompted us to change how we processed incoming requests. However this would require a migration, which we feared could cause a wipe of our database. 
-Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data in feed-viable data, without changing models. 
+Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data in feed-viable data, without changing models. See commits `ec8c79d2` and `39a2df11`.
 
 ### Operation
 As mentioned above we have continuously refactored our system throughout this project which sometimes has led us to having crashes or bugs in our live system. This has truly shown us the value of having monitoring and logging setup for our systems. Logging would give us the benefit of being able to see stack traces and logs, and monitoring would give us valuable insight into the state of users experience with our system. Many resources have been used setting up these tools, and therefore we unfortunately have not gotten to use the data from these as much as we might have wanted to, but we can see their value and how we would rely on these if we were to move forward with this project.
@@ -208,9 +221,7 @@ As mentioned above we have continuously refactored our system throughout this pr
 ### Maintenance
 In the beginning we experienced short downtimes on our droplet when we deployed a new version of our system.
 With the implementation of Green-Blue we've succeeded with deployment without downtime, which will enhance user
-experience and monitoring is shown without misleading information.
-
-of your ITU-MiniTwit systems. Link back to respective commit messages, issues, tickets, etc. to illustrate these.
+experience and monitoring is shown without misleading information. 
 
 During the project we've had more focus on operations rather than development. 
 Compared to previous projects, our primary focus was to establish foundations to make DevOps possible.
