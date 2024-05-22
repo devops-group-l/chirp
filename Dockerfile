@@ -8,7 +8,6 @@ ARG configuration=Release
 WORKDIR /src
 COPY ["src/Chirp.WebService/Chirp.WebService.csproj", "src/Chirp.WebService/"]
 # Install Node.js and npm
-# hadolint ignore=DL4006
 RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
 RUN apt-get install -y nodejs
 
