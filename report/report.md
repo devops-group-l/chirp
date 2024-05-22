@@ -200,13 +200,19 @@ Describe the biggest issues, how you solved them, and which are major lessons le
 At the beginning of the simulation, we implemented functionality for receiving HTTP requests and storing data in separate tables unrelated to 'real' data. This data served the relevant HTTP simulation endpoints, but was purposely not visible on our applications feed. 
 Later on we then had to display this simulation data, which initially prompted us to change how we processed incoming requests. However this would require a migration, which we feared could cause a wipe of our database. 
 Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data in feed-viable data, without changing models. 
-Through this we learned the value of `SKRIV MERE HER`
 
-- evolution and refactoring
-- operation, and
-- maintenance
+### Operation
+
+
+### Maintenance
+In the beginning we experienced short downtimes on our droplet when we deployed a new version of our system.
+With the implementation of Green-Blue we've succeeded with deployment without downtime, which will enhance user
+experience and monitoring is shown without misleading information.
 
 of your ITU-MiniTwit systems. Link back to respective commit messages, issues, tickets, etc. to illustrate these.
 
-Also reflect and describe what was the "DevOps" style of your work. For example, what did you do differently to previous development projects and how did it work?
-
+During the project we've had more focus on operations rather than development. 
+Compared to previous projects, our primary focus was to establish foundations to make DevOps possible.
+We've created a Blue-Green cloud solution to avoid downtime, monitoring and logging 
+to keep track of the system after deployment, and CI/CD Chain to ensure quality and avoid
+potential failures when implementing new features. 
