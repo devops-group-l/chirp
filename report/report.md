@@ -202,6 +202,7 @@ Later on we then had to display this simulation data, which initially prompted u
 Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data in feed-viable data, without changing models. 
 
 ### Operation
+As mentioned above we have continuously refactored our system throughout this project which sometimes has led us to having crashes or bugs in our live system. This has truly shown us the value of having monitoring and logging setup for our systems. Logging would give us the benefit of being able to see stack traces and logs, and monitoring would give us valuable insight into the state of users experience with our system. Many resources have been used setting up these tools, and therefore we unfortunately have not gotten to use the data from these as much as we might have wanted to, but we can see their value and how we would rely on these if we were to move forward with this project.
 
 
 ### Maintenance
