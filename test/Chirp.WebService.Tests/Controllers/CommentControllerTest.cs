@@ -1,4 +1,5 @@
 using Bogus;
+using Chirp.Core.Dto;
 using Chirp.Core.Extensions;
 using Chirp.Infrastructure.Models;
 using Chirp.Tests.Core;
@@ -13,6 +14,7 @@ public class CommentControllerTest
 {
     private readonly MockChirpRepositories _mockChirpRepositories =
         MockRepositoryFactory.GetMockCheepRepositories();
+    private readonly MockLoggerFactories _mockLoggerFactories = MockLoggerFactory.GetMockLoggers();
     private readonly CommentController _commentController;
 
     public CommentControllerTest()
@@ -22,19 +24,28 @@ public class CommentControllerTest
                 _mockChirpRepositories.AuthorRepository,
                 _mockChirpRepositories.CheepRepository,
                 _mockChirpRepositories.LikeRepository,
-                _mockChirpRepositories.CommentRepository
+                _mockChirpRepositories.CommentRepository,
+                _mockChirpRepositories.SimulationRepository,
+                _mockLoggerFactories.CommentLogger
             );
         mockController.CallBase = true;
 
         string name = new Faker().Name.FullName();
-        var user = new ClaimsUser
+        // var user = new ClaimsUser
+        // {
+        //     Id = new Faker().Random.Guid(),
+        //     Name = name,
+        //     Username = new Faker().Internet.UserName(name),
+        //     AvatarUrl = new Faker().Internet.Avatar()
+        // };
+        var author = new AuthorDto
         {
             Id = new Faker().Random.Guid(),
-            Name = name,
-            Username = new Faker().Internet.UserName(name),
-            AvatarUrl = new Faker().Internet.Avatar()
+            Email = new Faker().Internet.Email(),
+            Username = new Faker().Internet.UserName(name)
         };
-        mockController.As<IController>().Setup(bc => bc.GetUser).Returns(() => user);
+        // mockController.Setup(e => e.HttpContext.Items["user"]).Returns(author);
+        mockController.As<IController>().Setup(bc => bc.GetUser).Returns(() => author);
         mockController
             .As<IController>()
             .Setup(bc => bc.GetPathUrl)

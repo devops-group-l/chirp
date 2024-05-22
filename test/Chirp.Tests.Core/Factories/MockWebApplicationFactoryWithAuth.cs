@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
+using Chirp.Infrastructure.Contexts;
 using Chirp.Tests.Core.Fixtures;
 using Chirp.WebService;
 using Microsoft.AspNetCore.Authentication;
@@ -18,14 +19,14 @@ namespace Chirp.Tests.Core.Factories;
 
 public class MockWebApplicationFactoryWithAuth : DbFixture, IAsyncLifetime, IDisposable
 {
-    private readonly IHost _host;
+    public readonly IHost Host;
     private IPlaywright? Playwright { get; set; }
     public IBrowser? Browser { get; private set; }
     public string BaseUrl { get; } = $"http://localhost:{GetRandomUnusedPort()}";
 
     public MockWebApplicationFactoryWithAuth()
     {
-        _host = Program
+        Host = Program
             .CreateHostBuilder(null!)
             .ConfigureWebHostDefaults(webBuilder =>
             {
@@ -45,19 +46,19 @@ public class MockWebApplicationFactoryWithAuth : DbFixture, IAsyncLifetime, IDis
     {
         Playwright = await Microsoft.Playwright.Playwright.CreateAsync();
         Browser = await Playwright.Chromium.LaunchAsync();
-        await _host.StartAsync();
+        await Host.StartAsync();
     }
 
     public async Task DisposeAsync()
     {
-        await _host.StopAsync();
-        _host.Dispose();
+        await Host.StopAsync();
+        Host.Dispose();
         Playwright?.Dispose();
     }
 
     public new void Dispose()
     {
-        _host.Dispose();
+        Host.Dispose();
         Playwright?.Dispose();
     }
 

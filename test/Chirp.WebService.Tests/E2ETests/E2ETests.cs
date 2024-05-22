@@ -1,4 +1,10 @@
+using Bogus;
+using Chirp.Infrastructure.Contexts;
+using Chirp.Infrastructure.Models;
+using Chirp.Tests.Core;
 using Chirp.Tests.Core.Factories;
+using Chirp.WebService.Extensions;
+using Microsoft.Playwright;
 
 namespace Chirp.WebService.Tests.E2ETests;
 
@@ -15,11 +21,31 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task ClickAuthorNameRedirects()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         //XPath for author name
-        var authorXPath = "//*[@id='messagelist']/div[2]/div[1]/div[1]/a";
+        var authorXPath = "//*[@id=\"messagelist\"]/div[2]/div[1]/div/a";
 
         var authorButton = await page.QuerySelectorAsync(authorXPath);
 
@@ -47,12 +73,32 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task CanDeleteCheep()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string cheepMessage = "This is a cheep deleted by the E2E test!";
 
-        var shareButton = await page.QuerySelectorAsync("//*[@id='cheepSubmitButton']");
+        var shareButton = await page.QuerySelectorAsync("//*[@id=\"cheepSubmitButton\"]");
 
         if (shareButton == null)
             Assert.Fail();
@@ -86,8 +132,28 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task CanCreateCheep()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string cheepMessage = "This is a cheep generated by the E2E test!";
 
@@ -115,13 +181,33 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task CommentOnCheepTest()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string commentText = "This is a comment generated by the E2E test!";
 
         var postCommentButton = await page.QuerySelectorAsync(
-            "//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/button"
+            "//*[@id=\"messagelist\"]/div[1]/div[2]/div[2]/form/div/button"
         );
 
         if (postCommentButton == null)
@@ -158,8 +244,28 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task DeleteCommentOnCheepTest()
     {
         //Arrange: Create a comment
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string commentText = "This is a comment generated by the E2E test!";
 

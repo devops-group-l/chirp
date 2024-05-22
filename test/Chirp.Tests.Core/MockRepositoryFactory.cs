@@ -15,6 +15,7 @@ public struct MockChirpRepositories
     public IAuthorRepository AuthorRepository;
     public ILikeRepository LikeRepository;
     public ICommentRepository CommentRepository;
+    public ISimulationRepository SimulationRepository;
     public List<Author> TestAuthors;
     public List<Cheep> TestCheeps;
     public List<Like> TestLikes;
@@ -45,6 +46,11 @@ public static class MockRepositoryFactory
         ICommentRepository commentRepository = new CommentRepository(
             mockChirpDbContext.MockChirpDbContext.Object
         );
+        ISimulationRepository simulationRepository = new SimulationRepository(
+            mockChirpDbContext.MockChirpDbContext.Object,
+            authorRepository,
+            cheepRepository
+        );
 
         return new MockChirpRepositories
         {
@@ -52,6 +58,7 @@ public static class MockRepositoryFactory
             AuthorRepository = authorRepository,
             LikeRepository = likeRepository,
             CommentRepository = commentRepository,
+            SimulationRepository = simulationRepository,
             TestAuthors = mockChirpDbContext.Authors,
             TestCheeps = mockChirpDbContext.Cheeps,
             TestLikes = mockChirpDbContext.Likes,
@@ -60,7 +67,7 @@ public static class MockRepositoryFactory
             MockAuthorsDbSet = mockChirpDbContext.MockDbAuthorsSet,
             MockCheepsDbSet = mockChirpDbContext.MockDbCheepsSet,
             MockLikesDbSet = mockChirpDbContext.MockDbLikesSet,
-            MockCommentsDbSet = mockChirpDbContext.MockDbCommentsSet
+            MockCommentsDbSet = mockChirpDbContext.MockDbCommentsSet,
         };
     }
 }

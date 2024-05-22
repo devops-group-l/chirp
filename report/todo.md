@@ -1,17 +1,20 @@
 # To do list
-- [ ] Make test suite work again
-- [ ] Implement testing in our CI/CD, to use test as a quality gate
-- [ ] Clean up workflows, remove old remnants from BDSA.
+- [X] Make test suite work again
+- [X] Implement testing in our CI/CD, to use test as a quality gate
+- [X] Clean up workflows, remove old remnants from BDSA.
 - [ ] Add static analysis tools so we have 3.
     - [X] One linter for your main programming language
     - [X] One code formatter for your main programming language
-    - [ ] One linter for your dockerfiles
+    - [X] One linter for your dockerfiles
     - [ ] Use these 3 as quality gates in CI/CD
 - [X] Add Maintainability and Technical Debt estimation tools to your projects
 - [ ] Do we have replication/backup?
 - [ ] Infrastructure as Code 
     - automating also the creation of infrastructure.
     - Tror vi snakkede om at bruge vagrant, men nåede vi i mål med det.
+- [ ] Fix links in the repos
+
+- [ ] Merge dependabot updates into main
 
 # What to include in the report?
 
