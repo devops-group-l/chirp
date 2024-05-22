@@ -1,6 +1,6 @@
 ---
-title: DevOps Project Report
-subtitle: ITU Group L
+title: DevOps Project Report for Group L
+subtitle: DevOps, Software Evolution and Software Maintenance - BSDSESM1KU
 author:
 - "Andreas Bartholdy Christensen <anbc@itu.dk>"
 - "Marcus Andreas Aandahl <maraa@itu.dk>"
