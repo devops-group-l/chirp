@@ -116,8 +116,6 @@ It has the following steps:
 
 This ensures that we continuously deliver releases.
 
-[//]: # (TODO: Something about why we need to continuously deliver releases?)
-
 ##### Continuous Deployment CD Chain
 In Digital Ocean, we have already provisioned 2 VMs, along with 2 reserved IPs pointing to them, following the green-blue deployment model.
 Our CD chain is responsible for updating our VMs in Digital Ocean, and switch the reserved IPs in order to minimise downtime during deployments.
@@ -160,28 +158,28 @@ We use the .NET log framework Serilog to collect custom as well as system logs f
 Serilog is a simple way to send logs to a specified output.
 In our case the collected logs are outputted to Loki, which is running as a container.
 Loki acts as a log aggregator, which efficiently indexes the logs only based on its metadata,
-instead of the whole log text, which makes logs available milliseconds after they are received by Loki.
+instead of the whole log text, which makes logs available milliseconds after they are received.
 We then use Grafana to visualize the collected logs from Loki.
 #### What do we log
 Per default we log everything from 'log level' information. This is to ensure, that in case something goes wrong while live, we can get access to all necessary information as normally displayed in the terminal. Furthermore, we have also implemented some custom log prints, which prints whenever a controller is called, to help us trace user behavior.
 ### Security
-From the security assessment we realized that our ports on different containers were public. This is a theoretical security issue, both since software such as Grafana is authenticated with a user-login, we felt this was not a major risk. 
+From the security assessment we realized that our ports on different containers were public. This is a theoretical security issue since software such as Grafana uses authentication. We felt this was not a major risk. 
 
 Another reflection was on using SSH keys. This enabled us to not send password through network traffic, thereby reducing risk of interception. Our project was also layered with SSL while hosted on Digital Ocean. 
 
-In general, our simulation endpoints were 'protected' with an auth-header and sensitive information such as configuration secrets were ensured to not be committed to VCS. User passwords stored in database were encrypted with SHA256. 
+In general, our simulation endpoints were 'protected' with an auth-header. Sensitive information such as configuration secrets were ensured to not be committed to VCS. User passwords stored in database were encrypted with SHA256. 
 
 ### Strategy for scaling and upgrades
 #### Scaling strategy
 When it comes to scaling, we didn't have enough time to implement a solution.
-However, we did still make some considerations regarding it.
+However, we did still make some considerations regarding this topic.
 
 The first thing we would have done would be to implement some kind of horizontal scaling strategy. 
 We wanted to do this with Docker Swarm, where on our droplet, we could orchestrate container replication, along with utilising load balancing.
 
 This would have improved the availability of our application.
 However, it might have also caused some problems, as we would've started building a distributed system.
-This would have likely led us to have issues with having had to synchronise our logging and monitoring tools across our container replicas and our load balancer.
+This would have likely led us to have issues with having to synchronise our logging and monitoring tools across our container replicas and our load balancer.
 
 
 #### Upgrades
@@ -197,34 +195,32 @@ Thereafter, the CD chain switches the reserved IPs, such that the live reserved 
 This repeats on every deployment.
 
 The objective with this setup is to ensure very low, to no downtime during deployments.
-Furthermore, this also allows us, in case we find out our live droplet is erroneous, to switch back to a our previously live droplet.
+In case we find out our live droplet is erroneous, this also allows us to switch back to a our previously live droplet.
 
 ### Reflection on AI assistance
 During the project we've used ChatGPT to search for information and code snippets for guidance.
 It is a mutual opinion in the group that copy-pasting our code to any chat bot or other AI tools should be avoided
-as we're unaware of where the data is stored and exactly who has access. Therefor we view AI tools such as ChatGPT 
+as we're unaware of where the data is stored and exactly who has access. Therefore we view AI tools, such as ChatGPT, 
 as an addition to Google where we can search for information and get answers to our questions.
 Additionally, manual development has the best learning outcome.
 
 ## Lessons Learned Perspective
-Describe the biggest issues, how you solved them, and which are major lessons learned with regards to:
-
 ### Continuous refactoring
 At the beginning of the simulation, we implemented functionality for receiving HTTP requests and storing data in separate tables unrelated to 'real' data. This data served the relevant HTTP simulation endpoints, but was purposely not visible on our applications feed. 
 Later on we then had to display this simulation data, which initially prompted us to change how we processed incoming requests. However this would require a migration, which we feared could cause a wipe of our database. 
-Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data in feed-viable data, without changing models. See commits `ec8c79d2` and `39a2df11`.
+Therefore we had to figure out a way to transform incoming data into visible data, without changing data-models (and causing a migration). Ultimately we made it possible to transform this data into feed-viable data, without changing models. See commits `ec8c79d2` and `39a2df11`.
 
 ### Operation
 As mentioned above we have continuously refactored our system throughout this project which sometimes has led us to having crashes or bugs in our live system. This has truly shown us the value of having monitoring and logging setup for our systems. Logging would give us the benefit of being able to see stack traces and logs, and monitoring would give us valuable insight into the state of users experience with our system. Many resources have been used setting up these tools, and therefore we unfortunately have not gotten to use the data from these as much as we might have wanted to, but we can see their value and how we would rely on these if we were to move forward with this project.
 
 
 ### Maintenance
-In the beginning we experienced short downtimes on our droplet when we deployed a new version of our system.
-With the implementation of Green-Blue we've succeeded with deployment without downtime, which will enhance user
-experience and monitoring is shown without misleading information. 
+During the start of the project, we experienced short downtimes on our droplet when we deployed a new version of our system.
+With the implementation of Green-Blue we've succeeded with deployment with minimized downtime, which will enhance user
+experience and monitoring.
 
 During the project we've had more focus on operations rather than development. 
 Compared to previous projects, our primary focus was to establish foundations to make DevOps possible.
-We've created a Blue-Green cloud solution to avoid downtime, monitoring and logging 
+We've created a Blue-Green cloud solution to minimize downtime. Monitoring and logging was implemented
 to keep track of the system after deployment, and CI/CD Chain to ensure quality and avoid
 potential failures when implementing new features. 
