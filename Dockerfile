@@ -14,7 +14,6 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
     && apt-get install -y --no-install-recommends nodejs=16.20.2-1nodesource1 \
     && rm -rf /var/lib/apt/lists/*
 
-SHELL ["/bin/sh"]
 RUN dotnet restore "src/Chirp.WebService/Chirp.WebService.csproj"
 COPY . .
 WORKDIR "/src/src/Chirp.WebService"
