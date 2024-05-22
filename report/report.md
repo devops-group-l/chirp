@@ -24,8 +24,7 @@ For version control we have used GitHub.
 
 We have hosted our service at Digital Ocean, and done CI/CD through GitHub actions.
 
-`Tilføjer lige en bulletlist, så kan vi rette til under gennemlæsning`
-
+In addition, we also have the following dependencies:
 - Docker
 - DockerHub
 - Vagrant
@@ -36,19 +35,16 @@ We have hosted our service at Digital Ocean, and done CI/CD through GitHub actio
 - AspNetCoreAnalyzers
 - CSharpier
 - EF Core
-- Microsoft Identity (Kan denne fjernes efter nyt login?)
-- OpenTelemetry (Kan denne fjernes?)
+- OpenTelemetry
 
 `Er i tvivl om tools som grafana og docker er dependencies? Til gennemlæsning lad os lige tjekke SNYK. Den har en god liste over dependencies:
 https://app.snyk.io/org/pallebrandt/project/9d8d435b-9ed4-432e-a16b-30afca0aec08
 `
-
-
-
 For monitoring and logging we have used Grafana and Prometheus, which allowed us to `SKRIV MERE HER` ...
 
 ### Interactions of subsystems
-  ![alt text](img/User_Sequence.png "User sequence")
+![alt text](img/User_Sequence.png "User sequence")
+![Sequence Diagram](img/seq-diagram.jpg "Sequence Diagram")
 - Similarly, another illustrative sequence diagram that shows how requests from the simulator traverse your system.
 ### State of systems
 The overall state of our system is good. We have been using SonarCloud to quantify the state of our system, and here we pass the quality gate. Though this comes with a caveat. Estimations from SonarCloud is that we have an estimated technical debt of 1 day and 3 hours. We have 95 issues spanning the following qualities:
@@ -65,7 +61,6 @@ This perspective should clarify how code or other artifacts come from idea into 
 Our CI Chain can be split into the following 3 workflows, where the latter 2 can be considered our main CI chains:
 - Dependabot
 - Sonarcloud
-- Build and test Chain
 - Code coverage Chain
 
 ##### Dependabot
@@ -78,25 +73,15 @@ SonarCloud is a tool which enables use to get an analysis of our project.
 When a PR is created, an analysis is added as a sticky comment, which showcases potential issues with the implemented code, along with new potential security flaws.
 It is also run on our default branch, which gives us an general analysis of the project.
 
-##### Build and test CI Chain
-The build and test CI chain is a github action, which is run on every pull request to our `itu-minitwit` branch.
-This chain attempts to build our project, along with running the tests written for it.
-
-It has the following steps:
-
-![Build and Test Chain](img/build-test-chain.png "Build and Test Chain")
-
-This chain ensures that, when a developer implements a feature, the project can build, and works as intended.
-
 ##### Code coverage CI Chain
-The code coverage CI chain works as an extension to the build and test CI chain, since they both build and test the project, in addition to creating a test coverage report.
-It is run, along with the build and test CI chain, on every created pull request to our `itu-minitwit` branch.
+The code coverage CI chain attempts to build the project, then runs the tests whilst creating a test coverage report.
+It is run on every created pull request to our `itu-minitwit` branch.
 
 It has the following steps:
 
 ![Code Coverage Chain](img/code-coverage-chain.png "Code Coverage Chain")
 
-This chain ensures that enough of the code is tested at all times.
+This chain ensures that we can build the project, our tests pass, and that enough of the code is tested at all times.
 Furthermore, it is also used as a reminder for the developers to write tests to their newly implemented features.
 
 ##### CI Chain reflections
@@ -107,7 +92,6 @@ Although setting up Dependabot, we weren't good at continuously updating the rec
 
 Furthermore, early on in the project, we had commented out our 2 primary CI chains during a major refactoring of the project, and had forgotten to un-comment it.
 Looking back at it, we should have never uncommented them, but rather just adjusted to them, as it could have led to some serious consequences.
-Moreover, we could probably have done without the build and test chain, and just simply used the code coverage chain alone instead, as it will also fail if the project can't build or the tests fail.
 
 #### CD Chain
 Our CD Chain can be split into the following 2 workflows:
