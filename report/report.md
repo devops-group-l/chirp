@@ -12,7 +12,7 @@ numbersections: true
 
 ## System's Perspective
 ### The onion architecture
-![Onion Architecture](img/Onion_architecture.png "Onion architecture")
+![Onion Architecture](report/img/Onion_architecture.png "Onion architecture")
 
 We chose to work with the onion architecture. The architecture provides loose coupling with the dependencies only
 flowing inwards. The interactions between the layers are facilitated through interfaces and abstractions,
@@ -51,9 +51,9 @@ In addition, we also have the following dependencies:
 - OpenTelemetry
 
 ### Interactions of subsystems
-![User Sequence](img/User_Sequence.png "User sequence")
+![User Sequence](report/img/User_Sequence.png "User sequence")
 
-![Sequence Diagram](img/seq-diagram.jpg "Sequence Diagram")
+![Sequence Diagram](report/img/seq-diagram.jpg "Sequence Diagram")
 
 ### State of systems
 The overall state of our system is good. We have been using SonarCloud to quantify the state of our system, and here we pass the quality gate. Although this comes with a caveat. Estimations from SonarCloud is that we have an estimated technical debt of 1 day and 3 hours. We have 95 issues spanning the following qualities:
@@ -87,7 +87,7 @@ It is run on every created pull request to our `itu-minitwit` branch.
 
 It has the following steps:
 
-![Code Coverage Chain](img/code-coverage-chain.png "Code Coverage Chain")
+![Code Coverage Chain](report/img/code-coverage-chain.png "Code Coverage Chain")
 
 This chain ensures that we can build the project, our tests pass, and that enough of the code is tested at all times.
 Furthermore, it is also used as a reminder for the developers to write tests to their newly implemented features.
@@ -112,7 +112,7 @@ Our publish app CD chain is run on a schedule, which is every Thursday. It is re
 It can be split into the `prepare release` and `release app` jobs, where the latter job runs as a matrix for the OS' `linux-x64`, `win-x64` and `osx-x64`.
 It has the following steps:
 
-![Publish Chain](img/publish-chain.png "Publish Chain")
+![Publish Chain](report/img/publish-chain.png "Publish Chain")
 
 This ensures that we continuously deliver releases.
 
@@ -123,7 +123,7 @@ This CD chain is run on every push to the `itu-minitwit` branch, and can be trig
 
 It has the following steps:
 
-![CD Chain](img/cd-chain.png "CD Chain")
+![CD Chain](report/img/cd-chain.png "CD Chain")
 
 In short, when we start a deployment, we:
 - Build and upload the new docker image to Docker Hub
@@ -185,7 +185,7 @@ This would have likely led us to have issues with having to synchronise our logg
 #### Upgrades
 Regarding which upgrades we made to our project, one notable one was the implementation of the green-blue deployment model.
 The diagram below shows our setup in Digital Ocean, along with how our toolchain interacts.
-![Cloud Diagram](img/DevopsCd.png "Cloud Diagram")
+![Cloud Diagram](report/img/DevopsCd.png "Cloud Diagram")
 The way we implemented green-blue, was by having 2 droplets at all times, with 2 reserved/floating IPs pointing to them.
 One of those IPs is pointing to our live droplet (green), whilst the other one is pointing to a non-live one (blue).
 Furthermore, the droplets also share the same Managed PostgreSQL DB.
