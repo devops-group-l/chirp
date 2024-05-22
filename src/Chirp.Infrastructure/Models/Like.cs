@@ -16,7 +16,7 @@ public class Like
             _cheep = value;
         }
     }
-    
+
     private Author _likedByAuthor = null!;
     public Author LikedByAuthor
     {

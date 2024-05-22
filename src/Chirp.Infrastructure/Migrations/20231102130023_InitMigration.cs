@@ -16,13 +16,22 @@ namespace Chirp.Infrastructure.Migrations
                 columns: table => new
                 {
                     AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Name = table.Column<string>(
+                        type: "nvarchar(50)",
+                        maxLength: 50,
+                        nullable: false
+                    ),
+                    Email = table.Column<string>(
+                        type: "nvarchar(100)",
+                        maxLength: 100,
+                        nullable: false
+                    )
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Authors", x => x.AuthorId);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "Cheeps",
@@ -30,7 +39,11 @@ namespace Chirp.Infrastructure.Migrations
                 {
                     CheepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(160)", maxLength: 160, nullable: false),
+                    Text = table.Column<string>(
+                        type: "nvarchar(160)",
+                        maxLength: 160,
+                        nullable: false
+                    ),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -41,23 +54,24 @@ namespace Chirp.Infrastructure.Migrations
                         column: x => x.AuthorId,
                         principalTable: "Authors",
                         principalColumn: "AuthorId",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Cheeps_AuthorId",
                 table: "Cheeps",
-                column: "AuthorId");
+                column: "AuthorId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Cheeps");
+            migrationBuilder.DropTable(name: "Cheeps");
 
-            migrationBuilder.DropTable(
-                name: "Authors");
+            migrationBuilder.DropTable(name: "Authors");
         }
     }
 }

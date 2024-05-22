@@ -1,9 +1,10 @@
-using Chirp.Core.Repositories;
-using Chirp.Core.Dto;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
+using Chirp.Core.Dto;
+using Chirp.Core.Repositories;
 using Chirp.Infrastructure.Contexts;
+using Chirp.WebService.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Chirp.WebService.Controllers
 {
@@ -11,7 +12,22 @@ namespace Chirp.WebService.Controllers
     {
         private readonly IAuthorRepository _authorRepository;
         private readonly ILogger<UserController> _logger;
-        public UserController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository, ILogger<UserController> logger) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
+
+        public UserController(
+            IAuthorRepository authorRepository,
+            ICheepRepository cheepRepository,
+            ILikeRepository likeRepository,
+            ICommentRepository commentRepository,
+            ISimulationRepository simulationRepository,
+            ILogger<UserController> logger
+        )
+            : base(
+                authorRepository,
+                cheepRepository,
+                likeRepository,
+                commentRepository,
+                simulationRepository
+            )
         {
             _authorRepository = authorRepository;
             _logger = logger;
@@ -46,7 +62,9 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("Invalid input");
             }
 
-            var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(username);
+            var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(
+                username
+            );
 
             if ((bool)authorWithUsernameExists)
             {
@@ -58,9 +76,15 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("The two passwords do not match");
             }
 
-            string hashedPassword = SimpleHashPassword(password);
+            string hashedPassword = password.SimpleHashPassword();
 
-            var user = new AuthorDto { Id = new Guid() , Username = username, Email = email, Password = hashedPassword };
+            var user = new AuthorDto
+            {
+                Id = new Guid(),
+                Username = username,
+                Email = email,
+                Password = hashedPassword
+            };
 
             await AuthorRepository.AddAuthor(user);
 
@@ -77,7 +101,7 @@ namespace Chirp.WebService.Controllers
             string? username = collection["username"];
             string? enteredPassword = collection["password"];
 
-            string password = SimpleHashPassword(enteredPassword);
+            string password = enteredPassword?.SimpleHashPassword() ?? "";
 
             if (String.IsNullOrEmpty(username))
             {
@@ -88,8 +112,9 @@ namespace Chirp.WebService.Controllers
                 return RedirectWithError("You have to enter a password");
             }
 
-
-            var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(username);
+            var authorWithUsernameExists = await _authorRepository.AuthorWithUsernameExists(
+                username
+            );
 
             if ((bool)!authorWithUsernameExists)
             {
@@ -100,12 +125,12 @@ namespace Chirp.WebService.Controllers
 
             if (user.Password != password)
             {
-                return RedirectWithError("Invalid password");
+                return RedirectWithError("Invalid password " + user.Password + " - " + password);
             }
             else
             {
                 // Store user ID in the session
-                HttpContext.Session.Set("UserId", user.Id.ToByteArray()); 
+                HttpContext.Session.Set("UserId", user.Id.ToByteArray());
             }
 
             return Redirect("/");
@@ -117,7 +142,7 @@ namespace Chirp.WebService.Controllers
         public async Task<IActionResult> Logout()
         {
             _logger.LogInformation("UserController.Logout was called");
-            
+
             HttpContext.Session.Remove("UserId");
 
             return Redirect("/");
@@ -130,24 +155,19 @@ namespace Chirp.WebService.Controllers
         {
             _logger.LogInformation("UserController.Delete was called");
             Guid? userId = (Guid?)HttpContext.Items["userId"];
-            if (userId is null) {
-                _logger.LogDebug("UserController.Delete was called, but no user was found on ID: {userId}", userId);
+            if (userId is null)
+            {
+                _logger.LogDebug(
+                    "UserController.Delete was called, but no user was found on ID: {userId}",
+                    userId
+                );
                 return RedirectWithError("No users found to be deleted!");
             }
             await _authorRepository.DeleteAuthor(userId.Value);
 
             HttpContext.Session.Remove("UserId");
-            
-            return Redirect("/");
-        }
 
-        static string SimpleHashPassword(string password)
-        {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashBytes);
-            }
+            return Redirect("/");
         }
     }
 }

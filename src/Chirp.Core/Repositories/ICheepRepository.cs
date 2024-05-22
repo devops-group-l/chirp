@@ -1,4 +1,5 @@
 namespace Chirp.Core.Repositories;
+
 using Dto;
 
 public interface ICheepRepository

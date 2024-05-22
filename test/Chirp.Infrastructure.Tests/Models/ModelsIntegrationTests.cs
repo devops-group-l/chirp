@@ -16,7 +16,7 @@ public class ModelsIntegrationTests
             Text = new Faker().Random.Words(),
             Timestamp = new Faker().Date.Past()
         };
-        
+
         Assert.Equal(author.AuthorId, cheep.Author.AuthorId);
         Assert.Single(author.Cheeps);
         Assert.Equal(cheep, author.Cheeps.First());

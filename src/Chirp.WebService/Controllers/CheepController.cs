@@ -1,18 +1,32 @@
-using Chirp.Core.Repositories;
 using Chirp.Core.Dto;
+using Chirp.Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace Chirp.WebService.Controllers
 {
     public class CheepController : BaseController
     {
         private readonly ILogger<CheepController> _logger;
-        public CheepController(IAuthorRepository authorRepository, ICheepRepository cheepRepository, ILikeRepository likeRepository, ICommentRepository commentRepository, ISimulationRepository simulationRepository, ILogger<CheepController> logger) : base(authorRepository, cheepRepository, likeRepository, commentRepository, simulationRepository)
+
+        public CheepController(
+            IAuthorRepository authorRepository,
+            ICheepRepository cheepRepository,
+            ILikeRepository likeRepository,
+            ICommentRepository commentRepository,
+            ISimulationRepository simulationRepository,
+            ILogger<CheepController> logger
+        )
+            : base(
+                authorRepository,
+                cheepRepository,
+                likeRepository,
+                commentRepository,
+                simulationRepository
+            )
         {
             _logger = logger;
         }
-        
+
         // POST: Cheep/Like
         [HttpPost]
         [Route("Cheep/Like")]
@@ -29,11 +43,11 @@ namespace Chirp.WebService.Controllers
                 }
                 Guid cId = Guid.Parse(cheepId);
                 await LikeRepository.LikeCheep(user.Id, cId);
-                
+
                 return Redirect(GetPathUrl());
             });
         }
-        
+
         //POST: Unlike cheep
         [HttpPost]
         [Route("Cheep/Unlike")]
@@ -50,11 +64,10 @@ namespace Chirp.WebService.Controllers
                 }
                 Guid cId = Guid.Parse(cheepId);
                 await LikeRepository.UnlikeCheep(user.Id, cId);
-                
+
                 return Redirect(GetPathUrl());
             });
         }
-        
 
         // POST: Cheep/Create
         [HttpPost]
@@ -74,18 +87,18 @@ namespace Chirp.WebService.Controllers
 
                 if (cheepText.Length > 160)
                 {
-                    return RedirectWithError("Invalid input - cheep is too long (max 160 characters)");
+                    return RedirectWithError(
+                        "Invalid input - cheep is too long (max 160 characters)"
+                    );
                 }
 
-                await CheepRepository.AddCheep(new AddCheepDto
-                {
-                    AuthorId = user.Id,
-                    Text = cheepText
-                });
+                await CheepRepository.AddCheep(
+                    new AddCheepDto { AuthorId = user.Id, Text = cheepText }
+                );
                 return Redirect(GetPathUrl());
             });
         }
-        
+
         // POST: Cheep/Delete
         [HttpPost]
         [Route("Cheep/Delete")]
@@ -97,39 +110,46 @@ namespace Chirp.WebService.Controllers
             return await WithAuthAsync(async _ =>
             {
                 string? cheepId = collection["cheepId"];
-                
+
                 if (String.IsNullOrEmpty(cheepId))
                 {
-                    _logger.LogDebug("Controller.Delete was called and the Cheep Id was invalid, cheepId: " + cheepId);
+                    _logger.LogDebug(
+                        "Controller.Delete was called and the Cheep Id was invalid, cheepId: "
+                            + cheepId
+                    );
                     return RedirectWithError("Invalid Cheep Id");
                 }
-                
-                if (!await CheepRepository.DeleteCheep(Guid.Parse(cheepId))) return RedirectWithError("Cheep was not found");
-                
+
+                if (!await CheepRepository.DeleteCheep(Guid.Parse(cheepId)))
+                    return RedirectWithError("Cheep was not found");
+
                 return Redirect(GetPathUrl());
             });
         }
-        
+
         //Post Cheep/Follow
         [HttpPost]
         [Route("Cheep/Follow")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Follow(IFormCollection collection)
         {
-            
             return await WithAuthAsync(async user =>
             {
                 //The new account to follow
                 Guid authorToBeFollowed = Guid.Parse(collection["CheepAuthorId"].ToString());
 
-                _logger.LogInformation("Controller.Follow was called with user: {user.Id} try to follow user: {authorToBeFollowed}", user.Id, authorToBeFollowed);
-                
+                _logger.LogInformation(
+                    "Controller.Follow was called with user: {user} try to follow user: {authorToBeFollowed}",
+                    user.Id,
+                    authorToBeFollowed
+                );
+
                 await AuthorRepository.AddFollow(user.Id, authorToBeFollowed);
-                
-                return Redirect(GetPathUrl());//Redirect to same page
+
+                return Redirect(GetPathUrl()); //Redirect to same page
             });
         }
-        
+
         //Post Cheep/Unfollow
         [HttpPost]
         [Route("Cheep/Unfollow")]
@@ -138,13 +158,17 @@ namespace Chirp.WebService.Controllers
         {
             return await WithAuthAsync(async user =>
             {
-                Guid authorToBeUnfollowed = Guid.Parse(collection["CheepAuthorId"].ToString());//The new account to follow
+                Guid authorToBeUnfollowed = Guid.Parse(collection["CheepAuthorId"].ToString()); //The new account to follow
 
-                _logger.LogInformation("Controller.UnFollow was called with user: {user.Id} try to unfollow user: {authorToBeUnfollowed}", user.Id, authorToBeUnfollowed);
+                _logger.LogInformation(
+                    "Controller.UnFollow was called with user: {user} try to unfollow user: {authorToBeUnfollowed}",
+                    user.Id,
+                    authorToBeUnfollowed
+                );
 
                 await AuthorRepository.RemoveFollow(user.Id, authorToBeUnfollowed);
-                
-                return Redirect(GetPathUrl());//Redirect to same page
+
+                return Redirect(GetPathUrl()); //Redirect to same page
             });
         }
     }

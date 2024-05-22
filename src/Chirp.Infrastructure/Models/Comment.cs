@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Chirp.Infrastructure.Extensions;
 
 namespace Chirp.Infrastructure.Models;
 
@@ -6,9 +7,9 @@ public class Comment
 {
     [Key]
     public Guid CommentId { get; set; }
-    
+
     private Author _commentAuthor = null!;
-    
+
     public Author CommentAuthor
     {
         get => _commentAuthor;
@@ -18,9 +19,9 @@ public class Comment
             _commentAuthor = value;
         }
     }
-    
+
     private Cheep _cheep = null!;
-    
+
     public Cheep Cheep
     {
         get => _cheep;
@@ -30,12 +31,9 @@ public class Comment
             _cheep = value;
         }
     }
-    
-    [
-        Required,
-        MaxLength(160, ErrorMessage = "Comment must contain less than 160 characters")
-    ]
+
+    [Required, MaxLength(160, ErrorMessage = "Comment must contain less than 160 characters")]
     public string Text { get; set; } = "";
-    
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+
+    public DateTime Timestamp { get; set; } = DateTime.UtcNow.SetKindUtc();
 }

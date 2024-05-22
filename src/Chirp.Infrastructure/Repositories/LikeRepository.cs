@@ -13,30 +13,28 @@ public class LikeRepository : ILikeRepository
     public LikeRepository(ChirpDbContext chirpDbContext)
     {
         _chirpDbContext = chirpDbContext;
-
     }
 
     //Creates a like in DbContext
     public async Task LikeCheep(Guid authorId, Guid cheepId)
     {
         Author? author = await _chirpDbContext
-            .Authors
-            .Include(a => a.Likes)
+            .Authors.Include(a => a.Likes)
             .ThenInclude(like => like.Cheep)
             .SingleOrDefaultAsync(a => a.AuthorId == authorId);
 
-        Cheep? cheep = await _chirpDbContext.Cheeps.Include(c => c.Likes)
+        Cheep? cheep = await _chirpDbContext
+            .Cheeps.Include(c => c.Likes)
             .SingleOrDefaultAsync(c => c.CheepId == cheepId);
 
-        if (author is null) return;
-        if (cheep is null) return;
-        if (author.Likes.Any(l => l.Cheep.CheepId.ToString() == cheepId.ToString())) return; // Already liked
+        if (author is null)
+            return;
+        if (cheep is null)
+            return;
+        if (author.Likes.Any(l => l.Cheep.CheepId.ToString() == cheepId.ToString()))
+            return; // Already liked
 
-        _chirpDbContext.Likes.Add(new Like
-        {
-            LikedByAuthor = author,
-            Cheep = cheep
-        });
+        _chirpDbContext.Likes.Add(new Like { LikedByAuthor = author, Cheep = cheep });
 
         await _chirpDbContext.SaveChangesAsync();
     }
@@ -44,10 +42,12 @@ public class LikeRepository : ILikeRepository
     //Removes a like from DbContext
     public async Task UnlikeCheep(Guid authorId, Guid cheepId)
     {
-        Like? like = await _chirpDbContext.Likes
-            .SingleOrDefaultAsync(c => c.Cheep.CheepId == cheepId && c.LikedByAuthor.AuthorId == authorId);
+        Like? like = await _chirpDbContext.Likes.SingleOrDefaultAsync(c =>
+            c.Cheep.CheepId == cheepId && c.LikedByAuthor.AuthorId == authorId
+        );
 
-        if (like is null) return; //Not liked
+        if (like is null)
+            return; //Not liked
 
         _chirpDbContext.Likes.Remove(like);
         await _chirpDbContext.SaveChangesAsync();
@@ -57,16 +57,14 @@ public class LikeRepository : ILikeRepository
     public Task<List<LikeDto>> GetLikesByAuthorId(Guid authorId)
     {
         return _chirpDbContext
-            .Likes
-            .Include(l => l.LikedByAuthor)
+            .Likes.Include(l => l.LikedByAuthor)
             .Include(l => l.Cheep)
             .Where(l => l.LikedByAuthor.AuthorId == authorId)
-            .Select<Like, LikeDto>(l =>
-                new LikeDto
-                {
-                    CheepId = l.Cheep.CheepId,
-                    LikedByAuthorId = l.LikedByAuthor.AuthorId
-                }
-            ).ToListAsync();
+            .Select<Like, LikeDto>(l => new LikeDto
+            {
+                CheepId = l.Cheep.CheepId,
+                LikedByAuthorId = l.LikedByAuthor.AuthorId
+            })
+            .ToListAsync();
     }
 }

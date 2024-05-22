@@ -10,19 +10,13 @@ namespace Chirp.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Login",
-                table: "Authors",
-                newName: "Username");
+            migrationBuilder.RenameColumn(name: "Login", table: "Authors", newName: "Username");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.RenameColumn(
-                name: "Username",
-                table: "Authors",
-                newName: "Login");
+            migrationBuilder.RenameColumn(name: "Username", table: "Authors", newName: "Login");
         }
     }
 }

@@ -14,15 +14,17 @@ public class CommentRepository : ICommentRepository
     {
         _chirpDbContext = chirpDbContext;
     }
-    
+
     //Add a comment to a Cheep
     public async Task<bool> AddComment(AddCommentDto commentDto)
     {
-        Cheep? cheep = await _chirpDbContext.Cheeps
-            .SingleOrDefaultAsync(c => c.CheepId == commentDto.CheepId);
+        Cheep? cheep = await _chirpDbContext.Cheeps.SingleOrDefaultAsync(c =>
+            c.CheepId == commentDto.CheepId
+        );
 
-        if (cheep == null) return false;
-        
+        if (cheep == null)
+            return false;
+
         //Build the comment
         Comment comment = new Comment
         {
@@ -34,14 +36,17 @@ public class CommentRepository : ICommentRepository
 
         _chirpDbContext.Comments.Add(comment);
         await _chirpDbContext.SaveChangesAsync();
-        
+
         return true;
     }
-    
+
     public async Task<bool> DeleteComment(Guid commentId)
     {
-        var comment = await _chirpDbContext.Comments.FirstOrDefaultAsync(c => c.CommentId == commentId);
-        if (comment is null) return false;
+        var comment = await _chirpDbContext.Comments.FirstOrDefaultAsync(c =>
+            c.CommentId == commentId
+        );
+        if (comment is null)
+            return false;
         _chirpDbContext.Remove(comment);
         await _chirpDbContext.SaveChangesAsync();
         return true;

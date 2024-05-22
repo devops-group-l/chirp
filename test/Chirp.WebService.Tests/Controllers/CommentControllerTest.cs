@@ -1,4 +1,5 @@
 using Bogus;
+using Chirp.Core.Dto;
 using Chirp.Core.Extensions;
 using Chirp.Infrastructure.Models;
 using Chirp.Tests.Core;
@@ -11,27 +12,44 @@ namespace Chirp.WebService.Tests.Controllers;
 
 public class CommentControllerTest
 {
-    private readonly MockChirpRepositories _mockChirpRepositories = MockRepositoryFactory.GetMockCheepRepositories();
+    private readonly MockChirpRepositories _mockChirpRepositories =
+        MockRepositoryFactory.GetMockCheepRepositories();
+    private readonly MockLoggerFactories _mockLoggerFactories = MockLoggerFactory.GetMockLoggers();
     private readonly CommentController _commentController;
 
     public CommentControllerTest()
     {
-        Mock<CommentController> mockController = new(_mockChirpRepositories.AuthorRepository,
-            _mockChirpRepositories.CheepRepository,
-            _mockChirpRepositories.LikeRepository,
-            _mockChirpRepositories.CommentRepository);
+        Mock<CommentController> mockController =
+            new(
+                _mockChirpRepositories.AuthorRepository,
+                _mockChirpRepositories.CheepRepository,
+                _mockChirpRepositories.LikeRepository,
+                _mockChirpRepositories.CommentRepository,
+                _mockChirpRepositories.SimulationRepository,
+                _mockLoggerFactories.CommentLogger
+            );
         mockController.CallBase = true;
-        
+
         string name = new Faker().Name.FullName();
-        var user = new ClaimsUser
+        // var user = new ClaimsUser
+        // {
+        //     Id = new Faker().Random.Guid(),
+        //     Name = name,
+        //     Username = new Faker().Internet.UserName(name),
+        //     AvatarUrl = new Faker().Internet.Avatar()
+        // };
+        var author = new AuthorDto
         {
             Id = new Faker().Random.Guid(),
-            Name = name,
-            Username = new Faker().Internet.UserName(name),
-            AvatarUrl = new Faker().Internet.Avatar()
+            Email = new Faker().Internet.Email(),
+            Username = new Faker().Internet.UserName(name)
         };
-        mockController.As<IController>().Setup(bc => bc.GetUser).Returns(() => user);
-        mockController.As<IController>().Setup(bc => bc.GetPathUrl).Returns(() => new Faker().Internet.UrlWithPath());
+        // mockController.Setup(e => e.HttpContext.Items["user"]).Returns(author);
+        mockController.As<IController>().Setup(bc => bc.GetUser).Returns(() => author);
+        mockController
+            .As<IController>()
+            .Setup(bc => bc.GetPathUrl)
+            .Returns(() => new Faker().Internet.UrlWithPath());
 
         _commentController = mockController.Object;
     }
@@ -45,7 +63,7 @@ public class CommentControllerTest
         string cheepId = cheep.CheepId.ToString();
         string authorId = author.AuthorId.ToString();
         string commentText = new Faker().Random.Words();
-        
+
         IFormCollection collection = new FormCollection(
             new Dictionary<string, StringValues>
             {
@@ -73,12 +91,9 @@ public class CommentControllerTest
         string commentId = comment.CommentId.ToString();
 
         IFormCollection collection = new FormCollection(
-            new Dictionary<string, StringValues>
-            {
-                { "CommentId", commentId }
-            }
+            new Dictionary<string, StringValues> { { "CommentId", commentId } }
         );
-        
+
         // Act
         var result = await _commentController.Delete(collection);
 
@@ -89,24 +104,20 @@ public class CommentControllerTest
         Assert.False(string.IsNullOrEmpty(redirectResult.Url));
     }
 
-   [Fact] 
+    [Fact]
     public async Task TestDeleteCommentFail()
     {
         //Arrange
         string fakeCommentId = "not_an_id";
 
         IFormCollection collection = new FormCollection(
-            new Dictionary<string, StringValues>
-            {
-                { "CommentId", fakeCommentId }
-            }
+            new Dictionary<string, StringValues> { { "CommentId", fakeCommentId } }
         );
-        
+
         //Act
         IActionResult actionResult = await _commentController.Delete(collection);
-        
+
         //Assert
         Assert.False(actionResult is RedirectResult);
-
     }
 }

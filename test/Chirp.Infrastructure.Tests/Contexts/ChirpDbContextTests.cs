@@ -14,15 +14,17 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
     {
         _fixture = fixture;
     }
-    
+
     [Fact]
     public void TestModelsIdGenerationUnique()
     {
         ChirpDbContext context = _fixture.GetContext();
 
         List<Author> authors = DataGenerator.GenerateAuthorFaker(false).GenerateBetween(1, 10);
-        List<Cheep> cheeps = DataGenerator.GenerateCheepFaker(authors, false).GenerateBetween(50, 100);
-        
+        List<Cheep> cheeps = DataGenerator
+            .GenerateCheepFaker(authors, false)
+            .GenerateBetween(50, 100);
+
         // Guids should not have been set yet
         Guid emptyGuid = Guid.Empty;
         foreach (Author author in authors)
@@ -33,11 +35,11 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
         {
             Assert.Equal(emptyGuid, cheep.CheepId);
         }
-        
+
         context.Authors.AddRange(authors);
         context.Cheeps.AddRange(cheeps);
         context.SaveChanges();
-        
+
         // Guids should now be set and unique
         List<Guid> authorIds = new List<Guid>();
         foreach (Author author in authors)
@@ -46,7 +48,7 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
             Assert.True(!authorIds.Contains(author.AuthorId));
             authorIds.Add(author.AuthorId);
         }
-        
+
         List<Guid> cheepIds = new List<Guid>();
         foreach (Cheep cheep in cheeps)
         {
@@ -54,7 +56,7 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
             Assert.True(!cheepIds.Contains(cheep.CheepId));
             cheepIds.Add(cheep.CheepId);
         }
-        
+
         context.Cheeps.RemoveRange(cheeps);
         context.Authors.RemoveRange(authors);
         context.SaveChanges();
@@ -71,10 +73,10 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
             Assert.NotNull(cheep);
             Assert.IsType<Cheep>(cheep);
         }
-        
+
         Assert.Equal(_fixture.Data.Cheeps.Count, cheeps.Count);
     }
-    
+
     [Fact]
     public void TestGetAuthors()
     {
@@ -88,14 +90,14 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
         }
         Assert.Equal(_fixture.Data.Authors.Count, authors.Count);
     }
-    
+
     [Fact]
     public void TestAddCheepAuthorAndLike()
     {
         ChirpDbContext context = _fixture.GetContext();
-        
+
         Author author = DataGenerator.GenerateAuthorFaker(false).Generate();
-        
+
         Cheep cheep = new Cheep
         {
             Author = author,
@@ -103,11 +105,7 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
             Timestamp = new Faker().Date.Past()
         };
 
-        Like like = new Like
-        {
-            LikedByAuthor = author,
-            Cheep = cheep
-        };
+        Like like = new Like { LikedByAuthor = author, Cheep = cheep };
 
         Comment comment = new Comment
         {
@@ -120,7 +118,7 @@ public class ChirpDbContextTests : IClassFixture<ChirpDbContextFixture>
         EntityEntry<Cheep> addedCheep = context.Cheeps.Add(cheep);
         EntityEntry<Like> addedLike = context.Likes.Add(like);
         EntityEntry<Comment> addedComment = context.Comments.Add(comment);
-        
+
         Assert.Equal(author.Username, addedAuthor.Entity.Username);
         Assert.Equal(author.Username, addedCheep.Entity.Author.Username);
         Assert.Equal(cheep.Author, author);

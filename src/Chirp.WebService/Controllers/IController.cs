@@ -1,9 +1,9 @@
-using Chirp.Core.Extensions;
+using Chirp.Core.Dto;
 
 namespace Chirp.WebService.Controllers;
 
 public interface IController
 {
-    public Func<ClaimsUser?> GetUser { get; }
+    public Func<AuthorDto?> GetUser { get; }
     public Func<string> GetPathUrl { get; }
 }

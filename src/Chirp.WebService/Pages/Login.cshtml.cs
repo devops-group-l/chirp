@@ -7,14 +7,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Chirp.WebService.Pages;
 
-public class LoginModel: PageModel
+public class LoginModel : PageModel
 {
     public FooterPartialModel FooterPartialModel { get; set; }
-    
-    public LoginModel()
-    {
-      
-    }
+
+    public LoginModel() { }
 
     public IActionResult OnGet()
     {
@@ -22,7 +19,7 @@ public class LoginModel: PageModel
         int amountOfPages = 1;
 
         FooterPartialModel = FooterPartialModel.BuildFooterPartialModel(pageNumber, amountOfPages);
-        
+
         return Page();
     }
 }

@@ -18,7 +18,8 @@ public class ChirpDbContext : DbContext
     public virtual DbSet<SimulationFollows> SimulationFollows { get; set; } = null!;
 
     public virtual DbSet<SimulationLatest> SimulationLatests { get; set; } = null!;
-    public ChirpDbContext() {}
+
+    public ChirpDbContext() { }
 
     public ChirpDbContext(DbContextOptions<ChirpDbContext> options)
         : base(options)
@@ -27,43 +28,45 @@ public class ChirpDbContext : DbContext
         //Database.Migrate(); // Required for tests
         // DbInitializer.SeedDatabase(this);
     }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Cheep>()
+        modelBuilder
+            .Entity<Cheep>()
             .HasOne<Author>(c => c.Author)
             .WithMany(a => a.Cheeps)
             .HasForeignKey("AuthorId")
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Author>()
-            .HasMany<Author>(a => a.Follows)
-            .WithMany(c => c.FollowedBy);
+        modelBuilder.Entity<Author>().HasMany<Author>(a => a.Follows).WithMany(c => c.FollowedBy);
 
-        modelBuilder.Entity<Comment>()
+        modelBuilder
+            .Entity<Comment>()
             .HasOne<Author>(c => c.CommentAuthor)
             .WithMany(a => a.Comments)
             .HasForeignKey("AuthorId")
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
 
-
-        modelBuilder.Entity<Comment>()
+        modelBuilder
+            .Entity<Comment>()
             .HasOne<Cheep>(c => c.Cheep)
             .WithMany(c => c.Comments)
             .HasForeignKey("CheepId")
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
 
-        modelBuilder.Entity<Like>()
+        modelBuilder
+            .Entity<Like>()
             .HasOne<Author>(l => l.LikedByAuthor)
             .WithMany(a => a.Likes)
             .HasForeignKey("AuthorId")
             .OnDelete(DeleteBehavior.Restrict)
             .IsRequired(false);
 
-        modelBuilder.Entity<Like>()
+        modelBuilder
+            .Entity<Like>()
             .HasOne<Cheep>(l => l.Cheep)
             .WithMany(c => c.Likes)
             .HasForeignKey("CheepId")

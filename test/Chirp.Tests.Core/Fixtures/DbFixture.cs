@@ -1,21 +1,19 @@
-using Testcontainers.SqlEdge;
+using Testcontainers.PostgreSql;
 
 namespace Chirp.Tests.Core.Fixtures;
 
 public class DbFixture : IDisposable
 {
-    private readonly SqlEdgeContainer _container;
+    private readonly PostgreSqlContainer _container;
 
     protected DbFixture()
     {
-        _container = new SqlEdgeBuilder()
-            .WithImage("mcr.microsoft.com/azure-sql-edge")
-            .Build();
+        _container = new PostgreSqlBuilder().Build();
         _container.StartAsync().Wait();
-        
-        Environment.SetEnvironmentVariable("ConnectionStrings__ChirpSqlDb", _container.GetConnectionString());
+
+        Environment.SetEnvironmentVariable("DB_STRING", _container.GetConnectionString());
     }
-    
+
     public void Dispose()
     {
         _container.DisposeAsync().AsTask().Wait();
