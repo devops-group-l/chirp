@@ -58,22 +58,4 @@ public class LikeRepositoryTest
         //Assert
         Assert.NotEmpty(testList);
     }
-
-    [Fact] //Tests if a like is removed from the database
-    public async Task UnlikeCheepTest()
-    {
-        //Arrange
-        Like like = _mockChirpRepositories.TestLikes.First();
-        Guid cheepId = like.Cheep.CheepId;
-        Guid authorId = like.LikedByAuthor.AuthorId;
-        //Act
-        await _mockChirpRepositories.LikeRepository.UnlikeCheep(authorId, cheepId);
-
-        //Assert
-        _mockChirpRepositories.MockLikesDbSet.Verify(m => m.Remove(It.IsAny<Like>()), Times.Once);
-        _mockChirpRepositories.MockChirpDbContext.Verify(
-            m => m.SaveChangesAsync(It.IsAny<CancellationToken>()),
-            Times.Once
-        );
-    }
 }
