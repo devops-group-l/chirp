@@ -17,20 +17,11 @@ public static class MockLoggerFactory
 {
     public static MockLoggerFactories GetMockLoggers()
     {
-        var cheepLogger = new Mock<ILogger<CheepController>>
-        {
-            CallBase = true
-        };
-        
-        var userLogger = new Mock<ILogger<UserController>>
-        {
-            CallBase = true
-        };
-        
-        var commentLogger = new Mock<ILogger<CommentController>>
-        {
-            CallBase = true
-        };
+        var cheepLogger = new Mock<ILogger<CheepController>> { CallBase = true };
+
+        var userLogger = new Mock<ILogger<UserController>> { CallBase = true };
+
+        var commentLogger = new Mock<ILogger<CommentController>> { CallBase = true };
 
         return new MockLoggerFactories
         {

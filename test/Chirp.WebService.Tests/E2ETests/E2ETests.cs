@@ -30,17 +30,15 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
             Password = authorPassword.SimpleHashPassword(),
             AvatarUrl = new Faker().Image.PicsumUrl()
         };
-        using (var scope = _fixture.Host.Services.CreateScope()) {
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
             var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
             await dbContext.Authors.AddAsync(author);
             await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
             await dbContext.SaveChangesAsync();
         }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl+"/Login", new PageGotoOptions
-        {
-            Timeout = 60000L
-        });
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
         var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
         await page.GetByPlaceholder("Username").FillAsync(author.Username);
         await page.GetByPlaceholder("Password").FillAsync(authorPassword);
@@ -84,22 +82,20 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
             Password = authorPassword.SimpleHashPassword(),
             AvatarUrl = new Faker().Image.PicsumUrl()
         };
-        using (var scope = _fixture.Host.Services.CreateScope()) {
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
             var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
             await dbContext.Authors.AddAsync(author);
             await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
             await dbContext.SaveChangesAsync();
         }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl+"/Login", new PageGotoOptions
-        {
-            Timeout = 60000L
-        });
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
         var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
         await page.GetByPlaceholder("Username").FillAsync(author.Username);
         await page.GetByPlaceholder("Password").FillAsync(authorPassword);
         await loginButton!.ClickAsync();
-        
+
         string cheepMessage = "This is a cheep deleted by the E2E test!";
 
         var shareButton = await page.QuerySelectorAsync("//*[@id=\"cheepSubmitButton\"]");
@@ -145,17 +141,15 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
             Password = authorPassword.SimpleHashPassword(),
             AvatarUrl = new Faker().Image.PicsumUrl()
         };
-        using (var scope = _fixture.Host.Services.CreateScope()) {
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
             var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
             await dbContext.Authors.AddAsync(author);
             await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
             await dbContext.SaveChangesAsync();
         }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl+"/Login", new PageGotoOptions
-        {
-            Timeout = 60000L
-        });
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
         var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
         await page.GetByPlaceholder("Username").FillAsync(author.Username);
         await page.GetByPlaceholder("Password").FillAsync(authorPassword);
@@ -196,17 +190,15 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
             Password = authorPassword.SimpleHashPassword(),
             AvatarUrl = new Faker().Image.PicsumUrl()
         };
-        using (var scope = _fixture.Host.Services.CreateScope()) {
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
             var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
             await dbContext.Authors.AddAsync(author);
             await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
             await dbContext.SaveChangesAsync();
         }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl+"/Login", new PageGotoOptions
-        {
-            Timeout = 60000L
-        });
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
         var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
         await page.GetByPlaceholder("Username").FillAsync(author.Username);
         await page.GetByPlaceholder("Password").FillAsync(authorPassword);
@@ -261,17 +253,15 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
             Password = authorPassword.SimpleHashPassword(),
             AvatarUrl = new Faker().Image.PicsumUrl()
         };
-        using (var scope = _fixture.Host.Services.CreateScope()) {
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
             var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
             await dbContext.Authors.AddAsync(author);
             await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
             await dbContext.SaveChangesAsync();
         }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl+"/Login", new PageGotoOptions
-        {
-            Timeout = 60000L
-        });
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
         var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
         await page.GetByPlaceholder("Username").FillAsync(author.Username);
         await page.GetByPlaceholder("Password").FillAsync(authorPassword);

@@ -12,7 +12,7 @@ public static class HttpExtensions
 
         return referer.Replace(origin, "");
     }
-    
+
     public static string SimpleHashPassword(this string password)
     {
         using (SHA256 sha256 = SHA256.Create())
