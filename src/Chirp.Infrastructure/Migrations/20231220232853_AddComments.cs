@@ -21,7 +21,8 @@ namespace Chirp.Infrastructure.Migrations
                 oldClrType: typeof(string),
                 oldType: "nvarchar(50)",
                 oldMaxLength: 50,
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.CreateTable(
                 name: "Comments",
@@ -30,7 +31,11 @@ namespace Chirp.Infrastructure.Migrations
                     CommentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AuthorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CheepId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Text = table.Column<string>(type: "nvarchar(160)", maxLength: 160, nullable: false),
+                    Text = table.Column<string>(
+                        type: "nvarchar(160)",
+                        maxLength: 160,
+                        nullable: false
+                    ),
                     Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -41,31 +46,35 @@ namespace Chirp.Infrastructure.Migrations
                         column: x => x.AuthorId,
                         principalTable: "Authors",
                         principalColumn: "AuthorId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Restrict
+                    );
                     table.ForeignKey(
                         name: "FK_Comments_Cheeps_CheepId",
                         column: x => x.CheepId,
                         principalTable: "Cheeps",
                         principalColumn: "CheepId",
-                        onDelete: ReferentialAction.Restrict);
-                });
+                        onDelete: ReferentialAction.Restrict
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_AuthorId",
                 table: "Comments",
-                column: "AuthorId");
+                column: "AuthorId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Comments_CheepId",
                 table: "Comments",
-                column: "CheepId");
+                column: "CheepId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Comments");
+            migrationBuilder.DropTable(name: "Comments");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Name",
@@ -75,7 +84,8 @@ namespace Chirp.Infrastructure.Migrations
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "nvarchar(50)",
-                oldMaxLength: 50);
+                oldMaxLength: 50
+            );
         }
     }
 }

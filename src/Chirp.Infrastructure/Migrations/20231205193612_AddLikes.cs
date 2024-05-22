@@ -21,14 +21,14 @@ namespace Chirp.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Likes", x => new { x.LikedByAuthorId, x.CheepId });
-                });
+                }
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Likes");
+            migrationBuilder.DropTable(name: "Likes");
         }
     }
 }

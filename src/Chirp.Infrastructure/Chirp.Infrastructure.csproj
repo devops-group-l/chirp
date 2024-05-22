@@ -11,9 +11,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="CSharpier.MsBuild" Version="0.28.2">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="Hardware.Info" Version="100.1.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.16" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.16">
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.19" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.19">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

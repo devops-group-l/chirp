@@ -1,103 +1,179 @@
+using Bogus;
+using Chirp.Infrastructure.Contexts;
+using Chirp.Infrastructure.Models;
+using Chirp.Tests.Core;
 using Chirp.Tests.Core.Factories;
-
+using Chirp.WebService.Extensions;
+using Microsoft.Playwright;
 
 namespace Chirp.WebService.Tests.E2ETests;
 
 public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
 {
     private readonly MockWebApplicationFactoryWithAuth _fixture;
-    
+
     public E2ETests(MockWebApplicationFactoryWithAuth fixture)
     {
         _fixture = fixture;
     }
-    
+
     [Fact]
     public async Task ClickAuthorNameRedirects()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
-        
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
+
         //XPath for author name
-        var authorXPath = "//*[@id='messagelist']/div[2]/div[1]/div[1]/a";
-    
+        var authorXPath = "//*[@id=\"messagelist\"]/div[2]/div[1]/div/a";
+
         var authorButton = await page.QuerySelectorAsync(authorXPath);
-    
-        if (authorButton == null) Assert.Fail();
-    
+
+        if (authorButton == null)
+            Assert.Fail();
+
         var authorName = await authorButton.InnerTextAsync();
-            
+
         //Act
-        await authorButton.ClickAsync();//Simulate click
-        
-        var firstCheepAuthor = await page.WaitForSelectorAsync("//*[@id='messagelist']/div[1]/div[1]/div/a");
-    
-        if (firstCheepAuthor == null) Assert.Fail();
-        
+        await authorButton.ClickAsync(); //Simulate click
+
+        var firstCheepAuthor = await page.WaitForSelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[1]/div/a"
+        );
+
+        if (firstCheepAuthor == null)
+            Assert.Fail();
+
         var firstCheepAuthorValue = await firstCheepAuthor.InnerTextAsync();
-    
+
         Assert.Contains(authorName, firstCheepAuthorValue);
     }
-    
+
     [Fact]
     public async Task CanDeleteCheep()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string cheepMessage = "This is a cheep deleted by the E2E test!";
 
-        var shareButton = await page.QuerySelectorAsync("//*[@id='cheepSubmitButton']");
-        
-        if (shareButton == null) Assert.Fail();
+        var shareButton = await page.QuerySelectorAsync("//*[@id=\"cheepSubmitButton\"]");
+
+        if (shareButton == null)
+            Assert.Fail();
 
         //Act
         await page.GetByPlaceholder("Write your own cheep here!").FillAsync(cheepMessage);
         await shareButton.ClickAsync();
-        
-        //Status: the first cheep should now have been created
-        var cheepDeleteButton = await page.QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[2]/div[1]/form[last()]/button[1]");
 
-        if (cheepDeleteButton == null) Assert.Fail();
-        
+        //Status: the first cheep should now have been created
+        var cheepDeleteButton = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[2]/div[1]/form[last()]/button[1]"
+        );
+
+        if (cheepDeleteButton == null)
+            Assert.Fail();
+
         await cheepDeleteButton.ClickAsync();
-        
+
         //Status: the first cheep should now have been deleted
         var firstCheepLocation = await page.QuerySelectorAsync("//*[@id='messagelist']/div[1]/p");
 
-        if (firstCheepLocation == null) Assert.Fail();
-        
+        if (firstCheepLocation == null)
+            Assert.Fail();
+
         var firstCheepText = await firstCheepLocation.InnerTextAsync();
 
         Assert.DoesNotContain(cheepMessage, firstCheepText);
     }
-    
+
     [Fact]
     public async Task CanCreateCheep()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
-    
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
+
         string cheepMessage = "This is a cheep generated by the E2E test!";
-        
+
         var shareButton = await page.QuerySelectorAsync("//*[@id='cheepSubmitButton']");
-    
-        if (shareButton == null) Assert.Fail();
-    
+
+        if (shareButton == null)
+            Assert.Fail();
+
         //Act
         await page.GetByPlaceholder("Write your own cheep here!").FillAsync(cheepMessage);
         await shareButton.ClickAsync();
-    
+
         //Status: the first cheep should now have been created
         var firstCheepLocation = await page.QuerySelectorAsync("//*[@id='messagelist']/div[1]");
-    
-        if (firstCheepLocation == null) Assert.Fail();
-        
+
+        if (firstCheepLocation == null)
+            Assert.Fail();
+
         var firstCheepText = await firstCheepLocation.InnerTextAsync();
-    
+
         Assert.Contains(cheepMessage, firstCheepText);
     }
 
@@ -105,20 +181,43 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task CommentOnCheepTest()
     {
         //Arrange
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string commentText = "This is a comment generated by the E2E test!";
 
-        var postCommentButton = await page
-            .QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/button");
-        
-        if (postCommentButton == null) Assert.Fail();
-        
+        var postCommentButton = await page.QuerySelectorAsync(
+            "//*[@id=\"messagelist\"]/div[1]/div[2]/div[2]/form/div/button"
+        );
+
+        if (postCommentButton == null)
+            Assert.Fail();
+
         //Act
-        var firstCheepCommentPlaceholder = await page
-            .QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/div/input");
-        
+        var firstCheepCommentPlaceholder = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/div/input"
+        );
+
         if (firstCheepCommentPlaceholder != null)
         {
             await firstCheepCommentPlaceholder.FillAsync(commentText);
@@ -129,9 +228,12 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
         }
         await postCommentButton.ClickAsync();
 
-        var commentLocation = await page.QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[3]/div/div/div[1]");
-        
-        if (commentLocation == null) Assert.Fail();
+        var commentLocation = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[3]/div/div/div[1]"
+        );
+
+        if (commentLocation == null)
+            Assert.Fail();
 
         var commentTextFromLocation = await commentLocation.InnerTextAsync();
         //Assert
@@ -142,19 +244,42 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
     public async Task DeleteCommentOnCheepTest()
     {
         //Arrange: Create a comment
+        var mockDbContext = DataGenerator.GenerateMockChirpDbContext();
+        var authorPassword = new Faker().Internet.Password()!;
+        var author = new Author
+        {
+            Username = new Faker().Internet.UserName(),
+            Email = new Faker().Internet.Email(),
+            Password = authorPassword.SimpleHashPassword(),
+            AvatarUrl = new Faker().Image.PicsumUrl()
+        };
+        using (var scope = _fixture.Host.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+            await dbContext.Authors.AddAsync(author);
+            await dbContext.Cheeps.AddRangeAsync(mockDbContext.Cheeps);
+            await dbContext.SaveChangesAsync();
+        }
         var page = await _fixture.Browser!.NewPageAsync();
-        await page.GotoAsync(_fixture.BaseUrl);
+        await page.GotoAsync(_fixture.BaseUrl + "/Login", new PageGotoOptions { Timeout = 60000L });
+        var loginButton = await page.QuerySelectorAsync("//button[@id='login-button']");
+        await page.GetByPlaceholder("Username").FillAsync(author.Username);
+        await page.GetByPlaceholder("Password").FillAsync(authorPassword);
+        await loginButton!.ClickAsync();
 
         string commentText = "This is a comment generated by the E2E test!";
-        
-        var postCommentButton = await page
-            .QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/button");
-        
-        if (postCommentButton == null) Assert.Fail();
-        
-        var firstCheepCommentPlaceholder = await page
-            .QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/div/input");
-        
+
+        var postCommentButton = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/button"
+        );
+
+        if (postCommentButton == null)
+            Assert.Fail();
+
+        var firstCheepCommentPlaceholder = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[2]/div[2]/form/div/div/input"
+        );
+
         if (firstCheepCommentPlaceholder != null)
         {
             await firstCheepCommentPlaceholder.FillAsync(commentText);
@@ -163,34 +288,38 @@ public class E2ETests : IClassFixture<MockWebApplicationFactoryWithAuth>
         {
             Assert.Fail();
         }
-        
+
         await postCommentButton.ClickAsync();
-        
-        var commentLocation = await page.QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[3]/div/div/div[1]");
-        
-        if (commentLocation == null) Assert.Fail();
-        
+
+        var commentLocation = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[3]/div/div/div[1]"
+        );
+
+        if (commentLocation == null)
+            Assert.Fail();
+
         //Act: Delete the cheep
-        var commentDeleteButton = await page
-            .QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[3]/div/div/div/div[1]/div[2]/div/form/div/button");
-        if (commentDeleteButton == null) Assert.Fail();
+        var commentDeleteButton = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[3]/div/div/div/div[1]/div[2]/div/form/div/button"
+        );
+        if (commentDeleteButton == null)
+            Assert.Fail();
 
         await commentDeleteButton.ClickAsync();
 
-        var commentLocationAfterDeletion = await page
-            .QuerySelectorAsync("//*[@id='messagelist']/div[1]/div[3]/div/div/div");
-        
+        var commentLocationAfterDeletion = await page.QuerySelectorAsync(
+            "//*[@id='messagelist']/div[1]/div[3]/div/div/div"
+        );
+
         //Assert
         if (commentLocationAfterDeletion == null) //In case there are no other comments
         {
             Assert.True(true);
-        } else //In case there are other comments 
+        }
+        else //In case there are other comments
         {
             var commentTextAfterDeletion = await commentLocationAfterDeletion.InnerTextAsync();
             Assert.DoesNotContain(commentText, commentTextAfterDeletion);
-
         }
-        
-
     }
 }

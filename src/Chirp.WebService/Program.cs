@@ -1,10 +1,10 @@
 using Chirp.Core.Repositories;
 using Chirp.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Chirp.Infrastructure.Contexts;
 using Chirp.Infrastructure.Repositories;
-using Prometheus;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Prometheus;
 using Serilog;
 using Serilog.Sinks.Loki;
 
@@ -17,48 +17,34 @@ public class Program
     public static void Main(string[] args)
     {
         //Creating the Logger with Minimum Settings
-            Log.Logger = new LoggerConfiguration()
-                                .Enrich.WithProperty("Application", "minitwit")
-                                .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
-                                .Enrich.FromLogContext()
-                                .WriteTo.Console()
-                                .WriteTo.LokiHttp("http://loki:3100")
-                                .CreateLogger();
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.WithProperty("Application", "minitwit")
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .WriteTo.LokiHttp("http://loki:3100")
+            .CreateLogger();
 
-            //try/catch block will ensure any configuration issues are appropriately logged
-            try
-            {
-                Log.Information("Staring the Host");
+        //try/catch block will ensure any configuration issues are appropriately logged
+        try
+        {
+            Log.Information("Staring the Host");
 
-                var host = CreateHostBuilder(args).Build();
-                // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
-                host.Run();
-        
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Host Terminated Unexpectedly");
-            }
-
-            finally
-            {
-                Log.CloseAndFlush();
-            }
-
-
-        
-
-        
-        
-     
-       
-    
+            var host = CreateHostBuilder(args).Build();
+            // host.Services.GetService<ChirpDbContext>()?.Database.EnsureCreated();
+            host.Run();
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Host Terminated Unexpectedly");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 
-
     public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host
-            .CreateDefaultBuilder(args)
+        Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(builder =>
             {
                 builder.UseStartup<Startup>();
@@ -75,18 +61,17 @@ public class Program
             //            .WriteTo.LokiHttp("http://loki:3100")
             //            .WriteTo.Console();
             //     })
-            .ConfigureServices((context, services) =>
-            {
-                ConfigureServices(context.Configuration, services);
-            });
-
+            .ConfigureServices(
+                (context, services) =>
+                {
+                    ConfigureServices(context.Configuration, services);
+                }
+            );
 
     private static void ConfigureServices(IConfiguration configuration, IServiceCollection services)
     {
         services.AddHttpClient();
-        services
-            .AddRazorPages(_ => { })
-            .AddMvcOptions(_ => { });
+        services.AddRazorPages(_ => { }).AddMvcOptions(_ => { });
         services.AddSerilog();
         services.AddScoped<IAuthorRepository, AuthorRepository>();
         services.AddScoped<ICheepRepository, CheepRepository>();
@@ -94,7 +79,7 @@ public class Program
         services.AddScoped<ICommentRepository, CommentRepository>();
         services.AddScoped<ISimulationRepository, SimulationRepository>();
         services.AddSingleton(configuration);
-    
+
         services.AddSingleton(new UpdateLatestTracker());
         services.UseHttpClientMetrics();
 
@@ -107,15 +92,13 @@ public class Program
 
         var dbString = Environment.GetEnvironmentVariable("DB_STRING");
 
-        if (dbString is null) throw new Exception("DB_STRING is null");
-        
-        var sqlConnectionString = new NpgsqlConnectionStringBuilder(dbString)
-            {
-                Pooling = true
-            };
-        
+        if (dbString is null)
+            throw new Exception("DB_STRING is null");
+
+        var sqlConnectionString = new NpgsqlConnectionStringBuilder(dbString) { Pooling = true };
+
         Console.WriteLine($"Connection String: {sqlConnectionString}");
-        
+
         string? password = Environment.GetEnvironmentVariable("DB_PASSWORD");
 
         if (string.IsNullOrEmpty(sqlConnectionString.Password) && password != null)
@@ -126,7 +109,8 @@ public class Program
         }
 
         services.AddDbContext<ChirpDbContext>(options =>
-            options.UseNpgsql(sqlConnectionString.ConnectionString));
+            options.UseNpgsql(sqlConnectionString.ConnectionString)
+        );
     }
 }
 
@@ -136,8 +120,7 @@ public class Startup
     {
         using var server = new KestrelMetricServer(port: 8080);
         server.Start();
-        
-        
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
@@ -147,13 +130,10 @@ public class Startup
             app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
-        
-       
+
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseMetricServer();
-
-        
 
         app.UseRouting();
         app.UseSession();
@@ -161,41 +141,41 @@ public class Startup
         app.UseAuthorization();
         app.UseHttpMetrics();
         // app.UseSerilogRequestLogging();
-        
 
-         // Use the custom middleware
-        app.Use(async (context, next) =>
-        {
-            var authorRepository = context.RequestServices.GetRequiredService<IAuthorRepository>();
-            if (context.Session.TryGetValue("UserId", out var userIdByte))
+
+        // Use the custom middleware
+        app.Use(
+            async (context, next) =>
             {
-                var userId = new Guid(userIdByte);
-                // Store the userId in a way that it can be accessed during the request
-                // context.Items["user_id"] = userId;
-                // Optionally, query the database using userId
-                var user = await authorRepository.GetAuthorById(userId);
-                if (user == null)
+                var authorRepository =
+                    context.RequestServices.GetRequiredService<IAuthorRepository>();
+                if (context.Session.TryGetValue("UserId", out var userIdByte))
                 {
-                    // User not found in the database
-                    // Log an error message
-                    Console.WriteLine($"User with ID {userId} not found in the database.");
-                    // Redirect to the homepage with an error message
-                    context.Response.Redirect("/?error=UserNotFound");
-                    return;
+                    var userId = new Guid(userIdByte);
+                    // Store the userId in a way that it can be accessed during the request
+                    // context.Items["user_id"] = userId;
+                    // Optionally, query the database using userId
+                    var user = await authorRepository.GetAuthorById(userId);
+                    if (user == null)
+                    {
+                        // User not found in the database
+                        // Log an error message
+                        Console.WriteLine($"User with ID {userId} not found in the database.");
+                        // Redirect to the homepage with an error message
+                        context.Response.Redirect("/?error=UserNotFound");
+                        return;
+                    }
+                    // Store the user information for later use
+                    context.Items["user"] = user;
                 }
-                // Store the user information for later use
-                context.Items["user"] = user;
+                await next(context);
             }
-            await next(context);
-        });
+        );
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapRazorPages();
             endpoints.MapControllers();
             endpoints.MapMetrics();
-            
-        
-        
         });
     }
 }

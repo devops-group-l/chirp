@@ -11,14 +11,13 @@ namespace Chirp.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Likes",
-                table: "Likes");
+            migrationBuilder.DropPrimaryKey(name: "PK_Likes", table: "Likes");
 
             migrationBuilder.RenameColumn(
                 name: "LikedByAuthorId",
                 table: "Likes",
-                newName: "LikeId");
+                newName: "LikeId"
+            );
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "CheepId",
@@ -26,28 +25,29 @@ namespace Chirp.Infrastructure.Migrations
                 type: "uniqueidentifier",
                 nullable: true,
                 oldClrType: typeof(Guid),
-                oldType: "uniqueidentifier");
+                oldType: "uniqueidentifier"
+            );
 
             migrationBuilder.AddColumn<Guid>(
                 name: "AuthorId",
                 table: "Likes",
                 type: "uniqueidentifier",
-                nullable: true);
+                nullable: true
+            );
 
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Likes",
-                table: "Likes",
-                column: "LikeId");
+            migrationBuilder.AddPrimaryKey(name: "PK_Likes", table: "Likes", column: "LikeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Likes_AuthorId",
                 table: "Likes",
-                column: "AuthorId");
+                column: "AuthorId"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_Likes_CheepId",
                 table: "Likes",
-                column: "CheepId");
+                column: "CheepId"
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Likes_Authors_AuthorId",
@@ -55,7 +55,8 @@ namespace Chirp.Infrastructure.Migrations
                 column: "AuthorId",
                 principalTable: "Authors",
                 principalColumn: "AuthorId",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Restrict
+            );
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Likes_Cheeps_CheepId",
@@ -63,40 +64,30 @@ namespace Chirp.Infrastructure.Migrations
                 column: "CheepId",
                 principalTable: "Cheeps",
                 principalColumn: "CheepId",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Restrict
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Likes_Authors_AuthorId",
-                table: "Likes");
+            migrationBuilder.DropForeignKey(name: "FK_Likes_Authors_AuthorId", table: "Likes");
 
-            migrationBuilder.DropForeignKey(
-                name: "FK_Likes_Cheeps_CheepId",
-                table: "Likes");
+            migrationBuilder.DropForeignKey(name: "FK_Likes_Cheeps_CheepId", table: "Likes");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Likes",
-                table: "Likes");
+            migrationBuilder.DropPrimaryKey(name: "PK_Likes", table: "Likes");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Likes_AuthorId",
-                table: "Likes");
+            migrationBuilder.DropIndex(name: "IX_Likes_AuthorId", table: "Likes");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Likes_CheepId",
-                table: "Likes");
+            migrationBuilder.DropIndex(name: "IX_Likes_CheepId", table: "Likes");
 
-            migrationBuilder.DropColumn(
-                name: "AuthorId",
-                table: "Likes");
+            migrationBuilder.DropColumn(name: "AuthorId", table: "Likes");
 
             migrationBuilder.RenameColumn(
                 name: "LikeId",
                 table: "Likes",
-                newName: "LikedByAuthorId");
+                newName: "LikedByAuthorId"
+            );
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "CheepId",
@@ -106,12 +97,14 @@ namespace Chirp.Infrastructure.Migrations
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"),
                 oldClrType: typeof(Guid),
                 oldType: "uniqueidentifier",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Likes",
                 table: "Likes",
-                columns: new[] { "LikedByAuthorId", "CheepId" });
+                columns: new[] { "LikedByAuthorId", "CheepId" }
+            );
         }
     }
 }

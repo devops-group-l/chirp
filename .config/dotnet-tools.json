@@ -3,21 +3,27 @@
   "isRoot": true,
   "tools": {
     "jetbrains.dotcover.globaltool": {
-      "version": "2023.2.3",
+      "version": "2023.2.4",
       "commands": [
         "dotnet-dotcover"
       ]
     },
     "dotnet-reportgenerator-globaltool": {
-      "version": "5.2.2",
+      "version": "5.3.0",
       "commands": [
         "reportgenerator"
       ]
     },
     "powershell": {
-      "version": "7.4.1",
+      "version": "7.4.2",
       "commands": [
         "pwsh"
+      ]
+    },
+    "csharpier": {
+      "version": "0.28.2",
+      "commands": [
+        "dotnet-csharpier"
       ]
     }
   }

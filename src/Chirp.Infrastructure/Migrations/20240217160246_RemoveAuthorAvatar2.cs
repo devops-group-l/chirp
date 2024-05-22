@@ -10,9 +10,7 @@ namespace Chirp.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "AvatarUrl",
-                table: "Authors");
+            migrationBuilder.DropColumn(name: "AvatarUrl", table: "Authors");
         }
 
         /// <inheritdoc />
@@ -23,7 +21,8 @@ namespace Chirp.Infrastructure.Migrations
                 table: "Authors",
                 type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: ""
+            );
         }
     }
 }

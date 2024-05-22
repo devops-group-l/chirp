@@ -13,7 +13,11 @@ public class SimulationRepository : ISimulationRepository
     private readonly IAuthorRepository _authorRepository;
     private readonly ICheepRepository _cheepRepository;
 
-    public SimulationRepository(ChirpDbContext chirpDbContext, IAuthorRepository authorRepository, ICheepRepository cheepRepository)
+    public SimulationRepository(
+        ChirpDbContext chirpDbContext,
+        IAuthorRepository authorRepository,
+        ICheepRepository cheepRepository
+    )
     {
         _chirpDbContext = chirpDbContext;
         _authorRepository = authorRepository;
@@ -39,34 +43,32 @@ public class SimulationRepository : ISimulationRepository
 
         await _authorRepository.AddAuthor(dto);
     }
-    
+
     public async Task<List<SimulationMessageDto>> GetMessages(int amountToRetrieve)
     {
         return await _chirpDbContext
-            .Cheeps
-            .OrderByDescending(c => c.Timestamp)
+            .Cheeps.OrderByDescending(c => c.Timestamp)
             .Take(amountToRetrieve)
-            .Select(c =>
-                new SimulationMessageDto()
-                {
-                    username = c.Author.Username.Trim(),
-                    text = c.Text,
-                    pub_date = c.Timestamp.ToString(CultureInfo.CurrentCulture),
-                })
+            .Select(c => new SimulationMessageDto()
+            {
+                username = c.Author.Username.Trim(),
+                text = c.Text,
+                pub_date = c.Timestamp.ToString(CultureInfo.CurrentCulture),
+            })
             .ToListAsync();
     }
 
     public async Task<List<SimulationMessageDto>> GetSpecificMessages(string username, int amount)
     {
-        return await _chirpDbContext.Cheeps
-            .Where(c => c.Author.Username == username.Trim())
-            .Select(c =>
-                new SimulationMessageDto
-                {
-                    username = c.Author.Username.Trim(),
-                    text = c.Text,
-                    pub_date = c.Timestamp.ToString(CultureInfo.CurrentCulture),
-                }).OrderByDescending(x => x.pub_date)
+        return await _chirpDbContext
+            .Cheeps.Where(c => c.Author.Username == username.Trim())
+            .Select(c => new SimulationMessageDto
+            {
+                username = c.Author.Username.Trim(),
+                text = c.Text,
+                pub_date = c.Timestamp.ToString(CultureInfo.CurrentCulture),
+            })
+            .OrderByDescending(x => x.pub_date)
             .Take(amount)
             .ToListAsync();
     }
@@ -74,12 +76,10 @@ public class SimulationRepository : ISimulationRepository
     public async Task AddMessage(SimulationMessageDto message)
     {
         var author = await _authorRepository.GetAuthorByName(message.username);
-            
-        await _cheepRepository.AddCheep(new AddCheepDto
-        {
-            AuthorId = author.Id,
-            Text = message.text
-        });
+
+        await _cheepRepository.AddCheep(
+            new AddCheepDto { AuthorId = author.Id, Text = message.text }
+        );
     }
 
     public async Task<List<string>> GetFollowsForUser(string username, int amount)
@@ -109,7 +109,9 @@ public class SimulationRepository : ISimulationRepository
 
     public Boolean CheckIfUserExists(string username)
     {
-        return _chirpDbContext.SimulationUsers.AsNoTracking().Any(u => u.Username == username.Trim());
+        return _chirpDbContext
+            .SimulationUsers.AsNoTracking()
+            .Any(u => u.Username == username.Trim());
     }
 
     public void UpdateLatest(int value)
@@ -119,12 +121,9 @@ public class SimulationRepository : ISimulationRepository
         if (latest == null)
         {
             //This should happen the first the database is initialized, as there does not exist a "latest" yet
-            var newLatest = new SimulationLatest
-            {
-                LatestValue = value
-            };
-             _chirpDbContext.SimulationLatests.Add(newLatest);
-             _chirpDbContext.SaveChanges();
+            var newLatest = new SimulationLatest { LatestValue = value };
+            _chirpDbContext.SimulationLatests.Add(newLatest);
+            _chirpDbContext.SaveChanges();
             return;
         }
 
@@ -137,7 +136,8 @@ public class SimulationRepository : ISimulationRepository
     {
         var latest = _chirpDbContext.SimulationLatests.FirstOrDefault();
 
-        if (latest == null) return -1;
+        if (latest == null)
+            return -1;
 
         return latest.LatestValue;
     }

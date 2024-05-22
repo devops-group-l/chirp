@@ -15,15 +15,14 @@ namespace Chirp.Infrastructure.Migrations
                 table: "Authors",
                 type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: ""
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "AvatarUrl",
-                table: "Authors");
+            migrationBuilder.DropColumn(name: "AvatarUrl", table: "Authors");
         }
     }
 }
