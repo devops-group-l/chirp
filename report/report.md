@@ -42,6 +42,7 @@ For version control we have used GitHub.
 We have hosted our service at Digital Ocean, and done CI/CD through GitHub actions.
 
 In addition, we also have the following dependencies:
+
 - Docker
 - DockerHub
 - Vagrant
@@ -61,6 +62,7 @@ In addition, we also have the following dependencies:
 
 ## State of systems
 The overall state of our system is good. We have been using SonarCloud to quantify the state of our system, and here we pass the quality gate. Although this comes with a caveat. Estimations from SonarCloud is that we have an estimated technical debt of 1 day and 3 hours. We have 95 issues spanning the following qualities:
+
 - Security (11 issues)
 - Reliability (18 issues)
 - Maintainability (88 issues)
@@ -71,6 +73,7 @@ Therefore, if this project was to continue it would be preferable to address som
 ## CI/CD Chain
 ### CI Chain
 Our CI Chain can be split into the following 3 workflows, where the latter 2 can be considered our main CI chains:
+
 - Dependabot
 - Sonarcloud
 - Code coverage Chain
@@ -107,6 +110,7 @@ Looking back at it, we should have never uncommented them, but rather just adjus
 
 ### CD Chain
 Our CD Chain can be split into the following 2 workflows:
+
 - Publish App Chain
 - Continuous Deployment Chain
 
@@ -130,6 +134,7 @@ It has the following steps:
 ![CD Chain](report/img/cd-chain.png "CD Chain")
 
 In short, when we start a deployment, we:
+
 - Build and upload the new docker image to Docker Hub
 - SSH into our green droplet
 - Update the Docker image and restart using docker-compose
@@ -150,7 +155,8 @@ However, due to time constraints, we weren't able to implement this.
 We do pull-based monitoring, utilizing Prometheus and Grafana. Grafana pulls from Prometheus, which again pulls from our application.
 
 ### What do we monitor
-Our monitoring is passive blackbox. We monitor the following in our application.
+Our monitoring is passive blackbox. We monitor the following in our application:
+
 - The duration of HTTP requests
 - Average duration of HTTP requests
 - What endpoints are being hit
