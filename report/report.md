@@ -24,6 +24,27 @@ For version control we have used GitHub.
 
 We have hosted our service at Digital Ocean, and done CI/CD through GitHub actions.
 
+`Tilføjer lige en bulletlist, så kan vi rette til under gennemlæsning`
+
+- Docker
+- DockerHub
+- Vagrant
+- Serilog
+- Grafana
+- Prometheus
+- Loki
+- AspNetCoreAnalyzers
+- CSharpier
+- EF Core
+- Microsoft Identity (Kan denne fjernes efter nyt login?)
+- OpenTelemetry (Kan denne fjernes?)
+
+`Er i tvivl om tools som grafana og docker er dependencies? Til gennemlæsning lad os lige tjekke SNYK. Den har en god liste over dependencies:
+https://app.snyk.io/org/pallebrandt/project/9d8d435b-9ed4-432e-a16b-30afca0aec08
+`
+
+
+
 For monitoring and logging we have used Grafana and Prometheus, which allowed us to `SKRIV MERE HER` ...
 
 ### Interactions of subsystems
