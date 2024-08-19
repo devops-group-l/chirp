@@ -13,7 +13,7 @@
 
     <ItemGroup>
       <PackageReference Include="AspNetCoreAnalyzers" Version="0.3.0" />
-      <PackageReference Include="CSharpier.MsBuild" Version="0.28.2">
+      <PackageReference Include="CSharpier.MsBuild" Version="0.29.0">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
